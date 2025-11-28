@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Noticias - Kueni Kueni</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles/coordinador-noticias.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>Kueni Kueni</span>
+            </div>
+            <p class="sidebar-subtitle">Coordinador</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="coordinador-dashboard.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Panel</span>
+            </a>
+            
+            <a href="coordinador-eventos.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Eventos</span>
+            </a>
+            
+            <a href="coordinador-noticias.html" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                    <line x1="9" y1="7" x2="9" y2="17"></line>
+                    <line x1="13" y1="7" x2="17" y2="7"></line>
+                    <line x1="13" y1="11" x2="17" y2="11"></line>
+                    <line x1="13" y1="15" x2="17" y2="15"></line>
+                </svg>
+                <span>Noticias</span>
+            </a>
+        </nav>
+
+        <button id="btnCerrarSesion" class="btn-cerrar-sesion">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Cerrar Sesión
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Noticias</h1>
+                <p>Crea y administra las noticias de la organización</p>
+            </div>
+            <button id="btnAgregarNoticia" class="btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nueva Noticia
+            </button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Noticias</div>
+                <div class="stat-value" id="totalNoticias">0</div>
+                <div class="stat-subtitle">Todas las noticias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Publicadas</div>
+                <div class="stat-value" id="noticiasPublicadas">0</div>
+                <div class="stat-subtitle">Visibles para usuarios</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Borradores</div>
+                <div class="stat-value" id="noticiasBorradores">0</div>
+                <div class="stat-subtitle">En preparación</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Vistas</div>
+                <div class="stat-value" id="totalVistas">0</div>
+                <div class="stat-subtitle">Lecturas acumuladas</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros-container">
+            <div class="search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="inputBuscar" placeholder="Buscar noticias...">
+            </div>
+            
+            <select id="filtroEstado" class="filtro-select">
+                <option value="">Todos los estados</option>
+                <option value="publicado">Publicado</option>
+                <option value="borrador">Borrador</option>
+                <option value="archivado">Archivado</option>
+            </select>
+            
+            <select id="filtroCategoria" class="filtro-select">
+                <option value="">Todas las categorías</option>
+                <option value="Medio Ambiente">Medio Ambiente</option>
+                <option value="Deportes">Deportes</option>
+                <option value="Cultura">Cultura</option>
+                <option value="Emprendimiento">Emprendimiento</option>
+                <option value="General">General</option>
+            </select>
+        </div>
+
+        <!-- Tabla de Noticias -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>TÍTULO</th>
+                        <th>CATEGORÍA</th>
+                        <th>AUTOR</th>
+                        <th>FECHA</th>
+                        <th>ESTADO</th>
+                        <th>VISTAS</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaNoticias"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL CREAR/EDITAR NOTICIA -->
+    <div id="modalNoticia" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalTitulo">Nueva Noticia</h2>
+                    <p>Completa la información de la noticia</p>
+                </div>
+                <button id="btnCerrarModal" class="btn-close">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="modalMessage"></div>
+
+                <form id="formNoticia">
+                    <!-- Título -->
+                    <div class="form-group">
+                        <label for="titulo">Título <span class="required">*</span></label>
+                        <input type="text" id="titulo" class="form-input" placeholder="Título de la noticia" required maxlength="255">
+                        <small class="form-error" id="tituloError"></small>
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoria">Categoría <span class="required">*</span></label>
+                            <select id="categoria" class="form-input" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option value="Medio Ambiente">Medio Ambiente</option>
+                                <option value="Deportes">Deportes</option>
+                                <option value="Cultura">Cultura</option>
+                                <option value="Emprendimiento">Emprendimiento</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado <span class="required">*</span></label>
+                            <select id="estado" class="form-input" required>
+                                <option value="borrador">Borrador</option>
+                                <option value="publicado">Publicado</option>
+                                <option value="archivado">Archivado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Fecha de Publicación -->
+                    <div class="form-group">
+                        <label for="fechaPublicacion">Fecha de Publicación</label>
+                        <input type="date" id="fechaPublicacion" class="form-input">
+                    </div>
+
+                    <!-- Contenido -->
+                    <div class="form-group">
+                        <label for="contenido">Contenido <span class="required">*</span></label>
+                        <textarea id="contenido" class="form-textarea" rows="10" placeholder="Escribe el contenido de la noticia..." required></textarea>
+                        <small class="form-hint">Usa saltos de línea para separar párrafos</small>
+                        <small class="form-error" id="contenidoError"></small>
+                    </div>
+
+                    <!-- Sección de Imagen -->
+                    <div class="form-group">
+                        <label>Imagen de la Noticia</label>
+
+                        <!-- Opción 1: Subir desde computadora -->
+                        <div style="background:#f8f9fa;padding:1.5rem;border-radius:8px;border:2px dashed #e4e4e7;margin-bottom:1rem;">
+                            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0d5f3a" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <div>
+                                    <div style="font-weight:600;margin-bottom:0.25rem;">Subir desde tu computadora</div>
+                                    <div style="font-size:0.875rem;color:#71717a;">Formatos: JPG, PNG, GIF | Máximo: 5MB</div>
+                                </div>
+                            </div>
+                            <input type="file" id="imagenFile" accept="image/*" class="form-input" style="cursor:pointer;">
+                            <div id="uploadProgress" style="display:none;margin-top:0.75rem;"></div>
+                        </div>
+
+                        <!-- Opción 2: URL externa -->
+                        <div style="background:#f8f9fa;padding:1.5rem;border-radius:8px;border:2px dashed #e4e4e7;">
+                            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0d5f3a" stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                </svg>
+                                <div>
+                                    <div style="font-weight:600;margin-bottom:0.25rem;">🔗 O pega una URL externa</div>
+                                    <div style="font-size:0.875rem;color:#71717a;">Desde Imgur, Unsplash, etc.</div>
+                                </div>
+                            </div>
+                            <input type="url" id="imagenUrl" class="form-input" placeholder="https://ejemplo.com/imagen.jpg">
+                        </div>
+
+                        <!-- Preview de imagen -->
+                        <div id="imagenPreview" style="display:none; margin-top:1rem;">
+                            <div style="font-weight:600;margin-bottom:0.5rem;">Vista previa:</div>
+                            <img id="imagenPreviewImg" style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid #e5e7eb;">
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="modal-actions">
+                        <button type="button" id="btnCancelarModal" class="btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn-primary" id="btnGuardarNoticia">
+                            <span id="btnGuardarText">Guardar Noticia</span>
+                            <span id="btnGuardarLoader" style="display:none;"><span class="loader-small"></span> Guardando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/coordinador-noticias.js"></script>
+</body>
+</html>

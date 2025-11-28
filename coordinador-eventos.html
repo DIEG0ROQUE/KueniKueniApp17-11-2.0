@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Eventos - Coordinador</title>
+
+
+    <!-- 1. Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 2. Config de Supabase -->
+    <script src="javaScript/supabase-config.js"></script>
+    
+    <!-- 3. Auth Supabase -->
+    <script src="javaScript/auth-supabase.js"></script>
+
+    <link rel="stylesheet" href="styles/coordinador-eventos.css">
+</head>
+<body>
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>Kueni Kueni</span>
+            </div>
+            <p class="sidebar-subtitle">Coordinador</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="coordinador-dashboard.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Panel</span>
+            </a>
+            
+            <a href="coordinador-eventos.html" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Eventos</span>
+            </a>
+            
+            <a href="coordinador-noticias.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                    <line x1="9" y1="7" x2="9" y2="17"></line>
+                    <line x1="13" y1="7" x2="17" y2="7"></line>
+                </svg>
+                <span>Noticias</span>
+            </a>
+        </nav>
+
+        <button id="btnCerrarSesion" class="btn-cerrar-sesion">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Cerrar Sesión
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1> Gestión de Eventos</h1>
+                <p>Crea eventos y gestiona asistencias</p>
+            </div>
+            <button id="btnAgregarEvento" class="btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nuevo Evento
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Eventos</div>
+                <div class="stat-value" id="totalEventos">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Próximos</div>
+                <div class="stat-value" id="eventosProximos">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">En Curso</div>
+                <div class="stat-value" id="eventosActivos">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completados</div>
+                <div class="stat-value" id="eventosFinalizados">0</div>
+            </div>
+        </div>
+
+        <div class="filtros-container">
+            <div class="search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="inputBuscar" placeholder="Buscar eventos...">
+            </div>
+            
+            <select id="filtroEstado" class="filtro-select">
+                <option value="">Todos los estados</option>
+                <option value="proximo">Próximo</option>
+                <option value="en_curso">En Curso</option>
+                <option value="completado">Completado</option>
+            </select>
+            
+            <select id="filtroCategoria" class="filtro-select">
+                <option value="">Todas las categorías</option>
+                <option value="Educación">Educación</option>
+                <option value="Salud">Salud</option>
+                <option value="Medio Ambiente">Medio Ambiente</option>
+                <option value="Cultura">Cultura</option>
+                <option value="Deporte">Deporte</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>EVENTO</th>
+                        <th>CATEGORÍA</th>
+                        <th>FECHA</th>
+                        <th>HORA</th>
+                        <th>ESTADO</th>
+                        <th>ASISTENTES</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEventos"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Crear/Editar Evento -->
+    <div id="modalEvento" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalTitulo"> Nuevo Evento</h2>
+                    <p>Completa la información del evento</p>
+                </div>
+                <button id="btnCerrarModal" class="btn-close">×</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="formEvento">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título <span class="required">*</span></label>
+                            <input type="text" id="titulo" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría <span class="required">*</span></label>
+                            <select id="categoria" class="form-input" required>
+                                <option value="">Selecciona...</option>
+                                <option value="Educación"> Educación</option>
+                                <option value="Salud"> Salud</option>
+                                <option value="Medio Ambiente"> Medio Ambiente</option>
+                                <option value="Cultura"> Cultura</option>
+                                <option value="Deporte"> Deporte</option>
+                                <option value="Otro"> Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción <span class="required">*</span></label>
+                        <textarea id="descripcion" class="form-textarea" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha <span class="required">*</span></label>
+                            <input type="date" id="fechaEvento" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora <span class="required">*</span></label>
+                            <input type="time" id="horaEvento" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ubicación <span class="required">*</span></label>
+                            <input type="text" id="ubicacion" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cupo Máximo <span class="required">*</span></label>
+                            <input type="number" id="cupoMaximo" class="form-input" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado <span class="required">*</span></label>
+                        <select id="estado" class="form-input" required>
+                            <option value="proximo"> Próximo</option>
+                            <option value="en_curso"> En Curso</option>
+                            <option value="completado"> Completado</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="btnCancelarModal" class="btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn-primary" id="btnGuardarEvento">
+                            <span id="btnGuardarText">Guardar Evento</span>
+                            <span id="btnGuardarLoader" style="display:none;"><span class="loader-small"></span> Guardando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestionar Asistencias -->
+    <div id="modalAsistencias" class="modal">
+        <div class="modal-overlay" onclick="cerrarModalAsistencias()"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2>👥 Gestionar Asistencias</h2>
+                    <p id="eventoAsistenciaNombre"></p>
+                </div>
+                <button onclick="cerrarModalAsistencias()" class="btn-close">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="asistencias-stats">
+                    <div class="stat-mini">
+                        <span>Total Registrados:</span>
+                        <strong id="totalAsistentes">0</strong>
+                    </div>
+                    <div class="stat-mini">
+                        <span>Confirmados:</span>
+                        <strong id="confirmadosCount">0</strong>
+                    </div>
+                    <div class="stat-mini">
+                        <span>Asistieron:</span>
+                        <strong id="asistieronCount">0</strong>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">✓</th>
+                                <th>SOCIO</th>
+                                <th>EMAIL</th>
+                                <th>ESTADO</th>
+                                <th>REGISTRO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaAsistencias"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="javaScript/coordinador-eventos.js"></script>
+</body>
+</html>

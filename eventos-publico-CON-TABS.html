@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos - Kueni Kueni</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: #5f0d51;
+        }
+
+        .tab.active {
+            color: #5f0d51;
+            border-bottom-color: #5f0d51;
+        }
+
+        .tab-badge {
+            display: inline-block;
+            margin-left: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: #e5e7eb;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tab.active .tab-badge {
+            background: #5f0d51;
+            color: white;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Eventos Grid */
+        .eventos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .evento-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .evento-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .evento-categoria {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .evento-titulo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .evento-descripcion {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .evento-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .evento-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .evento-progress {
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #5f0d51;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 768px) {
+            .eventos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Eventos</h1>
+        <p>Participa en las actividades de la comunidad</p>
+    </div>
+
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="proximos">
+                Próximos Eventos <span class="tab-badge" id="badgeProximos">0</span>
+            </button>
+            <button class="tab" data-tab="en-curso">
+                En Curso <span class="tab-badge" id="badgeEnCurso">0</span>
+            </button>
+            <button class="tab" data-tab="completados">
+                Completados <span class="tab-badge" id="badgeCompletados">0</span>
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tab-proximos" class="tab-content active">
+            <div id="eventosProximos" class="eventos-grid">
+                <div class="loading-message">Cargando eventos próximos...</div>
+            </div>
+        </div>
+
+        <div id="tab-en-curso" class="tab-content">
+            <div id="eventosEnCurso" class="eventos-grid">
+                <div class="loading-message">Cargando eventos en curso...</div>
+            </div>
+        </div>
+
+        <div id="tab-completados" class="tab-content">
+            <div id="eventosCompletados" class="eventos-grid">
+                <div class="loading-message">Cargando eventos completados...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="javaScript/supabase-config.js"></script>
+    <script>
+        // Tabs functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                // Update tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${tabName}`).classList.add('active');
+            });
+        });
+
+        // Load events
+        document.addEventListener('DOMContentLoaded', cargarEventos);
+
+        async function cargarEventos() {
+            if (!window.supabaseClient) {
+                console.error('Supabase no inicializado');
+                return;
+            }
+
+            try {
+                const { data: eventos, error } = await window.supabaseClient
+                    .from('eventos')
+                    .select('*')
+                    .order('fecha_evento', { ascending: false });
+
+                if (error) throw error;
+
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+
+                const proximos = [];
+                const enCurso = [];
+                const completados = [];
+
+                eventos.forEach(evento => {
+                    const fechaEvento = new Date(evento.fecha_evento);
+                    fechaEvento.setHours(0, 0, 0, 0);
+
+                    if (fechaEvento.getTime() === hoy.getTime()) {
+                        enCurso.push(evento);
+                    } else if (fechaEvento > hoy) {
+                        proximos.push(evento);
+                    } else {
+                        completados.push(evento);
+                    }
+                });
+
+                mostrarEventos(proximos, 'eventosProximos', 'badgeProximos');
+                mostrarEventos(enCurso, 'eventosEnCurso', 'badgeEnCurso');
+                mostrarEventos(completados, 'eventosCompletados', 'badgeCompletados');
+
+                console.log('✅ Eventos cargados');
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function mostrarEventos(eventos, containerId, badgeId) {
+            const container = document.getElementById(containerId);
+            const badge = document.getElementById(badgeId);
+
+            badge.textContent = eventos.length;
+
+            if (eventos.length === 0) {
+                container.innerHTML = '<div class="empty-message">No hay eventos en esta sección</div>';
+                return;
+            }
+
+            container.innerHTML = eventos.map(evento => {
+                const fecha = new Date(evento.fecha_evento);
+                const fechaFormateada = fecha.toLocaleDateString('es-MX', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                const hora = evento.hora_evento ? evento.hora_evento.substring(0, 5) : '00:00';
+                const asistentes = evento.asistentes_confirmados || 0;
+                const cupo = evento.cupo_maximo || 0;
+                const porcentaje = cupo > 0 ? Math.round((asistentes / cupo) * 100) : 0;
+
+                const categoriaColors = {
+                    'Educación': { bg: '#dbeafe', text: '#1e40af' },
+                    'Salud': { bg: '#fee2e2', text: '#991b1b' },
+                    'Medio Ambiente': { bg: '#d1fae5', text: '#065f46' },
+                    'Cultura': { bg: '#e9d5ff', text: '#6b21a8' },
+                    'Deporte': { bg: '#fef3c7', text: '#92400e' },
+                    'Otro': { bg: '#f3f4f6', text: '#374151' }
+                };
+
+                const colores = categoriaColors[evento.categoria] || categoriaColors['Otro'];
+
+                return `
+                    <div class="evento-card">
+                        <span class="evento-categoria" style="background: ${colores.bg}; color: ${colores.text};">
+                            ${evento.categoria}
+                        </span>
+                        <h3 class="evento-titulo">${evento.titulo}</h3>
+                        <p class="evento-descripcion">${evento.descripcion || 'Sin descripción'}</p>
+                        <div class="evento-info">
+                            <div class="evento-info-item">
+                                ${fechaFormateada}
+                            </div>
+                            <div class="evento-info-item">
+                                ${hora}
+                            </div>
+                            <div class="evento-info-item">
+                                ${evento.ubicacion || 'Por definir'}
+                            </div>
+                            <div class="evento-info-item">
+                                ${asistentes} / ${cupo} asistentes
+                            </div>
+                        </div>
+                        <div class="evento-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${porcentaje}%;"></div>
+                            </div>
+                            <span class="progress-text">${porcentaje}% ocupado</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

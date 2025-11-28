@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacer una Donación - Kueni Kueni</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/donation-styles.css">
+</head>
+<body>
+    <!-- Header / Navegación -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo-section">
+                    <a href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                        <div class="logo-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="logo-text">
+                            <h1>Kueni Kueni</h1>
+                            <p>Paso a paso</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="acerca-de.html">Acerca de</a>
+                    <a href="eventos.html">Eventos</a>
+                    <a href="noticias.html">Noticias</a>
+                    <a href="donar.html" class="active">Donar</a>
+                </nav>
+                <div class="nav-buttons">
+                    <a href="login.html" class="btn-secondary">Iniciar Sesión</a>
+                    <a href="registro.html" class="btn-primary">Registrarse</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero de Donación -->
+    <section class="donation-hero">
+        <div class="container">
+            <h2 class="donation-title">Hacer una Donación</h2>
+            <p class="donation-subtitle">Tu apoyo hace posible nuestro trabajo en la comunidad</p>
+        </div>
+    </section>
+
+    <!-- Formulario de Donación -->
+    <section class="donation-form-section">
+        <div class="container">
+            <div class="donation-grid">
+                <!-- Columna Izquierda - Formulario -->
+                <div class="donation-form-card">
+                    <h3 class="form-card-title">Información de Donación</h3>
+                    <p class="form-card-subtitle">Completa los detalles de tu contribución</p>
+
+                    <form id="donationForm" class="donation-form">
+                        <!-- Tipo de Donación -->
+                        <div class="form-section">
+                            <label class="form-label">Tipo de Donación</label>
+                            <div class="radio-group-horizontal">
+                                <label class="radio-option">
+                                    <input type="radio" name="tipo-donacion" value="unica" checked>
+                                    <span>Donación única</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tipo-donacion" value="mensual">
+                                    <span>Donación mensual</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Monto de Donación -->
+                        <div class="form-section">
+                            <label class="form-label">Monto de Donación (MXN)</label>
+                            <div class="amount-grid">
+                                <button type="button" class="amount-btn" data-amount="100">$100</button>
+                                <button type="button" class="amount-btn" data-amount="250">$250</button>
+                                <button type="button" class="amount-btn" data-amount="500">$500</button>
+                                <button type="button" class="amount-btn" data-amount="1000">$1000</button>
+                                <button type="button" class="amount-btn" data-amount="2500">$2500</button>
+                                <button type="button" class="amount-btn amount-custom" data-amount="custom">Otro</button>
+                            </div>
+                            <input type="number" id="customAmount" class="custom-amount-input" placeholder="Ingresa monto personalizado" style="display: none;">
+                        </div>
+
+                        <!-- Destino de la Donación -->
+                        <div class="form-section">
+                            <label class="form-label" for="destino">Destino de la Donación</label>
+                            <select id="destino" name="destino" class="form-select">
+                                <option value="general">Apoyo General</option>
+                                <option value="medio-ambiente">Medio Ambiente</option>
+                                <option value="deporte">Deporte y Cultura</option>
+                                <option value="emprendimiento">Emprendimiento</option>
+                                <option value="asistencia">Asistencia Social</option>
+                            </select>
+                        </div>
+
+                        <!-- Nombre Completo -->
+                        <div class="form-section">
+                            <label class="form-label" for="nombre">Nombre Completo</label>
+                            <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Tu nombre completo" required>
+                        </div>
+
+                        <!-- Correo Electrónico -->
+                        <div class="form-section">
+                            <label class="form-label" for="email">Correo Electrónico</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="tu@email.com" required>
+                        </div>
+
+                        <!-- Mensaje Opcional -->
+                        <div class="form-section">
+                            <label class="form-label" for="mensaje">Mensaje (Opcional)</label>
+                            <textarea id="mensaje" name="mensaje" class="form-textarea" rows="3" placeholder="Deja un mensaje de apoyo..."></textarea>
+                        </div>
+
+                        <!-- Método de Pago -->
+                        <div class="form-section">
+                            <label class="form-label">Método de Pago</label>
+                            <div class="payment-method">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" stroke="#71717a" stroke-width="2"/>
+                                    <path d="M2 9h20" stroke="#71717a" stroke-width="2"/>
+                                </svg>
+                                <span>Tarjeta de Crédito/Débito</span>
+                            </div>
+                        </div>
+
+                        <!-- Información de Tarjeta -->
+                        <div class="form-section">
+                            <label class="form-label" for="card-number">Número de tarjeta</label>
+                            <input type="text" id="card-number" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section">
+                                <label class="form-label" for="expiry">MM/AA</label>
+                                <input type="text" id="expiry" class="form-input" placeholder="12/25" maxlength="5">
+                            </div>
+                            <div class="form-section">
+                                <label class="form-label" for="cvv">CVV</label>
+                                <input type="text" id="cvv" class="form-input" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+
+                        <!-- Botón de Donación -->
+                        <button type="submit" class="btn-donate">Donar $<span id="donateAmount">0</span> MXN</button>
+                    </form>
+                </div>
+
+                <!-- Columna Derecha - Resumen -->
+                <div class="donation-summary-card">
+                    <h3 class="summary-title">Resumen</h3>
+                    
+                    <div class="summary-item">
+                        <span class="summary-label">Monto:</span>
+                        <span class="summary-value" id="summaryAmount">$0 MXN</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span class="summary-label">Tipo:</span>
+                        <span class="summary-badge">Única</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span class="summary-label">Destino:</span>
+                        <span class="summary-value-small">Apoyo General</span>
+                    </div>
+
+                    <div class="impact-section">
+                        <div class="impact-icon-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#5f0d4d" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <h4>Tu Impacto</h4>
+                        </div>
+                        
+                        <p class="impact-description">Con tu donación de <strong>$<span id="impactAmount">0</span> MXN</strong> podrás ayudar a:</p>
+                        
+                        <ul class="impact-list">
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="#5f0d4d" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Financiar programas comunitarios</span>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="#5f0d4d" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Apoyar a familias vulnerables</span>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="#5f0d4d" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Preservar tradiciones culturales</span>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="#5f0d4d" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Promover el desarrollo sostenible</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Kueni Kueni</h4>
+                    <p>Asociación Civil sin fines de lucro dedicada al desarrollo integral de la región Mixteca.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <p>Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca<br>México</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="acerca-de.html">Acerca de</a></li>
+                        <li><a href="noticias.html">Noticias</a></li>
+                        <li><a href="eventos.html">Eventos</a></li>
+                        <li><a href="donar.html">Donar</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Kueni Kueni. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="javaScript/donation.js"></script>
+    <!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Configuración de Supabase -->
+<script src="javaScript/supabase-config.js"></script>
+
+<!-- Script de donaciones -->
+<script src="javaScript/donation.js"></script>
+</body>
+</html>

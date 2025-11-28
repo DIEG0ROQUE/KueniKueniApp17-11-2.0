@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Socios - Kueni Kueni</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles/admin-socios.css">
+    
+    <style>
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        /* Modal Container */
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Modal Header */
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #5f0d51;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        /* Modal Body */
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .badge-socio {
+            display: inline-block;
+            background: #fad1f0;
+            color: #5f0d51;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .required {
+            color: #ef4444;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #5f0d51;
+            box-shadow: 0 0 0 3px rgba(13, 95, 58, 0.1);
+        }
+        
+        .form-group input:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+        
+        .form-error {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: #dc2626;
+        }
+        
+        .password-requirements {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: none;
+        }
+        
+        .password-requirements.show {
+            display: block;
+        }
+        
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0.25rem 0;
+        }
+        
+        .requirement.valid {
+            color: #5f0d51;
+        }
+        
+        .requirement.invalid {
+            color: #dc2626;
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            display: none;
+        }
+        
+        .password-strength.show {
+            display: block;
+        }
+        
+        .strength-weak {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .strength-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .strength-strong {
+            background: #fad1ee;
+            color: #5f0d51;
+        }
+        
+        /* Modal Footer */
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .modal-footer button {
+            flex: 1;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn-save {
+            background: #5f0d51;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #4a0a41;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(95, 13, 91, 0.3);
+        }
+        
+        .btn-save:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .message-success {
+            background: #d1fae5;
+            color: #5f065f;
+            border: 1px solid #f3a7ed;
+        }
+        
+        .message-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>Kueni Kueni</span>
+            </div>
+            <p class="sidebar-subtitle">Administrador</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Panel</span>
+            </a>
+            
+            <a href="admin-eventos.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Eventos</span>
+            </a>
+            
+            <a href="admin-donaciones.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+                <span>Donaciones</span>
+            </a>
+            
+            <a href="admin-socios.html" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Socios</span>
+            </a>
+            
+            <a href="admin-estadisticas.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                </svg>
+                <span>Estadísticas</span>
+            </a>
+        </nav>
+
+        <button id="btnCerrarSesion" class="btn-cerrar-sesion">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Cerrar Sesión
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Socios</h1>
+                <p>Administra los miembros de la organización</p>
+            </div>
+            <button id="btnAgregarSocio" class="btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Agregar Socio
+            </button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Socios Activos</div>
+                <div class="stat-value" id="sociosActivos">0</div>
+                <div class="stat-subtitle">De <span id="totalSocios">0</span> totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Eventos Asistidos</div>
+                <div class="stat-value" id="eventosAsistidos">0</div>
+                <div class="stat-subtitle">Total de asistencias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Donaciones de Socios</div>
+                <div class="stat-value" id="donacionesSocios">$0</div>
+                <div class="stat-subtitle">MXN acumulado</div>
+            </div>
+        </div>
+
+        <!-- Buscador -->
+        <div class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="inputBuscar" placeholder="Buscar por nombre o email...">
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>NOMBRE</th>
+                        <th>EMAIL</th>
+                        <th>TELÉFONO</th>
+                        <th>FECHA DE INGRESO</th>
+                        <th>EVENTOS</th>
+                        <th>DONACIONES</th>
+                        <th>ESTADO</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaSocios">
+                    <!-- Los socios se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Agregar Socio -->
+    <div id="modalAgregarSocio" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>➕ Agregar Nuevo Socio</h2>
+                <button type="button" class="modal-close" onclick="cerrarModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <span class="badge-socio">TIPO: SOCIO</span>
+                
+                <div id="modalMessage"></div>
+                
+                <form id="formNuevoSocio">
+                    <div class="form-group">
+                        <label for="modalNombre">
+                            Nombre Completo <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="modalNombre" 
+                            placeholder="Juan Pérez García"
+                            required
+                        >
+                        <small class="form-error" id="modalNombreError"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalEmail">
+                            Correo Electrónico <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="email" 
+                            id="modalEmail" 
+                            placeholder="ejemplo@gmail.com"
+                            required
+                        >
+                        <small class="form-error" id="modalEmailError"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalTelefono">
+                            Teléfono <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="modalTelefono" 
+                            placeholder="9511234567"
+                            required
+                            maxlength="10"
+                        >
+                        <small class="form-error" id="modalTelefonoError"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalPassword">
+                            Contraseña <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="password" 
+                            id="modalPassword" 
+                            placeholder="Mínimo 8 caracteres"
+                            required
+                        >
+                        <small class="form-error" id="modalPasswordError"></small>
+                        <div id="modalPasswordStrength" class="password-strength"></div>
+                        <div id="modalPasswordRequirements" class="password-requirements">
+                            <div class="requirement invalid" id="modal-req-length">
+                                <span>✓</span> Al menos 8 caracteres
+                            </div>
+                            <div class="requirement invalid" id="modal-req-uppercase">
+                                <span>✓</span> Al menos 1 letra mayúscula
+                            </div>
+                            <div class="requirement invalid" id="modal-req-lowercase">
+                                <span>✓</span> Al menos 1 letra minúscula
+                            </div>
+                            <div class="requirement invalid" id="modal-req-number">
+                                <span>✓</span> Al menos 1 número
+                            </div>
+                            <div class="requirement invalid" id="modal-req-special">
+                                <span>✓</span> Al menos 1 carácter especial (@$!%*?&)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modalPasswordConfirm">
+                            Confirmar Contraseña <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="password" 
+                            id="modalPasswordConfirm" 
+                            placeholder="Repite tu contraseña"
+                            required
+                        >
+                        <small class="form-error" id="modalPasswordConfirmError"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Usuario</label>
+                        <input 
+                            type="text" 
+                            value="socio" 
+                            disabled
+                        >
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="cerrarModal()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-save" id="btnGuardarSocio">
+                    <span id="btnGuardarText">Guardar Socio</span>
+                    <span id="btnGuardarLoader" style="display: none;">
+                        <span class="loader"></span> Guardando...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/admin-socios.js"></script>
+    <script src="javaScript/modal-agregar-socio.js"></script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+/* Estilos para Mis Donaciones */
+.page-header-donaciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.btn-nueva-donacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: #5f0d51;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-nueva-donacion:hover {
+    background: #80154b;
+    transform: translateY(-2px);
+}
+
+.donaciones-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.donacion-stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.stat-icon-don {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon-don.money {
+    background: #fef3c7;
+    color: #ca8a04;
+}
+
+.stat-icon-don.count {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.stat-icon-don.average {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.stat-label-don {
+    font-size: 0.875rem;
+    color: #71717a;
+    margin: 0 0 0.5rem 0;
+}
+
+.stat-value-don {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #18181b;
+    margin: 0 0 0.25rem 0;
+}
+
+.stat-desc-don {
+    font-size: 0.75rem;
+    color: #a1a1aa;
+    margin: 0;
+}
+
+.donaciones-history-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.section-subtitle {
+    font-size: 0.9375rem;
+    color: #71717a;
+    margin: 0 0 1.5rem 0;
+}
+
+.donaciones-table-container {
+    overflow-x: auto;
+}
+
+.donaciones-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.donaciones-table th {
+    text-align: left;
+    padding: 0.875rem 1rem;
+    background: #f9fafb;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #71717a;
+    border-bottom: 1px solid #e4e4e7;
+}
+
+.donaciones-table td {
+    padding: 1rem;
+    font-size: 0.9375rem;
+    color: #52525b;
+    border-bottom: 1px solid #f4f4f5;
+}
+
+.donaciones-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.amount-cell {
+    font-weight: 700;
+    color: #5f0d51;
+}
+
+.badge-completada {
+    padding: 0.375rem 0.875rem;
+    background: #fad1f3;
+    color: #5f064c;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.impacto-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+}
+
+.impacto-card {
+    display: flex;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.5rem;
+    background: #fdf0fc;
+    border-radius: 8px;
+}
+
+.impacto-icon {
+    flex-shrink: 0;
+}
+
+.impacto-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.75rem 0;
+}
+
+.impacto-card p {
+    font-size: 0.9375rem;
+    color: #52525b;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Estilos para el botón de nueva donación */
+.btn-nueva-donacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #5f0d51;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-nueva-donacion:hover {
+    background: #4d053d;
+}
+
+/* Asegurar que el header tenga el layout correcto */
+.page-header-donaciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .donaciones-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .page-header-donaciones {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .btn-nueva-donacion {
+        width: 100%;
+        justify-content: center;
+    }
+}

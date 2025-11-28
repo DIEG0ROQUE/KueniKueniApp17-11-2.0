@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca de - Kueni Kueni</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo-section">
+                    <a href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                        <div class="logo-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                    fill="white" />
+                            </svg>
+                        </div>
+                        <div class="logo-text">
+                            <h1 id="org-nombre-header">Kueni Kueni</h1>
+                            <p>Paso a paso</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="acerca-de.html" class="active">Acerca de</a>
+                    <a href="eventos.html">Eventos</a>
+                    <a href="noticias.html">Noticias</a>
+                    <a href="donar.html">Donar</a>
+                </nav>
+                <div class="nav-buttons">
+                    <a href="login.html" class="btn-secondary">Iniciar Sesión</a>
+                    <a href="registro.html" class="btn-primary">Registrarse</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2 class="hero-title">Acerca de <span id="org-nombre-hero"></span></h2>
+            <p class="hero-subtitle" id="hero-descripcion"></p>
+        </div>
+    </section>
+
+    <section class="main-description">
+        <div class="container">
+            <div class="description-card">
+                <div class="description-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                            fill="#5e0652" />
+                    </svg>
+                </div>
+                <div class="description-content">
+                    <h3 id="org-nombre-desc"></h3>
+                    <p id="org-descripcion"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mission-vision">
+        <div class="container">
+            <div class="two-columns">
+                <div class="card">
+                    <div class="card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#5e0652" stroke-width="2" fill="none" />
+                            <path d="M12 6v6l4 4" stroke="#5e0652" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <h3>Nuestra Misión</h3>
+                    <p id="org-mision"></p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                                fill="#5e0652" />
+                        </svg>
+                    </div>
+                    <h3>Nuestra Visión</h3>
+                    <p id="org-vision"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="work-areas">
+        <div class="container">
+            <h2>Nuestras Áreas de Trabajo</h2>
+            <p class="section-subtitle">Programas y actividades que desarrollamos para la comunidad</p>
+
+            <div class="grid-4">
+                <div class="area-card">
+                    <div class="area-icon green-bg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4-4h2v16h-2V5zm4 8h2v8h-2v-8zm4-4h2v12h-2V9z"
+                                fill="#0d5f3a" />
+                        </svg>
+                    </div>
+                    <h3>Medio Ambiente</h3>
+                    <p>Proyectos de reforestación, conservación de recursos naturales y educación ambiental.</p>
+                </div>
+
+                <div class="area-card">
+                    <div class="area-icon blue-bg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                                fill="#3b82f6" />
+                        </svg>
+                    </div>
+                    <h3>Deporte y Recreación</h3>
+                    <p>Torneos deportivos, actividades recreativas y programas de activación física.</p>
+                </div>
+
+                <div class="area-card">
+                    <div class="area-icon purple-bg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                fill="#a855f7" />
+                        </svg>
+                    </div>
+                    <h3>Cultura y Tradiciones</h3>
+                    <p>Talleres de artesanías tradicionales y eventos culturales.</p>
+                </div>
+
+                <div class="area-card">
+                    <div class="area-icon orange-bg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"
+                                fill="#f97316" />
+                        </svg>
+                    </div>
+                    <h3>Emprendimiento</h3>
+                    <p>Capacitaciones y apoyo para proyectos productivos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="impact">
+        <div class="container">
+            <h2>Nuestro Impacto</h2>
+            <p class="section-subtitle">Resultados de más de <span id="anos-exp-sub"></span> años de trabajo comunitario
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 class="stat-number" id="stat-beneficiarios">--</h3>
+                    <p>Beneficiarios directos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="stat-number" id="stat-eventos">--</h3>
+                    <p>Eventos realizados</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="stat-number" id="stat-socios">--</h3>
+                    <p>Socios activos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="stat-number" id="stat-anos">--</h3>
+                    <p>Años de experiencia</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact">
+        <div class="container">
+            <h2>Información de Contacto</h2>
+            <p class="section-subtitle">Encuéntranos y comunícate con nosotros</p>
+
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                                fill="#5e0652" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Dirección</h3>
+                        <p id="contact-direccion">--</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                                fill="#5e0652" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Correo Electrónico</h3>
+                        <p id="contact-email">--</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                                fill="#5e0652" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Teléfono</h3>
+                        <p id="contact-telefono">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-banner">
+        <div class="container">
+            <h2>Únete a Nuestra Comunidad</h2>
+            <p>Juntos podemos hacer la diferencia</p>
+            <div class="cta-buttons">
+                <a href="registro.html" class="btn-cta-light">Solicitar Membresía</a>
+                <a href="donar.html" class="btn-cta-outline">Donar Ahora</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 id="footer-nombre"></h4>
+                    <p id="footer-descripcion"></p>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <p id="footer-direccion">--</p>
+                    <p id="footer-email-extra">--</p>
+                    <p id="footer-telefono-extra">--</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="acerca-de.html">Acerca de</a></li>
+                        <li><a href="noticias.html">Noticias</a></li>
+                        <li><a href="eventos.html">Eventos</a></li>
+                        <li><a href="donar.html">Donar</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="year"></span> <span id="footer-nombre-copy"></span>. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/acerca-de.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - Kueni Kueni</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/auth-styles.css">
+    
+    <style>
+        .tipo-usuario-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tipo-option {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tipo-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .tipo-card {
+            padding: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .tipo-option input[type="radio"]:checked + .tipo-card {
+            border-color: #0d5f3a;
+            background: #f0fdf4;
+        }
+        
+        .tipo-card:hover {
+            border-color: #0d5f3a;
+        }
+        
+        .tipo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tipo-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .tipo-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 1rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .form-error {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: #dc2626;
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .strength-weak {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .strength-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .strength-strong {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .password-requirements {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0.25rem 0;
+        }
+        
+        .requirement.valid {
+            color: #065f46;
+        }
+        
+        .requirement.invalid {
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo -->
+            <div class="auth-logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#0d5f3a"/>
+                </svg>
+            </div>
+
+            <h1 class="auth-title">Únete a Kueni Kueni</h1>
+            <p class="auth-subtitle">Crea tu cuenta y comienza a hacer la diferencia</p>
+
+            <!-- Mensajes -->
+            <div id="messageContainer"></div>
+
+            <!-- Formulario -->
+            <form id="registroForm" class="auth-form">
+                
+                <!-- Selector de tipo de usuario -->
+                <p class="section-title">¿Cómo quieres participar?</p>
+                <div class="tipo-usuario-selector">
+                    <label class="tipo-option">
+                        <input type="radio" name="tipoUsuario" value="socio" checked>
+                        <div class="tipo-card">
+                            <div class="tipo-icon"></div>
+                            <h3 class="tipo-title">Socio</h3>
+                            <p class="tipo-description">Participa en eventos y dona</p>
+                        </div>
+                    </label>
+                    
+                    <label class="tipo-option">
+                        <input type="radio" name="tipoUsuario" value="donante">
+                        <div class="tipo-card">
+                            <div class="tipo-icon"></div>
+                            <h3 class="tipo-title">Donante</h3>
+                            <p class="tipo-description">Apoya con donaciones</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombreCompleto">Nombre completo *</label>
+                    <input 
+                        type="text" 
+                        id="nombreCompleto" 
+                        class="form-input" 
+                        placeholder="Juan Pérez García"
+                        required
+                        autocomplete="name"
+                    >
+                    <small class="form-error" id="nombreError"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico *</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="tu@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                    <small class="form-error" id="emailError"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono *</label>
+                    <input 
+                        type="tel" 
+                        id="telefono" 
+                        class="form-input" 
+                        placeholder="9511234567"
+                        required
+                        autocomplete="tel"
+                        maxlength="10"
+                    >
+                    <small class="form-error" id="telefonoError"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña *</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-input" 
+                        placeholder="Crea una contraseña segura"
+                        required
+                        autocomplete="new-password"
+                    >
+                    <small class="form-error" id="passwordError"></small>
+                    <div id="passwordStrength" class="password-strength" style="display: none;"></div>
+                    <div id="passwordRequirements" class="password-requirements" style="display: none;">
+                        <div class="requirement" id="req-length">
+                            <span>✓</span> Al menos 8 caracteres
+                        </div>
+                        <div class="requirement" id="req-uppercase">
+                            <span>✓</span> Al menos 1 letra mayúscula
+                        </div>
+                        <div class="requirement" id="req-lowercase">
+                            <span>✓</span> Al menos 1 letra minúscula
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <span>✓</span> Al menos 1 número
+                        </div>
+                        <div class="requirement" id="req-special">
+                            <span>✓</span> Al menos 1 carácter especial (@$!%*?&)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordConfirm">Confirmar contraseña *</label>
+                    <input 
+                        type="password" 
+                        id="passwordConfirm" 
+                        class="form-input" 
+                        placeholder="Repite tu contraseña"
+                        required
+                        autocomplete="new-password"
+                    >
+                    <small class="form-error" id="passwordConfirmError"></small>
+                </div>
+
+                <button type="submit" class="btn-primary" id="registroBtn">
+                    <span id="btnText">Crear cuenta</span>
+                    <span id="btnLoader" style="display: none;">
+                        <span class="loader"></span> Registrando...
+                    </span>
+                </button>
+            </form>
+
+            <!-- Links -->
+            <div class="auth-links">
+                <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+                <p><a href="index.html">← Volver al inicio</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/registro.js"></script>
+</body>
+</html>

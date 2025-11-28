@@ -1,0 +1,491 @@
+/* === SOCIO DASHBOARD STYLES === */
+
+.socio-body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f9fafb;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+    width: 240px;
+    background: #5f0d51;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.role-badge {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+    flex: 1;
+    padding: 1.5rem 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-left-color: white;
+}
+
+.nav-item span {
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+/* Logout Button */
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    margin: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* === MAIN CONTENT === */
+.main-content {
+    margin-left: 240px;
+    flex: 1;
+    padding: 2rem;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.dashboard-header > div:first-child {
+    flex: 1;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.dashboard-header h1 span {
+    color: #5f0d51;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #71717a;
+    margin: 0;
+}
+
+/* === BOTÓN DE DONACIÓN EN DASHBOARD === */
+.btn-donar-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #5f0d51 0%, #640755 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(13, 95, 58, 0.2);
+    white-space: nowrap;
+}
+
+.btn-donar-dashboard:hover {
+    background: linear-gradient(135deg, #5f0d51 0%, #3d0133 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 95, 58, 0.3);
+}
+
+.btn-donar-dashboard:active {
+    transform: translateY(0);
+}
+
+/* === STATS GRID === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #71717a;
+    font-weight: 500;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon.calendar {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.stat-icon.money {
+    background: #fef3c7;
+    color: #ca8a04;
+}
+
+.stat-icon.upcoming {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.stat-icon.member {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #18181b;
+    margin-bottom: 0.25rem;
+}
+
+.stat-description {
+    font-size: 0.875rem;
+    color: #71717a;
+}
+
+/* === CONTENT GRID === */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e4e4e7;
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    color: #71717a;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #5f0d51;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0.5rem;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+/* === EVENTS LIST === */
+.events-list {
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.event-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f4f4f5;
+    align-items: start;
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: lowercase;
+    height: fit-content;
+}
+
+.event-badge.environment {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.event-badge.sports {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.event-badge.entrepreneurship {
+    background: #fed7aa;
+    color: #92400e;
+}
+
+.event-info {
+    flex: 1;
+}
+
+.event-info h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.event-info p {
+    font-size: 0.875rem;
+    color: #71717a;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+}
+
+.event-details {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #a1a1aa;
+    margin-bottom: 0.5rem;
+}
+
+.event-meta {
+    font-size: 0.75rem;
+    color: #71717a;
+}
+
+.attendees {
+    background: #f4f4f5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.btn-event-action {
+    padding: 0.5rem 1rem;
+    background: #5f0d51;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: fit-content;
+}
+
+.btn-event-action:hover {
+    background: #801569;
+}
+
+/* === ACTIVITY LIST === */
+.activity-list {
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.activity-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f4f4f5;
+    align-items: start;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-icon.event-icon {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.activity-icon.donation-icon {
+    background: #fef3c7;
+    color: #ca8a04;
+}
+
+.activity-icon.achievement-icon {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-content h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.25rem 0;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #a1a1aa;
+    margin: 0;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    .main-content {
+        margin-left: 200px;
+        padding: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .btn-donar-dashboard {
+        align-self: stretch;
+        justify-content: center;
+    }
+}

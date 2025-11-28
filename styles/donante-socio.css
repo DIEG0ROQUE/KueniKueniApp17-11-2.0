@@ -1,0 +1,355 @@
+/* === SER SOCIO PAGE === */
+
+.socio-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.socio-hero h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    color: #71717a;
+    margin: 0;
+}
+
+/* === BANNER DESTACADO === */
+.destacado-banner {
+    background: linear-gradient(135deg, #5f0d54 0%, #801560 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.destacado-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.destacado-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.75rem 0;
+}
+
+.destacado-content p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* === BENEFICIOS === */
+.beneficios-section {
+    margin-bottom: 3rem;
+}
+
+.beneficios-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 2rem 0;
+}
+
+.beneficios-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.beneficio-card {
+    background: white;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.beneficio-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+}
+
+.beneficio-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.beneficio-icon.eventos {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.beneficio-icon.voz {
+    background: #e9d5ff;
+    color: #7c3aed;
+}
+
+.beneficio-icon.impacto {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.beneficio-icon.reconocimiento {
+    background: #fef3c7;
+    color: #ca8a04;
+}
+
+.beneficio-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.beneficio-card p {
+    font-size: 0.9375rem;
+    color: #71717a;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* === REQUISITOS === */
+.requisitos-section {
+    margin-bottom: 3rem;
+}
+
+.requisitos-card {
+    background: #fafafa;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.requisitos-card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.requisitos-intro {
+    font-size: 0.9375rem;
+    color: #71717a;
+    margin: 0 0 1.5rem 0;
+}
+
+.requisitos-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.requisitos-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    color: #18181b;
+}
+
+/* === MEMBRESÍAS === */
+.membresias-section {
+    margin-bottom: 3rem;
+}
+
+.membresias-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 2rem 0;
+}
+
+.membresias-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.membresia-card {
+    background: white;
+    border: 2px solid #e4e4e7;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.membresia-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-6px);
+}
+
+.membresia-card.destacada {
+    border-color: #5f0d51;
+    background: linear-gradient(to bottom, rgba(13, 95, 58, 0.02) 0%, white 100%);
+}
+
+.membresia-badge {
+    display: inline-block;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.membresia-badge.activa {
+    background: #fad1f6;
+    color: #5f0d51;
+}
+
+.membresia-badge.fundador {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.membresia-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.5rem 0;
+}
+
+.membresia-descripcion {
+    font-size: 0.9375rem;
+    color: #71717a;
+    margin: 0 0 1.5rem 0;
+}
+
+.precio-container {
+    padding: 1.5rem 0;
+    border-top: 1px solid #f4f4f5;
+    border-bottom: 1px solid #f4f4f5;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.precio {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #5f0d51;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.precio-periodo {
+    font-size: 0.875rem;
+    color: #71717a;
+}
+
+.membresia-beneficios {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.membresia-beneficios li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    color: #52525b;
+}
+
+/* === CTA FINAL === */
+.cta-final {
+    background: white;
+    border: 2px solid #e4e4e7;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.cta-final h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 0.75rem 0;
+}
+
+.cta-final p {
+    font-size: 1rem;
+    color: #71717a;
+    margin: 0 0 2rem 0;
+}
+
+.btn-solicitar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2.5rem;
+    background: #5f0d51;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-solicitar:hover {
+    background: #6b0b5b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(95, 13, 81, 0.3);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+    .beneficios-grid,
+    .membresias-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .destacado-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .destacado-content h2 {
+        font-size: 1.25rem;
+    }
+    
+    .socio-hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .cta-final {
+        padding: 2rem 1.5rem;
+    }
+    
+    .cta-final h2 {
+        font-size: 1.5rem;
+    }
+}

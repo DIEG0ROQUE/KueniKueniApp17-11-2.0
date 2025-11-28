@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Donaciones - Kueni Kueni</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/admin-donacion.css">
+    <link rel="stylesheet" href="styles/admin-dashboard.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span>Kueni Kueni</span>
+        </div>
+        <p class="sidebar-subtitle">Administrador</p>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="admin-dashboard.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Panel</span>
+        </a>
+        
+        <a href="admin-eventos.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Eventos</span>
+        </a>
+        
+        <a href="admin-donaciones.html" class="nav-item active" >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+            </svg>
+            <span>Donaciones</span>
+        </a>
+        
+        <a href="admin-socios.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Socios</span>
+        </a>
+        
+        <!-- NUEVA PESTAÑA DE NOTICIAS -->
+        <a href="admin-noticias.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                <line x1="9" y1="7" x2="9" y2="17"></line>
+                <line x1="13" y1="7" x2="17" y2="7"></line>
+                <line x1="13" y1="11" x2="17" y2="11"></line>
+                <line x1="13" y1="15" x2="17" y2="15"></line>
+            </svg>
+            <span>Noticias</span>
+        </a>
+        
+        <a href="admin-estadisticas.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="20" x2="12" y2="10"></line>
+                <line x1="18" y1="20" x2="18" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            <span>Estadísticas</span>
+        </a>
+    </nav>
+
+    <button id="btnCerrarSesion" class="btn-cerrar-sesion">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Cerrar Sesión
+    </button>
+</aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="donations-container">
+                <!-- Header de la página -->
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Gestión de Donaciones</h1>
+                        <p class="page-subtitle">Administra y da seguimiento a las donaciones recibidas</p>
+                    </div>
+                </div>
+
+                <!-- Tarjetas de estadísticas -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-label">Total Recaudado</span>
+                            <span class="stat-icon">$</span>
+                        </div>
+                        <div class="stat-value" id="totalRecaudado">$0</div>
+                        <div class="stat-description">MXN este mes</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-label">Donaciones Completadas</span>
+                        </div>
+                        <div class="stat-value" id="donacionesCompletadas">0</div>
+                        <div class="stat-description">Transacciones exitosas</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-label">Donaciones Pendientes</span>
+                        </div>
+                        <div class="stat-value" id="donacionesPendientes">0</div>
+                        <div class="stat-description">En proceso</div>
+                    </div>
+                </div>
+
+                <!-- Sección de historial -->
+                <div class="donations-history">
+                    <div class="history-header">
+                        <div>
+                            <h2 class="history-title">Historial de Donaciones</h2>
+                            <p class="history-subtitle">Lista completa de donaciones recibidas</p>
+                        </div>
+                    </div>
+
+                    <!-- SELECTOR DE MES Y BOTÓN EXPORTAR -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+    <!-- Selector de Mes -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label for="selectorMes" style="font-weight: 500; color: #374151; font-size: 14px;">
+                     Mes:
+                </label>
+                <select 
+                    id="selectorMes"
+                    style="
+                        padding: 10px 40px 10px 16px;
+                        border: 1px solid #d1d5db;
+                        border-radius: 6px;
+                        background-color: white;
+                        font-size: 14px;
+                        color: #1f2937;
+                        cursor: pointer;
+                        outline: none;
+                        transition: all 0.2s;
+                        background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%277%27 viewBox=%270 0 12 7%27%3e%3cpath fill=%27%23374151%27 d=%27M1 1l5 5 5-5%27/%3e%3c/svg%3e');
+                        background-repeat: no-repeat;
+                        background-position: right 12px center;
+                        background-size: 12px;
+                        appearance: none;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+                        min-width: 200px;
+                    "
+                >
+                    <!-- Opciones se generan automáticamente -->
+                </select>
+            </div>
+            
+            <!-- Botones de Exportar -->
+            <div style="display: flex; gap: 12px;">
+                <!-- Botón Exportar CSV -->
+                <button class="btn-export" id="btnExportarCSV" style="background-color: #10b981; border-color: #10b981;">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4.66667 6.66667L8 10L11.3333 6.66667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 10V2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Exportar CSV
+                </button>
+                
+                <!-- Botón Exportar PDF -->
+                <button class="btn-export" id="btnExportarPDF" style="background-color: #ef4444; border-color: #ef4444;">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 2H12C12.5523 2 13 2.44772 13 3V13C13 13.5523 12.5523 14 12 14H4C3.44772 14 3 13.5523 3 13V3C3 2.44772 3.44772 2 4 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 8H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 11H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Exportar PDF
+                </button>
+            </div>
+        </div>
+
+
+                    <!-- Barra de búsqueda -->
+                    <div class="search-bar">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 19L14.65 14.65" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input type="text" id="inputBuscar" placeholder="Buscar por nombre o email..." class="search-input">
+                    </div>
+
+                    <!-- Tabla de donaciones -->
+                    <div class="table-wrapper">
+                        <table class="donations-table">
+                            <thead>
+                                <tr>
+                                    <th>Donante</th>
+                                    <th>Email</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaDonaciones">
+                                <!-- Los datos se cargan dinámicamente -->
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px; color: #9ca3af;">
+                                        Cargando donaciones...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="javascript/supabase-config.js"></script>
+    
+    <!-- JavaScript de donaciones -->
+    <script src="javascript/admin-donacion.js"></script>
+</body>
+</html>

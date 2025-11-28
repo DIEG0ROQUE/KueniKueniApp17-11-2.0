@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sincronización de Usuarios - Kueni Kueni</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0d5f3a 0%, #166534 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab:hover {
+            color: #0d5f3a;
+        }
+        
+        .tab.active {
+            color: #0d5f3a;
+            border-bottom-color: #0d5f3a;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            color: #374151;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: start;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            color: #92400e;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            border: 2px solid #60a5fa;
+            color: #1e40af;
+        }
+        
+        .alert-danger {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #dc2626;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+        
+        .icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #0d5f3a;
+            box-shadow: 0 0 0 3px rgba(13, 95, 58, 0.1);
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: #0d5f3a;
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #166534;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 95, 58, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0d5f3a, #10b981);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .results {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-success {
+            color: #10b981;
+        }
+        
+        .result-error {
+            color: #ef4444;
+        }
+        
+        .result-info {
+            color: #60a5fa;
+        }
+        
+        code {
+            background: #374151;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fbbf24;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #0d5f3a;
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0d5f3a;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo"></div>
+            <h1>Sincronización de Usuarios</h1>
+            <p class="subtitle">Herramienta para sincronizar usuarios con Supabase Auth</p>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="cambiarTab(0)">Configuración</button>
+            <button class="tab" onclick="cambiarTab(1)">Sincronizar</button>
+            <button class="tab" onclick="cambiarTab(2)">Guía</button>
+        </div>
+        
+        <!-- Tab 1: Configuración -->
+        <div class="tab-content active" id="tab0">
+            <div class="section">
+                <h2>Configuración de Supabase</h2>
+                <div class="alert alert-info">
+                    <span class="icon">ℹ</span>
+                    <div>
+                        <strong>¿Dónde encuentro esto?</strong><br>
+                        Ve a tu proyecto en Supabase → <strong>Settings</strong> → <strong>API</strong>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Supabase URL:</label>
+                    <input type="text" id="supabaseUrl" placeholder="https://xxxxxxxxxxxx.supabase.co">
+                </div>
+                
+                <div class="form-group">
+                    <label>Supabase Anon Key (Pública):</label>
+                    <input type="text" id="supabaseAnonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Supabase Service Role Key (SECRETA - Solo para esta herramienta):</label>
+                    <input type="password" id="supabaseServiceKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    <small style="color: #6b7280; font-size: 12px; display: block; margin-top: 5px;">
+                        Esta key tiene permisos de administrador. NO la uses en tu código de producción.
+                    </small>
+                </div>
+                
+                <button class="btn btn-primary" onclick="conectarSupabase()">
+                    <span>🔌</span> Conectar a Supabase
+                </button>
+                
+                <div id="connectionStatus" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Sincronizar -->
+        <div class="tab-content" id="tab1">
+            <div class="section">
+                <h2>Sincronizar Usuarios Existentes</h2>
+                
+                <div class="alert alert-warning">
+                    <span class="icon"></span>
+                    <div>
+                        <strong>¿Qué hace esto?</strong><br>
+                        Lee todos los usuarios de tu tabla <code>usuarios</code> y los crea en <strong>Supabase Authentication</strong>.
+                        Esto es necesario para que funcione la recuperación de contraseña.
+                    </div>
+                </div>
+                
+                <div id="statsContainer" style="display: none;">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalUsers">0</div>
+                            <div class="stat-label">Usuarios encontrados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="successCount">0</div>
+                            <div class="stat-label">Sincronizados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="errorCount">0</div>
+                            <div class="stat-label">Errores</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="sincronizarUsuarios()" id="syncBtn" style="margin-top: 20px;">
+                    <span></span> Iniciar Sincronización
+                </button>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Procesando...</div>
+                </div>
+                
+                <div class="results" id="results"></div>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Guía -->
+        <div class="tab-content" id="tab2">
+            <div class="section">
+                <h2>Guía Paso a Paso</h2>
+                
+                <div class="alert alert-info">
+                    <span class="icon"></span>
+                    <div>
+                        <strong>Sigue estos pasos en orden:</strong>
+                    </div>
+                </div>
+                
+                <ol>
+                    <li>
+                        <strong>Ve a la pestaña "Configuración"</strong><br>
+                        Ingresa tus credenciales de Supabase y haz clic en "Conectar"
+                    </li>
+                    <li>
+                        <strong>Ve a la pestaña "Sincronizar"</strong><br>
+                        Haz clic en "Iniciar Sincronización" y espera a que termine
+                    </li>
+                    <li>
+                        <strong>Verifica en tu Dashboard de Supabase</strong><br>
+                        Ve a <code>Authentication → Users</code> y verifica que aparezcan tus usuarios
+                    </li>
+                    <li>
+                        <strong>Prueba la recuperación de contraseña</strong><br>
+                        Usa el email de un usuario que acabas de sincronizar
+                    </li>
+                </ol>
+                
+                <div class="alert alert-danger" style="margin-top: 20px;">
+                    <span class="icon"></span>
+                    <div>
+                        <strong>IMPORTANTE - Seguridad:</strong><br>
+                        • Esta herramienta es solo para uso único<br>
+                        • NO subas el Service Role Key a GitHub o sitios públicos<br>
+                        • Después de sincronizar, elimina las keys de esta página<br>
+                        • Considera cambiar el Service Role Key después
+                    </div>
+                </div>
+                
+                <div class="alert alert-success" style="margin-top: 20px;">
+                    <span class="icon"></span>
+                    <div>
+                        <strong>Después de sincronizar:</strong><br>
+                        Los usuarios podrán usar "¿Olvidaste tu contraseña?" y recibirán un email de recuperación.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let supabaseClient = null;
+        let supabaseAdmin = null;
+        
+        // Cargar valores guardados
+        window.addEventListener('load', () => {
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedAnonKey = localStorage.getItem('supabaseAnonKey');
+            
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedAnonKey) document.getElementById('supabaseAnonKey').value = savedAnonKey;
+        });
+        
+        // Guardar al escribir
+        ['supabaseUrl', 'supabaseAnonKey'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', (e) => {
+                localStorage.setItem(id, e.target.value);
+            });
+        });
+        
+        function cambiarTab(index) {
+            // Actualizar tabs
+            document.querySelectorAll('.tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+            });
+            
+            // Actualizar contenido
+            document.querySelectorAll('.tab-content').forEach((content, i) => {
+                content.classList.toggle('active', i === index);
+            });
+        }
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            results.style.display = 'block';
+            
+            const item = document.createElement('div');
+            item.className = `result-item result-${type}`;
+            item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(item);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        async function conectarSupabase() {
+            const url = document.getElementById('supabaseUrl').value.trim();
+            const anonKey = document.getElementById('supabaseAnonKey').value.trim();
+            const serviceKey = document.getElementById('supabaseServiceKey').value.trim();
+            const statusDiv = document.getElementById('connectionStatus');
+            
+            if (!url || !anonKey || !serviceKey) {
+                statusDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <span class="icon"></span>
+                        <div>Por favor completa todos los campos</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const { createClient } = supabase;
+                
+                // Cliente normal (anon key)
+                supabaseClient = createClient(url, anonKey);
+                
+                // Cliente admin (service role key)
+                supabaseAdmin = createClient(url, serviceKey);
+                
+                // Verificar conexión
+                const { data, error } = await supabaseClient.from('usuarios').select('count');
+                
+                if (error) {
+                    throw new Error('No se pudo conectar a la tabla usuarios: ' + error.message);
+                }
+                
+                statusDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <span class="icon"></span>
+                        <div>
+                            <strong>¡Conectado exitosamente!</strong><br>
+                            Puedes pasar a la pestaña "Sincronizar"
+                        </div>
+                    </div>
+                `;
+                
+                // Cambiar automáticamente a la pestaña de sincronización
+                setTimeout(() => cambiarTab(1), 1500);
+                
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <span class="icon"></span>
+                        <div>
+                            <strong>Error de conexión:</strong><br>
+                            ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        async function sincronizarUsuarios() {
+            if (!supabaseClient || !supabaseAdmin) {
+                alert('Primero debes conectar a Supabase en la pestaña "Configuración"');
+                cambiarTab(0);
+                return;
+            }
+            
+            const syncBtn = document.getElementById('syncBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const results = document.getElementById('results');
+            const statsContainer = document.getElementById('statsContainer');
+            
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '<span></span> Sincronizando...';
+            progressContainer.style.display = 'block';
+            results.innerHTML = '';
+            results.style.display = 'block';
+            statsContainer.style.display = 'block';
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            try {
+                addResult('Obteniendo usuarios de la tabla...', 'info');
+                
+                // Obtener todos los usuarios
+                const { data: usuarios, error: fetchError } = await supabaseClient
+                    .from('usuarios')
+                    .select('email, password_hash, nombre_completo, estado');
+                
+                if (fetchError) {
+                    throw new Error('Error al obtener usuarios: ' + fetchError.message);
+                }
+                
+                if (!usuarios || usuarios.length === 0) {
+                    addResult('No se encontraron usuarios en la tabla', 'error');
+                    return;
+                }
+                
+                document.getElementById('totalUsers').textContent = usuarios.length;
+                addResult(`Encontrados ${usuarios.length} usuarios`, 'success');
+                addResult('', 'info');
+                
+                // Sincronizar cada usuario
+                for (let i = 0; i < usuarios.length; i++) {
+                    const usuario = usuarios[i];
+                    const progress = ((i + 1) / usuarios.length) * 100;
+                    
+                    progressFill.style.width = progress + '%';
+                    progressText.textContent = `Procesando ${i + 1} de ${usuarios.length}...`;
+                    
+                    try {
+                        addResult(`Procesando: ${usuario.email}`, 'info');
+                        
+                        // Crear usuario en Auth usando admin API
+                        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+                            email: usuario.email,
+                            password: usuario.password_hash,
+                            email_confirm: true // Marcar como confirmado
+                        });
+                        
+                        if (authError) {
+                            // Si el usuario ya existe, no es un error crítico
+                            if (authError.message.includes('already registered')) {
+                                addResult(`${usuario.email} - Ya existe en Auth (omitido)`, 'info');
+                            } else {
+                                throw authError;
+                            }
+                        } else {
+                            addResult(`${usuario.email} - Sincronizado exitosamente`, 'success');
+                            successCount++;
+                            document.getElementById('successCount').textContent = successCount;
+                        }
+                        
+                    } catch (error) {
+                        addResult(`${usuario.email} - Error: ${error.message}`, 'error');
+                        errorCount++;
+                        document.getElementById('errorCount').textContent = errorCount;
+                    }
+                    
+                    // Pequeña pausa para no saturar la API
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                addResult('', 'info');
+                addResult(' ¡Sincronización completada!', 'success');
+                addResult(` Exitosos: ${successCount}`, 'success');
+                if (errorCount > 0) {
+                    addResult(`Errores: ${errorCount}`, 'error');
+                }
+                
+                progressText.textContent = '¡Completado!';
+                
+                setTimeout(() => {
+                    alert(`Sincronización completada!\n\n` +
+                          `• Usuarios sincronizados: ${successCount}\n` +
+                          `• Errores: ${errorCount}\n\n` +
+                          `Verifica en tu Dashboard de Supabase → Authentication → Users`);
+                }, 500);
+                
+            } catch (error) {
+                addResult(`ERROR GENERAL: ${error.message}`, 'error');
+                alert('Error: ' + error.message);
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.innerHTML = '<span>🔄</span> Iniciar Sincronización';
+            }
+        }
+    </script>
+</body>
+</html>

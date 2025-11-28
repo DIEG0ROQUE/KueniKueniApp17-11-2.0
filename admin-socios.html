@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Socios - Kueni Kueni</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles/admin-socios.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span>Kueni Kueni</span>
+        </div>
+        <p class="sidebar-subtitle">Administrador</p>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="admin-dashboard.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Panel</span>
+        </a>
+        
+        <a href="admin-eventos.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Eventos</span>
+        </a>
+        
+        <a href="admin-donaciones.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+            </svg>
+            <span>Donaciones</span>
+        </a>
+        
+        <a href="admin-socios.html" class="nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Socios</span>
+        </a>
+        
+        <!-- NUEVA PESTAÑA DE NOTICIAS -->
+        <a href="admin-noticias.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                <line x1="9" y1="7" x2="9" y2="17"></line>
+                <line x1="13" y1="7" x2="17" y2="7"></line>
+                <line x1="13" y1="11" x2="17" y2="11"></line>
+                <line x1="13" y1="15" x2="17" y2="15"></line>
+            </svg>
+            <span>Noticias</span>
+        </a>
+        
+        <a href="admin-estadisticas.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="20" x2="12" y2="10"></line>
+                <line x1="18" y1="20" x2="18" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            <span>Estadísticas</span>
+        </a>
+    </nav>
+
+    <button id="btnCerrarSesion" class="btn-cerrar-sesion">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Cerrar Sesión
+    </button>
+</aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Socios</h1>
+                <p>Administra los miembros de la organización</p>
+            </div>
+            
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Socios Activos</div>
+                <div class="stat-value" id="sociosActivos">0</div>
+                <div class="stat-subtitle">De <span id="totalSocios">0</span> totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Eventos Asistidos</div>
+                <div class="stat-value" id="eventosAsistidos">0</div>
+                <div class="stat-subtitle">Total de asistencias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Donaciones de Socios</div>
+                <div class="stat-value" id="donacionesSocios">$0</div>
+                <div class="stat-subtitle">MXN acumulado</div>
+            </div>
+        </div>
+
+        <!-- Buscador -->
+        <div class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="inputBuscar" placeholder="Buscar por nombre o email...">
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>NOMBRE</th>
+                        <th>EMAIL</th>
+                        <th>TELÉFONO</th>
+                        <th>FECHA DE INGRESO</th>
+                        <th>EVENTOS</th>
+                        <th>DONACIONES</th>
+                        <th>ESTADO</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaSocios"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL CON TODAS LAS VALIDACIONES -->
+    <div id="modalSocio" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Agregar Nuevo Socio</h2>
+                    <p>Completa la información del nuevo miembro</p>
+                    <span style="display:inline-block;background:#d1fae5;color:#065f46;padding:0.35rem 0.75rem;border-radius:6px;font-size:0.8rem;font-weight:600;margin-top:0.5rem;">TIPO: SOCIO</span>
+                </div>
+                <button id="btnCerrarModal" class="btn-close">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="modalMessage"></div>
+
+                <form id="formSocio">
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label for="nombreCompleto">Nombre Completo <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="nombreCompleto" class="form-input" placeholder="Juan Pérez García" required>
+                        <small class="form-error" id="nombreError"></small>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico <span style="color:#ef4444;">*</span></label>
+                        <input type="email" id="email" class="form-input" placeholder="ejemplo@gmail.com" required>
+                        <small class="form-error" id="emailError"></small>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="form-group">
+                        <label for="telefono">Teléfono <span style="color:#ef4444;">*</span></label>
+                        <input type="tel" id="telefono" class="form-input" placeholder="9511234567" required maxlength="10">
+                        <small class="form-error" id="telefonoError"></small>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="form-group">
+                        <label for="password">Contraseña <span style="color:#ef4444;">*</span></label>
+                        <input type="password" id="password" class="form-input" placeholder="Mínimo 8 caracteres" required>
+                        <small class="form-error" id="passwordError"></small>
+                        
+                        <div id="passwordStrength" class="password-strength"></div>
+                        
+                        <div id="passwordRequirements" class="password-requirements">
+                            <div class="requirement" id="req-length"><span>✓</span> Al menos 8 caracteres</div>
+                            <div class="requirement" id="req-uppercase"><span>✓</span> Al menos 1 letra mayúscula</div>
+                            <div class="requirement" id="req-lowercase"><span>✓</span> Al menos 1 letra minúscula</div>
+                            <div class="requirement" id="req-number"><span>✓</span> Al menos 1 número</div>
+                            <div class="requirement" id="req-special"><span>✓</span> Al menos 1 carácter especial (@$!%*?&)</div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar Contraseña -->
+                    <div class="form-group">
+                        <label for="passwordConfirm">Confirmar Contraseña <span style="color:#ef4444;">*</span></label>
+                        <input type="password" id="passwordConfirm" class="form-input" placeholder="Repite tu contraseña" required>
+                        <small class="form-error" id="passwordConfirmError"></small>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <label for="estado">Estado <span style="color:#ef4444;">*</span></label>
+                        <select id="estado" class="form-input" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="modal-actions">
+                        <button type="button" id="btnCancelarModal" class="btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn-primary" id="btnGuardarSocio">
+                            <span id="btnGuardarText">Guardar Socio</span>
+                            <span id="btnGuardarLoader" style="display:none;"><span class="loader-small"></span> Guardando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader"><div class="spinner"></div></div>
+
+    <!-- Scripts -->
+    <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/admin-socios.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca de - Kueni Kueni</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/donante-dashboard.css">
+    <link rel="stylesheet" href="styles/donante-acercade.css">
+</head>
+<body>
+    <div class="donante-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar-donante">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2>Kueni Kueni</h2>
+                    <p class="role-badge">Portal de Donantes</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="donante-dashboard.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/>
+                    </svg>
+                    <span>Inicio</span>
+                </a>
+                <a href="donante-donar.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
+                    </svg>
+                    <span>Donar</span>
+                </a>
+                <a href="donante-noticias.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z" fill="currentColor"/>
+                    </svg>
+                    <span>Noticias</span>
+                </a>
+                <a href="donante-acerca.html" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
+                    </svg>
+                    <span>Acerca de</span>
+                </a>
+                <a href="donante-socio.html" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/>
+                    </svg>
+                    <span>Ser Socio</span>
+                </a>
+            </nav>
+
+            <button class="logout-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
+                </svg>
+                <span>Cerrar Sesión</span>
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-acerca">
+                <div class="hero-content">
+                    <h1 class="page-title">Acerca de Kueni Kueni</h1>
+                    <p class="page-subtitle">Conoce nuestra historia, misión y el impacto que generamos en la región Mixteca de Oaxaca</p>
+                </div>
+            </section>
+
+            <!-- Descripción Principal -->
+            <section class="main-description">
+                <div class="acerca-container">
+                    <div class="description-card">
+                        <div class="description-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#5f0d51"/>
+                            </svg>
+                        </div>
+                        <div class="description-content">
+                            <h3>Kueni Kueni - Paso a Paso</h3>
+                            <p>Somos una asociación civil sin fines de lucro con más de 11 años de experiencia trabajando en la región Mixteca de Oaxaca. Nuestro nombre, que significa "paso a paso" en lengua mixteca, refleja nuestra filosofía de trabajo: construir comunidad de manera gradual, sostenible y con la participación activa de todos los miembros.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Misión y Visión -->
+            <section class="mission-vision">
+                <div class="acerca-container">
+                    <div class="two-columns">
+                        <div class="card">
+                            <div class="card-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="#5f0d51" stroke-width="2" fill="none"/>
+                                    <path d="M12 6v6l4 4" stroke="#5f0d51" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <h3>Nuestra Misión</h3>
+                            <p>Promover el bienestar social y el desarrollo integral de las comunidades de la región Mixteca a través de programas de medio ambiente, deporte, cultura y emprendimiento, con especial énfasis en grupos vulnerables como mujeres y adultos mayores.</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#5f0d51"/>
+                                </svg>
+                            </div>
+                            <h3>Nuestra Visión</h3>
+                            <p>Ser una organización líder en el desarrollo comunitario de la región Mixteca, reconocida por su impacto social positivo, transparencia en la gestión de recursos y capacidad de generar cambios sostenibles en la calidad de vida de las personas.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Áreas de Trabajo -->
+            <section class="work-areas">
+                <div class="acerca-container">
+                    <h2>Nuestras Áreas de Trabajo</h2>
+                    <p class="section-subtitle">Programas y actividades que desarrollamos para la comunidad</p>
+                    
+                    <div class="grid-4">
+                        <div class="area-card">
+                            <div class="area-icon green-bg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4-4h2v16h-2V5zm4 8h2v8h-2v-8zm4-4h2v12h-2V9z" fill="#0d5f3a"/>
+                                </svg>
+                            </div>
+                            <h3>Medio Ambiente</h3>
+                            <p>Proyectos de reforestación, conservación de recursos naturales y educación ambiental para promover prácticas sostenibles en la comunidad.</p>
+                        </div>
+                        
+                        <div class="area-card">
+                            <div class="area-icon blue-bg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#3b82f6"/>
+                                </svg>
+                            </div>
+                            <h3>Deporte y Recreación</h3>
+                            <p>Torneos deportivos, actividades recreativas y programas de activación física para promover la salud y la integración social.</p>
+                        </div>
+                        
+                        <div class="area-card">
+                            <div class="area-icon purple-bg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#a855f7"/>
+                                </svg>
+                            </div>
+                            <h3>Cultura y Tradiciones</h3>
+                            <p>Talleres de artesanías tradicionales, eventos culturales y actividades para preservar y promover el patrimonio cultural mixteco.</p>
+                        </div>
+                        
+                        <div class="area-card">
+                            <div class="area-icon orange-bg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" fill="#f97316"/>
+                                </svg>
+                            </div>
+                            <h3>Emprendimiento</h3>
+                            <p>Capacitaciones, asesorías y apoyo para el desarrollo de proyectos productivos y negocios locales sostenibles.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Impacto -->
+            <section class="impact">
+                <div class="acerca-container">
+                    <h2>Nuestro Impacto</h2>
+                    <p class="section-subtitle">Resultados de más de 11 años de trabajo comunitario</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 class="stat-number">500+</h3>
+                            <p>Beneficiarios directos</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="stat-number">50+</h3>
+                            <p>Eventos realizados</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="stat-number">30+</h3>
+                            <p>Socios activos</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 class="stat-number">11+</h3>
+                            <p>Años de experiencia</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contacto -->
+            <section class="contact">
+                <div class="acerca-container">
+                    <h2>Información de Contacto</h2>
+                    <p class="section-subtitle">Encuéntranos y comunícate con nosotros</p>
+                    
+                    <div class="contact-grid">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#5f0d51"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Dirección</h3>
+                                <p>Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca<br>México, C.P. 69600</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#5f0d51"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Correo Electrónico</h3>
+                                <p>contacto@kuenikueni.org</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#5f0d51"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Teléfono</h3>
+                                <p>+52 951 123 4567</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Banner -->
+            <section class="cta-banner">
+                <div class="cta-content">
+                    <h2>Únete a Nuestra Comunidad</h2>
+                    <p>Juntos podemos hacer la diferencia en la Mixteca Oaxaqueña</p>
+                    <div class="cta-buttons">
+                        <a href="donante-socio.html" class="btn-cta-light">Solicitar Membresía</a>
+                        <a href="donante-donar.html" class="btn-cta-outline">Donar Ahora</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="javaScript/donante-dashboard.js"></script>
+</body>
+</html>

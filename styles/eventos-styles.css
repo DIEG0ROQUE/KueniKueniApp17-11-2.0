@@ -1,0 +1,172 @@
+/* === PÁGINA DE EVENTOS === */
+
+/* Sección de Eventos */
+.eventos-section {
+    padding: 4rem 0 6rem;
+    background: #fafafa;
+}
+
+/* Grid de Eventos */
+.eventos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Tarjeta de Evento */
+.evento-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.evento-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+/* Header del Evento */
+.evento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.evento-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.evento-badge.medio-ambiente {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.evento-badge.deportes {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.evento-badge.emprendimiento {
+    background: #fed7aa;
+    color: #92400e;
+}
+
+.evento-badge.cultura {
+    background: #e9d5ff;
+    color: #6b21a8;
+}
+
+.evento-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: #f4f4f5;
+    color: #71717a;
+}
+
+/* Título y Descripción */
+.evento-titulo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #18181b;
+    margin-bottom: 0.5rem;
+}
+
+.evento-descripcion {
+    color: #71717a;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+/* Detalles del Evento */
+.evento-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.evento-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #52525b;
+    font-size: 0.875rem;
+}
+
+.evento-detail-item svg {
+    flex-shrink: 0;
+}
+
+/* Barra de Progreso */
+.evento-progress {
+    margin-bottom: 1.5rem;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #71717a;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e4e4e7;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4c0d5f 0%, #771580 100%);
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+/* Botón del Evento */
+.btn-evento {
+    width: 100%;
+    padding: 0.875rem;
+    background: #5f0d4d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-evento:hover {
+    background: #671580;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 95, 58, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .eventos-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .eventos-section {
+        padding: 3rem 0 4rem;
+    }
+}

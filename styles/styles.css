@@ -499,9 +499,10 @@ body {
     color: var(--white);
     text-decoration: none;
     border-radius: 8px;
-    font-size: 19px;
+    font-size: 17px;
     font-weight: 600;
     transition: all 0.2s;
+    border: 2px solid var(--primary-green);
     box-shadow: 0 4px 12px rgba(95, 13, 81, 0.4);
     display: inline-flex;
     align-items: center;
@@ -552,7 +553,7 @@ body {
 
 /* Stats Home */
 .stats-home {
-    padding: 0 0 100px;
+    padding: 40 0 30px;
     background-color: var(--secondary-beige);
 }
 
@@ -671,7 +672,7 @@ body {
 }
 
 .impact-areas h2 {
-    font-size: 36px;
+    font-size: 45px;
     font-weight: 700;
     color: var(--text-dark);
     text-align: center;
@@ -690,13 +691,13 @@ body {
     border-radius: 8px;
     padding: 32px 24px;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.5s;
     border: 1px solid var(--border-light);
 }
 
 .area-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-20px);
+    box-shadow: 0 5px 13px rgba(0, 0, 0, 0.08);
 }
 
 .area-icon {
@@ -726,7 +727,7 @@ body {
 }
 
 .area-card h3 {
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 8px;
@@ -734,7 +735,7 @@ body {
 }
 
 .area-card p {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--text-gray);
     line-height: 1.6;
 }
@@ -743,7 +744,7 @@ body {
     background-color: var(--white);
     border: 1px solid var(--border-light);
     border-radius: 8px;
-    padding: 32px 24px;
+    overflow: hidden;
     text-align: center;
     transition: all 0.2s;
 }
@@ -751,6 +752,17 @@ body {
 .impact-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.impact-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.impact-card-content {
+    padding: 32px 24px;
 }
 
 .impact-icon {
@@ -879,11 +891,34 @@ body {
     line-height: 1.6;
 }
 
+
 /* CTA Banner */
 .cta-banner {
-    background-color: var(--primary-green);
+    position: relative;
     padding: 80px 0;
     text-align: center;
+    overflow: hidden;
+    background-color: var(--primary-green);
+}
+
+.cta-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../img_kuenikueni/caminataKueni5Km1.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    z-index: 1;
+}
+
+.cta-banner .container {
+    position: relative;
+    z-index: 2;
 }
 
 .cta-banner h2 {
@@ -919,7 +954,7 @@ body {
 }
 
 .btn-cta-light:hover {
-    background-color: #f4f4f5;
+    background-color: #f7ccf1;
 }
 
 .btn-cta-outline {
@@ -941,11 +976,13 @@ body {
 /* Footer */
 .footer {
     background-color: var(--white);
+  
     padding: 60px 0 32px;
     border-top: 1px solid var(--border-light);
 }
 
 .footer-grid {
+    
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 48px;
@@ -953,6 +990,7 @@ body {
 }
 
 .footer-col h4 {
+ 
     font-size: 16px;
     font-weight: 700;
     color: var(--text-dark);
@@ -961,12 +999,14 @@ body {
 }
 
 .footer-col p {
+   
     font-size: 14px;
     color: var(--text-gray);
     line-height: 1.7;
 }
 
 .footer-col ul {
+   
     list-style: none;
 }
 
@@ -995,6 +1035,45 @@ body {
     font-size: 13px;
     color: var(--text-gray);
 }
+
+.footer-social {
+    margin-top: 0px;
+}
+
+.footer-social h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+}
+
+.social-links {
+    display: flex;
+    gap: 12px;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background-color: #fdf0fb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background-color: var(--primary-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(95, 13, 81, 0.3);
+}
+
+.social-links a:hover svg path {
+    fill: white;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -1028,7 +1107,7 @@ body {
     .hero-home-subtitle-main {
         font-size: 24px;
     }
-    
+       
     .hero-home-subtitle {
         font-size: 15px;
     }

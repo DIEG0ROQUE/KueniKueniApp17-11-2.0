@@ -46,7 +46,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Header transparente solo para la página de inicio */
 .header.header-transparent {
     background-color: transparent;
     border-bottom: 1px solid transparent;
@@ -96,7 +95,6 @@ body {
     transition: color 0.3s ease;
 }
 
-/* Texto blanco solo cuando el header es transparente */
 .header.header-transparent .logo-text h1 {
     color: var(--white);
 }
@@ -274,7 +272,6 @@ body {
     box-shadow: 0 4px 12px rgba(95, 13, 81, 0.6);
 }
 
-/* Icono de corazón animado */
 .heart-icon {
     display: inline-flex;
     align-items: center;
@@ -305,7 +302,6 @@ body {
     }
 }
 
-/* Animación de fondo del botón */
 .btn-donate-animated {
     position: relative;
     overflow: hidden;
@@ -374,7 +370,6 @@ body {
     z-index: 2;
 }
 
-/* Controles del carrusel */
 .carousel-control {
     position: absolute;
     top: 50%;
@@ -406,7 +401,6 @@ body {
     right: 32px;
 }
 
-/* Indicadores del carrusel */
 .carousel-indicators {
     position: absolute;
     bottom: 32px;
@@ -546,10 +540,6 @@ body {
     background-color: var(--secondary-beige);
 }
 
-/* ============================================
-   CAMBIOS Y ADICIONES PARA ACERCA-DE.HTML
-   ============================================ */
-
 /* Hero Section - Página Acerca de */
 .hero {
     background-color: var(--white);
@@ -576,7 +566,6 @@ body {
 
 }
 
-/* Main Description - Actualizado */
 .main-description {
     padding: 30px 0;
     background-color: var(--secondary-beige);
@@ -588,12 +577,9 @@ body {
     padding: 40px;
     display: flex;
     flex-direction: column;
-    /* Cambiado */
     gap: 24px;
     align-items: center;
-    /* NUEVO - centra horizontalmente */
     text-align: center;
-    /* NUEVO - centra el texto */
     border: 1px solid var(--border-light);
     margin-bottom: 40px;
 }
@@ -624,13 +610,8 @@ body {
 }
 
 
-
-/* ============================================
-   NUEVO: Carrusel de imágenes
-   ============================================ */
 .image-carousel {
     position: relative;
-    /* NUEVO - para posicionar las flechas */
     overflow: hidden;
     background-color: var(--white);
     border-radius: 8px;
@@ -643,7 +624,6 @@ body {
     gap: 20px;
     animation: scroll 30s linear infinite;
     transition: transform 0.5s ease;
-    /* NUEVO - para navegación suave */
 }
 
 .carousel-track img {
@@ -668,7 +648,6 @@ body {
     animation-play-state: paused;
 }
 
-/* NUEVO: Botones de navegación del carrusel */
 .carousel-nav-btn {
     position: absolute;
     top: 50%;
@@ -700,15 +679,12 @@ body {
     right: 16px;
 }
 
-/* ============================================
-   Mission & Vision - Completamente Rediseñado
-   ============================================ */
+/* Misión y visión */
 .mission-vision {
     padding: 30px 0;
     background-color: var(--secondary-beige);
 }
 
-/* NUEVO: Layout en filas con imágenes */
 .mission-vision-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -717,7 +693,6 @@ body {
     margin-bottom: 40px;
 }
 
-/* NUEVO: Reverse para invertir orden en Visión */
 .mission-vision-row.reverse {
     direction: rtl;
 }
@@ -726,7 +701,6 @@ body {
     direction: ltr;
 }
 
-/* NUEVO: Contenedores de imágenes */
 .mission-images,
 .vision-images {
     display: grid;
@@ -743,7 +717,6 @@ body {
     border: 1px solid var(--border-light);
 }
 
-/* Mantener estilos existentes de card */
 .two-columns {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -841,7 +814,6 @@ body {
     transition: all 0.5s;
     border: 1px solid var(--border-light);
     overflow: hidden;
-    /* NUEVO - para las imágenes */
 }
 
 .area-card:hover {
@@ -849,7 +821,6 @@ body {
     box-shadow: 0 5px 13px rgba(0, 0, 0, 0.08);
 }
 
-/* NUEVO: Imagen en tarjetas */
 .area-card-image {
     width: 100%;
     height: 200px;
@@ -1010,7 +981,6 @@ body {
     letter-spacing: -0.02em;
 }
 
-/* NUEVO: Grid con mapa */
 .contact-grid-with-map {
     display: grid;
     grid-template-columns: 400px 1fr;
@@ -1018,7 +988,6 @@ body {
     margin-top: 56px;
 }
 
-/* NUEVO: Contenedor de información */
 .contact-info {
     display: flex;
     flex-direction: column;
@@ -1063,7 +1032,6 @@ body {
     line-height: 1.6;
 }
 
-/* NUEVO: Contenedor del mapa */
 .contact-map {
     height: 400px;
     border-radius: 8px;
@@ -1354,7 +1322,6 @@ body {
         font-size: 28px;
     }
 
-    /* NUEVO: Responsive para carrusel */
     .carousel-track img {
         height: 180px;
     }
@@ -1368,7 +1335,6 @@ body {
         margin: 0 auto;
     }
 
-    /* NUEVO: Responsive para Mission & Vision */
     .mission-vision-row,
     .mission-vision-row.reverse {
         grid-template-columns: 1fr;
@@ -1380,7 +1346,6 @@ body {
         height: 200px;
     }
 
-    /* NUEVO: Responsive para contacto con mapa */
     .contact-grid-with-map {
         grid-template-columns: 1fr;
     }

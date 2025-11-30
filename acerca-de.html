@@ -63,9 +63,7 @@
     <section class="main-description">
 
         <div class="container">
-            <!-- Carrusel de imágenes -->
             <div class="image-carousel">
-                <!-- Botón anterior -->
                 <button class="carousel-nav-btn carousel-prev-btn" aria-label="Anterior">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="white" />
@@ -89,8 +87,6 @@
                     <img src="img_kuenikueni/visitaHospital.jpeg" alt="Actividad 6">
                     <img src="img_kuenikueni/arte1.jpeg" alt="Actividad 7">
                 </div>
-
-                <!-- Botón siguiente -->
                 <button class="carousel-nav-btn carousel-next-btn" aria-label="Siguiente">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" fill="white" />
@@ -118,8 +114,6 @@
     <section class="mission-vision">
         <div class="container">
 
-
-            <!-- Misión con imagen -->
             <div class="mission-vision-row">
                 <div class="card">
                     <div class="card-icon">
@@ -139,7 +133,6 @@
                 </div>
             </div>
 
-            <!-- Visión con imagen -->
             <div class="mission-vision-row reverse">
                 <div class="card">
                     <div class="card-icon">
@@ -401,7 +394,7 @@
     <script src="javaScript/acerca-de.js"></script>
 </body>
 <script>
-    // Control del carrusel de imágenes
+ 
     document.addEventListener('DOMContentLoaded', function () {
         const carouselTrack = document.getElementById('carouselTrack');
         const prevBtn = document.querySelector('.carousel-prev-btn');
@@ -412,15 +405,14 @@
             let isAnimating = false;
             const images = carouselTrack.querySelectorAll('img');
             const totalImages = 5;
-            const imageWidth = 270; // Ancho de imagen + gap (250px + 20px)
-
-            // Pausar animación al interactuar
+            const imageWidth = 270; 
+         
             function pauseAnimation() {
                 carouselTrack.style.animation = 'none';
             }
             carouselTrack.style.transition = 'transform 0.5s ease';
             if (isAnimating) return;
-            // Reanudar animación
+           
             function resumeAnimation() {
                 carouselTrack.style.animationPlayState = 'running';
             }
@@ -430,37 +422,28 @@
                 carouselTrack.style.transform = `translateX(${offset}px)`;
             }
 
-            // Botón siguiente
             nextBtn.addEventListener('click', function () {
                 pauseAnimation();
                 currentIndex++;
 
-                // Si llegamos al final de las imágenes originales, reiniciamos
                 if (currentIndex >= totalImages) {
                     currentIndex = 0;
                 }
 
                 updateCarousel();
-
-                // Reanudar después de 3 segundos
                 setTimeout(resumeAnimation, 5000);
             });
 
             carouselTrack.addEventListener('mouseenter', function () { stopAnimation(); });
 
-            // Botón anterior
             prevBtn.addEventListener('click', function () {
                 pauseAnimation();
                 currentIndex--;
-
-                // Si vamos antes del inicio, vamos al final
                 if (currentIndex < 0) {
                     currentIndex = totalImages - 1;
                 }
 
                 updateCarousel();
-
-                // Reanudar después de 3 segundos
                 setTimeout(resumeAnimation, 3000);
             });
         }

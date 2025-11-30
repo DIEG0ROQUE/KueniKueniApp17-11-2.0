@@ -1,4 +1,4 @@
-// donation.js - Sistema de donaciones con conexión a Supabase
+// donation.js - Sistema de donaciones con validación de tarjetas y conexión a Supabase
 
 const EMAIL_SERVER_URL = 'http://localhost:3000';
 
@@ -81,6 +81,7 @@ if (donacion && !error) {
 document.addEventListener('DOMContentLoaded', function() {
     let selectedAmount = 0;
     let isCustomAmount = false;
+    let currentCardType = null;
 
     // Elementos del DOM
     const amountButtons = document.querySelectorAll('.amount-btn');
@@ -91,17 +92,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const impactAmount = document.getElementById('impactAmount');
     const destinoSelect = document.getElementById('destino');
     const tipoDonacion = document.querySelectorAll('input[name="tipo-donacion"]');
-    
+
     // Card inputs
     const cardNumber = document.getElementById('card-number');
     const expiry = document.getElementById('expiry');
     const cvv = document.getElementById('cvv');
 
     // ============================================
+    // AGREGAR CONTENEDOR PARA LOGO DE TARJETA
+    // ============================================
+    if (cardNumber) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-input-wrapper';
+        cardNumber.parentNode.insertBefore(wrapper, cardNumber);
+        wrapper.appendChild(cardNumber);
+
+        const logoContainer = document.createElement('div');
+        logoContainer.className = 'card-logo';
+        logoContainer.id = 'card-logo';
+        wrapper.appendChild(logoContainer);
+
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'card-error';
+        wrapper.appendChild(errorMsg);
+    }
+
+    // ============================================
     // MANEJO DE SELECCIÓN DE MONTOS
     // ============================================
     amountButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             // Remover selección previa
             amountButtons.forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
@@ -124,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Monto personalizado
-    customAmountInput.addEventListener('input', function() {
+    customAmountInput.addEventListener('input', function () {
         selectedAmount = parseFloat(this.value) || 0;
         updateSummary();
     });
@@ -136,25 +157,130 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // FORMATEO DE CAMPOS DE TARJETA
+    // FORMATEO Y VALIDACIÓN DE TARJETA
     // ============================================
-    cardNumber.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\s/g, '');
-        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-        e.target.value = formattedValue;
-    });
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\s/g, '');
 
-    expiry.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length >= 2) {
-            value = value.slice(0, 2) + '/' + value.slice(2, 4);
-        }
-        e.target.value = value;
-    });
+            // Limitar solo a números
+            value = value.replace(/\D/g, '');
 
-    cvv.addEventListener('input', function(e) {
-        e.target.value = e.target.value.replace(/\D/g, '');
-    });
+            // Detectar tipo de tarjeta
+            const detectedCard = detectCardType(value);
+            currentCardType = detectedCard;
+
+            // Mostrar logo
+            const logoContainer = document.getElementById('card-logo');
+            if (detectedCard && logoContainer) {
+                logoContainer.innerHTML = `<img src="${detectedCard.config.logo}" alt="${detectedCard.config.name}">`;
+                logoContainer.classList.add('active');
+            } else if (logoContainer) {
+                logoContainer.classList.remove('active');
+            }
+
+            // Limitar longitud según tipo de tarjeta
+            let maxLength = 16;
+            if (detectedCard) {
+                maxLength = Math.max(...detectedCard.config.lengths);
+            }
+
+            if (value.length > maxLength) {
+                value = value.slice(0, maxLength);
+            }
+
+            // Formatear
+            const formatted = formatCardNumber(value, detectedCard);
+            e.target.value = formatted;
+
+            // Validar
+            const errorMsg = document.getElementById('card-error');
+
+            if (value.length >= 13) {
+                const isValidLength = detectedCard ?
+                    detectedCard.config.lengths.includes(value.length) :
+                    value.length === 16;
+
+                const isValidLuhn = luhnCheck(value);
+
+                if (isValidLength && isValidLuhn) {
+                    e.target.classList.add('valid');
+                    e.target.classList.remove('invalid');
+                    if (errorMsg) {
+                        errorMsg.classList.remove('active');
+                    }
+                } else {
+                    e.target.classList.add('invalid');
+                    e.target.classList.remove('valid');
+                    if (errorMsg) {
+                        errorMsg.textContent = 'Número de tarjeta inválido';
+                        errorMsg.classList.add('active');
+                    }
+                }
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+                if (errorMsg) {
+                    errorMsg.classList.remove('active');
+                }
+            }
+
+            // Actualizar longitud de CVV
+            if (cvv && detectedCard) {
+                cvv.maxLength = detectedCard.config.cvvLength;
+                cvv.placeholder = detectedCard.config.cvvLength === 4 ? '1234' : '123';
+            }
+        });
+    }
+
+    // Validar fecha de expiración
+    if (expiry) {
+        expiry.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+
+            if (value.length > 4) {
+                value = value.slice(0, 4);
+            }
+
+            e.target.value = formatExpiry(value);
+
+            if (value.length === 4) {
+                if (validateExpiry(e.target.value)) {
+                    e.target.classList.add('valid');
+                    e.target.classList.remove('invalid');
+                } else {
+                    e.target.classList.add('invalid');
+                    e.target.classList.remove('valid');
+                }
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+            }
+        });
+    }
+
+    // Validar CVV
+    if (cvv) {
+        cvv.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+
+            const expectedLength = currentCardType?.config.cvvLength || 3;
+
+            if (value.length > expectedLength) {
+                value = value.slice(0, expectedLength);
+            }
+
+            e.target.value = value;
+
+            if (value.length === expectedLength) {
+                e.target.classList.add('valid');
+                e.target.classList.remove('invalid');
+            } else if (value.length > 0) {
+                e.target.classList.add('invalid');
+                e.target.classList.remove('valid');
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+            }
+        });
+    }
 
     // ============================================
     // ACTUALIZAR RESUMEN
@@ -176,9 +302,57 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================
+    // VALIDAR TARJETA MEJORADO
+    // ============================================
+    function validarTarjeta() {
+        const cardNum = cardNumber.value.replace(/\s/g, '');
+        const expiryVal = expiry.value;
+        const cvvVal = cvv.value;
+
+        // Validar número de tarjeta con Luhn
+        if (cardNum.length < 13 || !luhnCheck(cardNum)) {
+            mostrarMensaje('Número de tarjeta inválido', 'error');
+            cardNumber.classList.add('invalid');
+            return false;
+        }
+
+        // Validar longitud según tipo de tarjeta
+        if (currentCardType) {
+            if (!currentCardType.config.lengths.includes(cardNum.length)) {
+                mostrarMensaje(`Número de tarjeta ${currentCardType.config.name} debe tener ${currentCardType.config.lengths.join(' o ')} dígitos`, 'error');
+                return false;
+            }
+        }
+
+        // Validar formato de fecha
+        if (!/^\d{2}\/\d{2}$/.test(expiryVal)) {
+            mostrarMensaje('Fecha de expiración inválida (MM/AA)', 'error');
+            expiry.classList.add('invalid');
+            return false;
+        }
+
+        // Validar que no esté vencida
+        if (!validateExpiry(expiryVal)) {
+            mostrarMensaje('La tarjeta está vencida', 'error');
+            expiry.classList.add('invalid');
+            return false;
+        }
+
+        // Validar CVV según tipo de tarjeta
+        const expectedCvvLength = currentCardType?.config.cvvLength || 3;
+        if (cvvVal.length !== expectedCvvLength) {
+            mostrarMensaje(`CVV debe tener ${expectedCvvLength} dígitos`, 'error');
+            cvv.classList.add('invalid');
+            return false;
+        }
+
+        return true;
+    }
+
+    // ============================================
     // ENVIAR FORMULARIO
     // ============================================
-    donationForm.addEventListener('submit', async function(e) {
+    donationForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         // Validar que se haya seleccionado un monto
@@ -196,14 +370,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = {
             donante_nombre: document.getElementById('nombre').value.trim(),
             donante_email: document.getElementById('email').value.trim(),
-            donante_telefono: null, // Opcional, puedes agregarlo al form si lo necesitas
+            donante_telefono: null,
             monto: selectedAmount,
             moneda: 'MXN',
             metodo_pago: 'tarjeta',
-            estado_pago: 'completado', // En producción esto vendría del procesador de pago
+            estado_pago: 'completado',
             descripcion: obtenerDescripcionDonacion(),
             referencia_pago: generarReferenciaPago(),
-            socio_id: obtenerSocioId() // Si está logueado como socio
+            socio_id: obtenerSocioId()
         };
 
         console.log('Datos de donación:', formData);
@@ -211,40 +385,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Guardar en Supabase
         await guardarDonacion(formData);
     });
-
-    // ============================================
-    // VALIDAR TARJETA
-    // ============================================
-    function validarTarjeta() {
-        const cardNum = cardNumber.value.replace(/\s/g, '');
-        const expiryVal = expiry.value;
-        const cvvVal = cvv.value;
-
-        if (cardNum.length < 15 || cardNum.length > 16) {
-            mostrarMensaje('Número de tarjeta inválido', 'error');
-            return false;
-        }
-
-        if (!/^\d{2}\/\d{2}$/.test(expiryVal)) {
-            mostrarMensaje('Fecha de expiración inválida (MM/AA)', 'error');
-            return false;
-        }
-
-        // Validar que no esté vencida
-        const [month, year] = expiryVal.split('/');
-        const expDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
-        if (expDate < new Date()) {
-            mostrarMensaje('La tarjeta está vencida', 'error');
-            return false;
-        }
-
-        if (cvvVal.length < 3 || cvvVal.length > 4) {
-            mostrarMensaje('CVV inválido', 'error');
-            return false;
-        }
-
-        return true;
-    }
 
     // ============================================
     // GUARDAR DONACIÓN EN SUPABASE
@@ -281,9 +421,20 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 donationForm.reset();
                 selectedAmount = 0;
+                currentCardType = null;
                 updateSummary();
                 amountButtons.forEach(btn => btn.classList.remove('selected'));
                 customAmountInput.style.display = 'none';
+
+                // Limpiar estados de validación
+                cardNumber.classList.remove('valid', 'invalid');
+                expiry.classList.remove('valid', 'invalid');
+                cvv.classList.remove('valid', 'invalid');
+
+                const logoContainer = document.getElementById('card-logo');
+                if (logoContainer) {
+                    logoContainer.classList.remove('active');
+                }
             }, 3000);
 
         } catch (error) {
@@ -301,12 +452,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const destino = destinoSelect.options[destinoSelect.selectedIndex].text;
         const tipo = document.querySelector('input[name="tipo-donacion"]:checked').value;
         const mensaje = document.getElementById('mensaje').value.trim();
-        
+
         let descripcion = `Donación ${tipo === 'unica' ? 'única' : 'mensual'} para ${destino}`;
         if (mensaje) {
             descripcion += ` - Mensaje: ${mensaje}`;
         }
-        
+
         return descripcion;
     }
 
@@ -317,7 +468,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function obtenerSocioId() {
-        // Si el usuario está logueado como socio, obtener su ID
         return sessionStorage.getItem('socioId') || null;
     }
 
@@ -325,7 +475,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // MENSAJES Y UI
     // ============================================
     function mostrarMensaje(mensaje, tipo) {
-        // Crear o actualizar el contenedor de mensajes
         let container = document.querySelector('.message-container');
         if (!container) {
             container = document.createElement('div');
@@ -339,7 +488,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // Auto-ocultar después de 5 segundos
         setTimeout(() => {
             const msg = container.querySelector('.message');
             if (msg) {
@@ -374,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function mostrarCargando(mostrar) {
         const submitBtn = donationForm.querySelector('button[type="submit"]');
-        
+
         if (mostrar) {
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
@@ -392,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// ESTILOS PARA MENSAJES
+// ESTILOS PARA MENSAJES Y VALIDACIÓN
 // ============================================
 const styles = document.createElement('style');
 styles.textContent = `
@@ -446,6 +594,64 @@ styles.textContent = `
         color: white;
         border-color: #5f0d51;
         transform: scale(1.05);
+    }
+
+    /* Estilos de validación de tarjeta */
+    .card-input-wrapper {
+        position: relative;
+    }
+
+    .card-input-wrapper .form-input {
+        padding-right: 50px;
+    }
+
+    .card-logo {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 25px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-logo.active {
+        display: flex;
+    }
+
+    .card-logo img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .form-input.valid {
+        border-color: #22c55e;
+    }
+
+    .form-input.invalid {
+        border-color: #ef4444;
+    }
+
+    .form-input.valid:focus {
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+    }
+
+    .form-input.invalid:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .error-message {
+        font-size: 12px;
+        color: #ef4444;
+        margin-top: 4px;
+        display: none;
+    }
+
+    .error-message.active {
+        display: block;
     }
 `;
 document.head.appendChild(styles);

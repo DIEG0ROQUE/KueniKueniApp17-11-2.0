@@ -3,20 +3,21 @@
 /* Hero de Donación */
 .donation-hero {
     background-color: var(--secondary-beige);
-    padding: 80px 0 60px;
+    padding: 80px 0 40px;
     text-align: center;
 }
 
 .donation-title {
-    font-size: 42px;
+    background: linear-gradient(135deg, #5f0d51 0%, #7d1167 100%);
+    font-size: 45px;
     font-weight: 700;
-    color: var(--text-dark);
+    color: white;
     margin-bottom: 16px;
     letter-spacing: -0.02em;
 }
 
 .donation-subtitle {
-    font-size: 17px;
+    font-size: 21px;
     color: var(--text-gray);
     max-width: 600px;
     margin: 0 auto;
@@ -24,7 +25,7 @@
 
 /* Sección del Formulario */
 .donation-form-section {
-    padding: 60px 0 100px;
+    padding: 40px 0 100px;
     background-color: var(--secondary-beige);
 }
 
@@ -218,11 +219,123 @@
     gap: 16px;
 }
 
+/* Estilos adicionales para validación de tarjetas */
+
+/* Contenedor de tarjeta con logo */
+.card-input-wrapper {
+    position: relative;
+}
+
+.card-input-wrapper .form-input {
+    padding-right: 50px;
+}
+
+.card-logo {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 25px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-logo.active {
+    display: flex;
+}
+
+.card-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Estados de validación */
+.form-input.valid {
+    border-color: #22c55e;
+}
+
+.form-input.invalid {
+    border-color: #ef4444;
+}
+
+.form-input.valid:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.form-input.invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Mensajes de error */
+.error-message {
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 4px;
+    display: none;
+}
+
+.error-message.active {
+    display: block;
+}
+
+/* Iconos de validación */
+.validation-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+}
+
+.validation-icon.active {
+    display: block;
+}
+
+/* Método de pago mejorado */
+.payment-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+
+.payment-cards {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.payment-card-icon {
+    width: 35px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+}
+
+.payment-card-icon.active {
+    opacity: 1;
+}
+
+.payment-card-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
 /* Botón de Donación */
 .btn-donate {
     width: 100%;
     padding: 16px 24px;
-    background-color: #906b90;
+    background-color: #750e5bbd;
     color: var(--white);
     border: none;
     border-radius: 6px;
@@ -234,7 +347,7 @@
 }
 
 .btn-donate:hover:not(:disabled) {
-    background-color: #6d225d;
+    background-color: #5e074b;
     transform: translateY(-1px);
 }
 

@@ -1,81 +1,136 @@
 // donation.js - Sistema de donaciones con validación de tarjetas y conexión a Supabase
 
-const EMAIL_SERVER_URL = 'http://localhost:3000';
+// Definir tipos de tarjetas con sus patrones
+const cardTypes = {
+    visa: {
+        pattern: /^4/,
+        lengths: [13, 16, 19],
+        cvvLength: 3,
+        name: 'Visa',
+       logo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNy45ODI0MzkwMjQzOTAyNDIiIHZpZXdCb3g9IjAgMCAxMDI1IDc2OCI+PHBhdGggZmlsbD0iIzRmNDZlNSIgZD0iTTk2MC4zMSA3NjhoLTg5NnEtMjYgMC00NS0xOC41VCAuMzEgNzA0VjU3NmgxMDI0djEyOHEwIDI3LTE4LjUgNDUuNXQtNDUuNSAxOC41TS4zMSA2NHEwLTI2IDE4LjUtNDV0NDUuNS0xOWg4OTZxMjcgMCA0NS41IDE5dDE4LjUgNDV2NjRILjMxem0zMjkgNDQ4bDUyLTMyMGg4M2wtNTIgMzIwem01MjktMzIwaDY3bDY3IDMyMGgtNzdsLTE5LTMyaC05NmwtMTggMzJoLTg3bDEyNC0yOTZsMS0yLjVsNC02bDctN2wxMS02em0zOCAyMjRsLTI5LTEzN2wtMzUgMTM3em0tMzM4IDk2cS0yNSAwLTQ5LTQuNXQtMzQtOC41bC0xMS00bDEyLTcwcTE3IDE0IDUwIDE5LjV0NjAuNS0xdDI3LjUtMjYuNXEwLTEzLTE4LTI1LjV0LTQwLTIxLjV0LTQwLTI5dC0xOC00N3EwLTI5IDE1LjUtNTF0MzkuNS0zMnQ0NS0xNC41dDQwLTQuNXExNyAwIDM2IDMuNXQyOSA2LjVsMTAgM2wtMTIgNjdxLTI2LTE2LTcxLjUtMTQuNXQtNDUuNSAyNS41cTAgMTIgMTguNSAyMy41dDQwLjUgMjF0NDAgMzAuNXQxOCA0OHEwIDM2LTI0LjUgNjEuNXQtNTUuNSAzNXQtNjMgOS41bS00NTYtMzIwcTE2IDAgMjUuNSA3LjV0MTEuNSAxNC41bDIgN2wyOCAxNDRsMTAgNDdsNzktMjIwaDkwbC0xMzMgMzIwaC04N2wtNzItMjc4cS0yMi0xMy01Ni0yNHYtMTh6Ii8+PC9zdmc+'
+    },
+    mastercard: {
+        pattern: /^(5[1-5]|2[2-7])/,
+        lengths: [16],
+        cvvLength: 3,
+        name: 'Mastercard',
+        logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCA0MCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHJ4PSIzIiBmaWxsPSIjRUIwMDFCIi8+CiAgPGNpcmNsZSBjeD0iMTUiIGN5PSIxMi41IiByPSI1IiBmaWxsPSIjRkY1RjAwIi8+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSIxMi41IiByPSI1IiBmaWxsPSIjRkY1RjAwIi8+CiAgPHBhdGggZD0iTSAyMCAxMi41IEEgNSA1IDAgMCAwIDE1IDE3LjUgQSA1IDUgMCAwIDAgMjUgMTcuNSBBIDUgNSAwIDAgMCAyMCAxMi41IFoiIGZpbGw9IiNGRjVGMDAiLz4KPC9zdmc+'
+    },
+    amex: {
+        pattern: /^3[47]/,
+        lengths: [15],
+        cvvLength: 4,
+        name: 'American Express',
+        logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCA0MCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHJ4PSIzIiBmaWxsPSIjMDA2RkNGIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFNRVg8L3RleHQ+Cjwvc3ZnPg=='
+    },
+    discover: {
+        pattern: /^6(?:011|5)/,
+        lengths: [16, 19],
+        cvvLength: 3,
+        name: 'Discover',
+        logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCA0MCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHJ4PSIzIiBmaWxsPSIjRkY2MDAwIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIxMi41IiByPSI1IiBmaWxsPSIjRkZDRDAwIi8+Cjwvc3ZnPg=='
+    }
+};
 
-async function enviarComprobanteDonacion(donacion) {
-    try {
-        const response = await fetch(`${EMAIL_SERVER_URL}/send-donation-receipt`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: donacion.email,
-                nombre: donacion.nombre,
-                monto: donacion.monto,
-                fecha: donacion.fecha || new Date().toLocaleDateString('es-MX'),
-                folio: donacion.folio || `DON-${Date.now()}`,
-                metodo_pago: donacion.metodo_pago
-            })
-        });
+// ============================================
+// FUNCIONES DE VALIDACIÓN DE TARJETA
+// ============================================
 
-        const data = await response.json();
-        
-        if (response.ok) {
-            console.log('✅ Comprobante enviado');
-            return true;
-        } else {
-            console.error('❌ Error:', data.error);
-            return false;
+// Detectar tipo de tarjeta
+function detectCardType(number) {
+    const cleanNumber = number.replace(/\s/g, '');
+    
+    for (const [type, config] of Object.entries(cardTypes)) {
+        if (config.pattern.test(cleanNumber)) {
+            return { type, config };
         }
-    } catch (error) {
-        console.error('❌ Error al enviar comprobante:', error);
-        return false;
+    }
+    
+    return null;
+}
+
+function getCardType(number) {
+    number = number.replace(/\s+/g, '');
+
+    if (/^4/.test(number)) return "visa";
+    if (/^5[1-5]/.test(number)) return "mastercard";
+    if (/^3[47]/.test(number)) return "amex";
+    if (/^6(?:011|5)/.test(number)) return "discover";
+
+    return "";
+}
+
+// Validar usando algoritmo de Luhn
+function luhnCheck(number) {
+    const cleanNumber = number.replace(/\s/g, '');
+    let sum = 0;
+    let isEven = false;
+    
+    for (let i = cleanNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(cleanNumber[i]);
+        
+        if (isEven) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+        
+        sum += digit;
+        isEven = !isEven;
+    }
+    
+    return sum % 10 === 0;
+}
+
+// Formatear número de tarjeta
+function formatCardNumber(value, cardType) {
+    const cleanValue = value.replace(/\s/g, '');
+    
+    if (cardType?.type === 'amex') {
+        // American Express: 4-6-5
+        return cleanValue.replace(/(\d{4})(\d{6})(\d{5})/, '$1 $2 $3').trim();
+    } else {
+        // Otras tarjetas: 4-4-4-4
+        return cleanValue.replace(/(\d{4})/g, '$1 ').trim();
     }
 }
 
-
-
-
-
-
-
-// Después de guardar la donación en Supabase
-const { data: donacion, error } = await supabaseClient
-    .from('donaciones')
-    .insert([nuevaDonacion])
-    .select()
-    .single();
-
-if (donacion && !error) {
-    // Enviar comprobante por correo
-    await enviarComprobanteDonacion({
-        email: donacion.email || sessionStorage.getItem('userEmail'),
-        nombre: donacion.nombre_donante || sessionStorage.getItem('userName'),
-        monto: donacion.monto,
-        fecha: donacion.fecha_donacion,
-        folio: donacion.id,
-        metodo_pago: donacion.metodo_pago
-    });
+// Formatear fecha de expiración
+function formatExpiry(value) {
+    const cleanValue = value.replace(/\D/g, '');
     
-    alert('¡Donación registrada! Revisa tu correo para el comprobante.');
+    if (cleanValue.length >= 2) {
+        return cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4);
+    }
+    
+    return cleanValue;
 }
 
+function validateExpiry(value) {
+    const parts = value.split('/');
+    if (parts.length !== 2) return false;
 
+    const month = parseInt(parts[0]);
+    const year = parseInt('20' + parts[1]);
 
+    if (month < 1 || month > 12) return false;
 
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
 
+  
+    if (year < currentYear) return false;
 
+  
+    if (year === currentYear && month < currentMonth) return false;
 
+    
+    if (year > currentYear + 15) return false;
 
-
-
-
-
-
-
-
-
-
-
+    return true;
+}
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const impactAmount = document.getElementById('impactAmount');
     const destinoSelect = document.getElementById('destino');
     const tipoDonacion = document.querySelectorAll('input[name="tipo-donacion"]');
-
+    
     // Card inputs
     const cardNumber = document.getElementById('card-number');
     const expiry = document.getElementById('expiry');
@@ -106,12 +161,12 @@ document.addEventListener('DOMContentLoaded', function() {
         wrapper.className = 'card-input-wrapper';
         cardNumber.parentNode.insertBefore(wrapper, cardNumber);
         wrapper.appendChild(cardNumber);
-
+        
         const logoContainer = document.createElement('div');
         logoContainer.className = 'card-logo';
         logoContainer.id = 'card-logo';
         wrapper.appendChild(logoContainer);
-
+        
         const errorMsg = document.createElement('div');
         errorMsg.className = 'error-message';
         errorMsg.id = 'card-error';
@@ -122,8 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // MANEJO DE SELECCIÓN DE MONTOS
     // ============================================
     amountButtons.forEach(btn => {
-        btn.addEventListener('click', function () {
-            // Remover selección previa
+        btn.addEventListener('click', function() {
+           
             amountButtons.forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
 
@@ -145,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Monto personalizado
-    customAmountInput.addEventListener('input', function () {
+    customAmountInput.addEventListener('input', function() {
         selectedAmount = parseFloat(this.value) || 0;
         updateSummary();
     });
@@ -160,15 +215,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // FORMATEO Y VALIDACIÓN DE TARJETA
     // ============================================
     if (cardNumber) {
-        cardNumber.addEventListener('input', function (e) {
+        cardNumber.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\s/g, '');
-
+            
             // Limitar solo a números
             value = value.replace(/\D/g, '');
-
+            
             // Detectar tipo de tarjeta
             const detectedCard = detectCardType(value);
             currentCardType = detectedCard;
+            
+            // ==== PLACEHOLDER DINÁMICO SEGÚN TIPO DE TARJETA ====
+if (detectedCard) {
+    let placeholder = '';
+
+    switch (detectedCard.type) {
+        case 'visa':
+        case 'mastercard':
+        case 'discover':
+            placeholder = '#### #### #### ####';
+            break;
+        case 'amex':
+            placeholder = '#### ###### #####';
+            break;
+    }
+
+    cardNumber.placeholder = placeholder;
+} else {
+    // Placeholder genérico cuando aún no detecta tarjeta
+    cardNumber.placeholder = '#### #### #### ####';
+}
+
 
             // Mostrar logo
             const logoContainer = document.getElementById('card-logo');
@@ -178,31 +255,31 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (logoContainer) {
                 logoContainer.classList.remove('active');
             }
-
+            
             // Limitar longitud según tipo de tarjeta
             let maxLength = 16;
             if (detectedCard) {
                 maxLength = Math.max(...detectedCard.config.lengths);
             }
-
+            
             if (value.length > maxLength) {
                 value = value.slice(0, maxLength);
             }
-
+            
             // Formatear
             const formatted = formatCardNumber(value, detectedCard);
             e.target.value = formatted;
-
+            
             // Validar
             const errorMsg = document.getElementById('card-error');
-
+            
             if (value.length >= 13) {
-                const isValidLength = detectedCard ?
-                    detectedCard.config.lengths.includes(value.length) :
+                const isValidLength = detectedCard ? 
+                    detectedCard.config.lengths.includes(value.length) : 
                     value.length === 16;
-
+                
                 const isValidLuhn = luhnCheck(value);
-
+                
                 if (isValidLength && isValidLuhn) {
                     e.target.classList.add('valid');
                     e.target.classList.remove('invalid');
@@ -223,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     errorMsg.classList.remove('active');
                 }
             }
-
+            
             // Actualizar longitud de CVV
             if (cvv && detectedCard) {
                 cvv.maxLength = detectedCard.config.cvvLength;
@@ -234,15 +311,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validar fecha de expiración
     if (expiry) {
-        expiry.addEventListener('input', function (e) {
+        expiry.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-
+            
             if (value.length > 4) {
                 value = value.slice(0, 4);
             }
-
+            
             e.target.value = formatExpiry(value);
-
+            
             if (value.length === 4) {
                 if (validateExpiry(e.target.value)) {
                     e.target.classList.add('valid');
@@ -259,17 +336,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validar CVV
     if (cvv) {
-        cvv.addEventListener('input', function (e) {
+        cvv.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-
+            
             const expectedLength = currentCardType?.config.cvvLength || 3;
-
+            
             if (value.length > expectedLength) {
                 value = value.slice(0, expectedLength);
             }
-
+            
             e.target.value = value;
-
+            
             if (value.length === expectedLength) {
                 e.target.classList.add('valid');
                 e.target.classList.remove('invalid');
@@ -352,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     // ENVIAR FORMULARIO
     // ============================================
-    donationForm.addEventListener('submit', async function (e) {
+    donationForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         // Validar que se haya seleccionado un monto
@@ -425,12 +502,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateSummary();
                 amountButtons.forEach(btn => btn.classList.remove('selected'));
                 customAmountInput.style.display = 'none';
-
+                
                 // Limpiar estados de validación
                 cardNumber.classList.remove('valid', 'invalid');
                 expiry.classList.remove('valid', 'invalid');
                 cvv.classList.remove('valid', 'invalid');
-
+                
                 const logoContainer = document.getElementById('card-logo');
                 if (logoContainer) {
                     logoContainer.classList.remove('active');
@@ -452,12 +529,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const destino = destinoSelect.options[destinoSelect.selectedIndex].text;
         const tipo = document.querySelector('input[name="tipo-donacion"]:checked').value;
         const mensaje = document.getElementById('mensaje').value.trim();
-
+        
         let descripcion = `Donación ${tipo === 'unica' ? 'única' : 'mensual'} para ${destino}`;
         if (mensaje) {
             descripcion += ` - Mensaje: ${mensaje}`;
         }
-
+        
         return descripcion;
     }
 
@@ -522,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function mostrarCargando(mostrar) {
         const submitBtn = donationForm.querySelector('button[type="submit"]');
-
+        
         if (mostrar) {
             submitBtn.disabled = true;
             submitBtn.innerHTML = `

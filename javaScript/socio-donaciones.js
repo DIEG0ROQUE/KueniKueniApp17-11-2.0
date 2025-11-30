@@ -1,9 +1,28 @@
-// socio-donaciones.js - Sistema de gestión de donaciones del socio (Optimizado)
-// ============================================================================
+// ============================================
+// SISTEMA COMPLETO DE DONACIONES CON SUSCRIPCIONES
+// Mantiene funcionalidad original + nuevas características
+// ============================================
 
-// ============================================================================
-// 1. VERIFICACIÓN DE SESIÓN Y CONFIGURACIÓN INICIAL
-// ============================================================================
+const DONACIONES_POR_PAGINA = 10;
+let paginaActualHistorial = 1;
+let todasLasDonaciones = [];
+let donacionesFiltradas = [];
+let suscripcionActual = null;
+
+// Bancos detectables por BIN (primeros 4-6 dígitos)
+const BANCOS_MEXICO = {
+    'BBVA': { bins: ['4152', '4772'], color: '#004481' },
+    'Santander': { bins: ['5579'], color: '#EC0000' },
+    'Banorte': { bins: ['5465', '5492'], color: '#DA291C' },
+    'HSBC': { bins: ['4051', '5469'], color: '#DB0011' },
+    'Citibanamex': { bins: ['5256', '4915'], color: '#003B71' },
+    'ScotiaBank': { bins: ['4571'], color: '#EC1C24' },
+    'Inbursa': { bins: ['5204'], color: '#C8102E' }
+};
+
+// ============================================
+// 1. INICIALIZACIÓN
+// ============================================
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Inicializando vista de donaciones...');
@@ -18,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Verificar cliente Supabase
     if (!window.supabaseClient) {
         console.error('Error: Cliente Supabase no inicializado');
-        mostrarMensajeError('Error de configuración. Por favor, recarga la página.');
+        mostrarMensaje('Error de configuración. Por favor, recarga la página.', 'error');
         return;
     }
     
@@ -37,12 +56,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     await inicializarDonaciones(socioId);
     
     // Configurar event listeners
-    configurarEventListeners();
+    configurarEventListeners(socioId);
 });
 
-// ============================================================================
+// ============================================
 // 2. VERIFICACIÓN DE SESIÓN
-// ============================================================================
+// ============================================
 
 function verificarSesion() {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
@@ -60,23 +79,28 @@ function verificarSesion() {
     return true;
 }
 
-// ============================================================================
-// 3. INICIALIZACIÓN DE LA VISTA DE DONACIONES
-// ============================================================================
+// ============================================
+// 3. INICIALIZACIÓN COMPLETA
+// ============================================
 
 async function inicializarDonaciones(socioId) {
     try {
-        // Cargar donaciones del socio
+        // Cargar suscripción activa (si existe)
+        await cargarSuscripcion(socioId);
+        
+        // Cargar donaciones
         const donaciones = await cargarDonacionesSocio(socioId);
         
         if (donaciones && donaciones.length > 0) {
+            todasLasDonaciones = donaciones;
+            donacionesFiltradas = [...donaciones];
+            
             // Actualizar estadísticas
             actualizarEstadisticas(donaciones);
             
-            // Mostrar tabla de donaciones
-            mostrarTablaDonaciones(donaciones);
+            // Mostrar primera página
+            mostrarPaginaHistorial(1);
         } else {
-            // No hay donaciones
             mostrarSinDonaciones();
             actualizarEstadisticasVacias();
         }
@@ -85,13 +109,13 @@ async function inicializarDonaciones(socioId) {
         
     } catch (error) {
         console.error('Error al cargar donaciones:', error);
-        mostrarMensajeError('Ocurrió un error al cargar tus donaciones. Por favor, intenta actualizar la página.');
+        mostrarMensaje('Ocurrió un error al cargar tus donaciones. Por favor, intenta actualizar la página.', 'error');
     }
 }
 
-// ============================================================================
-// 4. CARGAR DONACIONES DEL SOCIO
-// ============================================================================
+// ============================================
+// 4. CARGAR DONACIONES
+// ============================================
 
 async function cargarDonacionesSocio(socioId) {
     console.log('Cargando donaciones del socio:', socioId);
@@ -105,11 +129,6 @@ async function cargarDonacionesSocio(socioId) {
         
         if (error) {
             console.error('Error al cargar donaciones:', error);
-            
-            if (error.message.includes('permission')) {
-                mostrarMensajeError('No tienes permiso para ver esta información. Contacta al administrador.');
-            }
-            
             return [];
         }
         
@@ -122,13 +141,65 @@ async function cargarDonacionesSocio(socioId) {
     }
 }
 
-// ============================================================================
-// 5. ACTUALIZAR ESTADÍSTICAS
-// ============================================================================
+// ============================================
+// 5. SUSCRIPCIONES
+// ============================================
+
+async function cargarSuscripcion(socioId) {
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('suscripciones_mensuales')
+            .select('*')
+            .eq('socio_id', socioId)
+            .eq('estado', 'activa')
+            .maybeSingle();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error al cargar suscripción:', error);
+            return;
+        }
+        
+        if (data) {
+            suscripcionActual = data;
+            mostrarEstadoSuscripcion(data);
+        }
+    } catch (error) {
+        console.error('Error al cargar suscripción:', error);
+    }
+}
+
+function mostrarEstadoSuscripcion(suscripcion) {
+    const statusSection = document.getElementById('suscripcionStatus');
+    if (!statusSection) return;
+    
+    statusSection.style.display = 'block';
+    
+    const montoEl = document.getElementById('montoSuscripcion');
+    if (montoEl) montoEl.textContent = parseFloat(suscripcion.monto).toFixed(2);
+    
+    const proximaEl = document.getElementById('proximoCargo');
+    if (proximaEl) {
+        const proximaFecha = new Date(suscripcion.proxima_fecha_cargo);
+        proximaEl.textContent = proximaFecha.toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+    
+    const tarjetaEl = document.getElementById('tarjetaSuscripcion');
+    if (tarjetaEl) tarjetaEl.textContent = `**** ${suscripcion.ultimos_digitos}`;
+}
+
+// ============================================
+// 6. ESTADÍSTICAS
+// ============================================
 
 function actualizarEstadisticas(donaciones) {
     // Filtrar solo donaciones completadas
-    const donacionesCompletadas = donaciones.filter(d => d.estado_pago === 'completado');
+    const donacionesCompletadas = donaciones.filter(d => 
+        d.estado === 'completado' || d.estado_pago === 'completado'
+    );
     
     // Calcular total donado
     const totalDonado = donacionesCompletadas.reduce((sum, d) => sum + parseFloat(d.monto), 0);
@@ -140,28 +211,14 @@ function actualizarEstadisticas(donaciones) {
     const promedio = numDonaciones > 0 ? totalDonado / numDonaciones : 0;
     
     // Actualizar UI
-    const statCards = document.querySelectorAll('.donacion-stat-card');
+    const totalEl = document.getElementById('totalDonado');
+    if (totalEl) totalEl.textContent = `$${totalDonado.toFixed(2)}`;
     
-    if (statCards[0]) {
-        const totalElement = statCards[0].querySelector('.stat-value-don');
-        if (totalElement) {
-            totalElement.textContent = `$${totalDonado.toLocaleString('es-MX', {minimumFractionDigits: 0})}`;
-        }
-    }
+    const numeroEl = document.getElementById('numeroDonaciones');
+    if (numeroEl) numeroEl.textContent = numDonaciones;
     
-    if (statCards[1]) {
-        const numElement = statCards[1].querySelector('.stat-value-don');
-        if (numElement) {
-            numElement.textContent = numDonaciones;
-        }
-    }
-    
-    if (statCards[2]) {
-        const promedioElement = statCards[2].querySelector('.stat-value-don');
-        if (promedioElement) {
-            promedioElement.textContent = `$${promedio.toLocaleString('es-MX', {minimumFractionDigits: 0})}`;
-        }
-    }
+    const promedioEl = document.getElementById('promedioDonacion');
+    if (promedioEl) promedioEl.textContent = `$${promedio.toFixed(2)}`;
     
     console.log('Estadísticas actualizadas:', {
         total: totalDonado,
@@ -170,281 +227,483 @@ function actualizarEstadisticas(donaciones) {
     });
 }
 
-// ============================================================================
-// 6. ACTUALIZAR ESTADÍSTICAS VACÍAS
-// ============================================================================
-
 function actualizarEstadisticasVacias() {
-    const statCards = document.querySelectorAll('.donacion-stat-card');
+    const totalEl = document.getElementById('totalDonado');
+    if (totalEl) totalEl.textContent = '$0';
     
-    if (statCards[0]) {
-        const totalElement = statCards[0].querySelector('.stat-value-don');
-        if (totalElement) totalElement.textContent = '$0';
-    }
+    const numeroEl = document.getElementById('numeroDonaciones');
+    if (numeroEl) numeroEl.textContent = '0';
     
-    if (statCards[1]) {
-        const numElement = statCards[1].querySelector('.stat-value-don');
-        if (numElement) numElement.textContent = '0';
-    }
-    
-    if (statCards[2]) {
-        const promedioElement = statCards[2].querySelector('.stat-value-don');
-        if (promedioElement) promedioElement.textContent = '$0';
-    }
+    const promedioEl = document.getElementById('promedioDonacion');
+    if (promedioEl) promedioEl.textContent = '$0';
 }
 
-// ============================================================================
-// 7. MOSTRAR TABLA DE DONACIONES
-// ============================================================================
+// ============================================
+// 7. PAGINACIÓN
+// ============================================
 
-function mostrarTablaDonaciones(donaciones) {
-    const tbody = document.querySelector('.donaciones-table tbody');
+function mostrarPaginaHistorial(pagina) {
+    const inicio = (pagina - 1) * DONACIONES_POR_PAGINA;
+    const fin = inicio + DONACIONES_POR_PAGINA;
+    const paginaDatos = donacionesFiltradas.slice(inicio, fin);
     
-    if (!tbody) {
-        console.warn('Tbody de la tabla no encontrado');
+    const tbody = document.getElementById('donacionesTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    if (paginaDatos.length === 0 && donacionesFiltradas.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 3rem; color: #6b7280;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 1rem; opacity: 0.3;">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
+                    </svg>
+                    <div style="font-size: 1.125rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.5rem;">No hay donaciones registradas</div>
+                    <div>Realiza tu primera donación para apoyar a la comunidad</div>
+                </td>
+            </tr>
+        `;
         return;
     }
     
-    tbody.innerHTML = donaciones.map(donacion => {
-        const badge = obtenerBadgeEstado(donacion.estado_pago);
-        const descripcion = obtenerDescripcionDonacion(donacion);
+    paginaDatos.forEach(donacion => {
+        const row = document.createElement('tr');
+        const fecha = new Date(donacion.fecha_donacion);
+        const tipoDonacion = donacion.tipo_donacion || 'unica';
+        const estado = donacion.estado || donacion.estado_pago || 'completado';
+        const descripcion = donacion.descripcion || donacion.mensaje || 'Donación general';
         
-        return `
-            <tr>
-                <td>${formatearFechaDonacion(donacion.fecha_donacion)}</td>
-                <td>${descripcion}</td>
-                <td class="amount-cell">$${parseFloat(donacion.monto).toLocaleString('es-MX', {minimumFractionDigits: 2})} ${donacion.moneda}</td>
-                <td><span class="badge-${badge.clase}">${badge.texto}</span></td>
-            </tr>
+        row.innerHTML = `
+            <td>${fecha.toLocaleDateString('es-MX')}</td>
+            <td>${descripcion}</td>
+            <td style="font-weight: 600; color: #5f0d51;">$${parseFloat(donacion.monto).toFixed(2)}</td>
+            <td><span class="badge-tipo-${tipoDonacion}">${tipoDonacion === 'mensual' ? 'Mensual' : 'Única'}</span></td>
+            <td><span class="badge-estado-${estado}">${estado === 'completado' ? 'Completado' : 'Pendiente'}</span></td>
         `;
-    }).join('');
+        tbody.appendChild(row);
+    });
     
-    console.log('Tabla de donaciones actualizada');
+    actualizarPaginacionHistorial(pagina);
 }
 
-// ============================================================================
-// 8. OBTENER DESCRIPCIÓN DE DONACIÓN
-// ============================================================================
-
-function obtenerDescripcionDonacion(donacion) {
-    // Si tiene mensaje personalizado, usarlo
-    if (donacion.mensaje) {
-        return donacion.mensaje;
+function actualizarPaginacionHistorial(pagina) {
+    const totalPaginas = Math.ceil(donacionesFiltradas.length / DONACIONES_POR_PAGINA);
+    
+    const paginaInfo = document.getElementById('paginaInfo');
+    if (paginaInfo) {
+        paginaInfo.textContent = `Página ${pagina} de ${totalPaginas || 1}`;
     }
     
-    // Si tiene destino específico, usarlo
-    if (donacion.destino && donacion.destino !== 'general') {
-        const destinos = {
-            'reforestacion': 'Donación para programa de reforestación',
-            'artesanias': 'Donación para taller de artesanías',
-            'deportivo': 'Apoyo para eventos deportivos',
-            'asistencia': 'Donación para asistencia social'
-        };
-        return destinos[donacion.destino] || 'Contribución general';
-    }
+    const btnPrev = document.getElementById('btnPrevHistorial');
+    if (btnPrev) btnPrev.disabled = pagina === 1;
     
-    // Si tiene descripción explícita
-    if (donacion.descripcion) {
-        return donacion.descripcion;
-    }
+    const btnNext = document.getElementById('btnNextHistorial');
+    if (btnNext) btnNext.disabled = pagina === totalPaginas || totalPaginas === 0;
     
-    // Por defecto
-    return 'Contribución general';
+    paginaActualHistorial = pagina;
 }
-
-// ============================================================================
-// 9. MOSTRAR MENSAJE SIN DONACIONES
-// ============================================================================
 
 function mostrarSinDonaciones() {
-    const tbody = document.querySelector('.donaciones-table tbody');
-    
+    const tbody = document.getElementById('donacionesTableBody');
     if (!tbody) return;
     
     tbody.innerHTML = `
         <tr>
-            <td colspan="4" style="text-align: center; padding: 3rem; color: #64748b;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
+            <td colspan="5" style="text-align: center; padding: 3rem; color: #6b7280;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 1rem; opacity: 0.3;">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
                 </svg>
-                <p style="font-size: 1.1rem; font-weight: 500; margin-bottom: 0.5rem;">Aún no tienes donaciones registradas</p>
-                <p style="font-size: 0.9rem;">Haz tu primera donación para apoyar a la comunidad</p>
-                <button 
-                    onclick="window.location.href='donante-donar.html'" 
-                    style="
-                        margin-top: 1.5rem;
-                        padding: 0.75rem 1.5rem;
-                        background: #5f0d51;
-                        color: white;
-                        border: none;
-                        border-radius: 8px;
-                        font-weight: 500;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                    "
-                    onmouseover="this.style.background='#4d0a37ff'"
-                    onmouseout="this.style.background='#5f0d51'"
-                >
-                    Hacer una Donación
-                </button>
+                <div style="font-size: 1.125rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.5rem;">No hay donaciones registradas</div>
+                <div>Realiza tu primera donación para apoyar a la comunidad</div>
             </td>
         </tr>
     `;
 }
 
-// ============================================================================
-// 10. CONFIGURAR EVENT LISTENERS
-// ============================================================================
+// ============================================
+// 8. FILTROS
+// ============================================
 
-function configurarEventListeners() {
-    // Botón de cerrar sesión
+function aplicarFiltros() {
+    const filtroMonto = document.getElementById('filtroMonto');
+    const filtroFecha = document.getElementById('filtroFecha');
+    
+    if (!filtroMonto || !filtroFecha) return;
+    
+    const valorMonto = filtroMonto.value;
+    const valorFecha = filtroFecha.value;
+    
+    donacionesFiltradas = [...todasLasDonaciones];
+    
+    // Ordenar por monto
+    if (valorMonto === 'mayor') {
+        donacionesFiltradas.sort((a, b) => parseFloat(b.monto) - parseFloat(a.monto));
+    } else if (valorMonto === 'menor') {
+        donacionesFiltradas.sort((a, b) => parseFloat(a.monto) - parseFloat(b.monto));
+    }
+    
+    // Ordenar por fecha
+    if (valorFecha === 'reciente') {
+        donacionesFiltradas.sort((a, b) => new Date(b.fecha_donacion) - new Date(a.fecha_donacion));
+    } else if (valorFecha === 'antiguo') {
+        donacionesFiltradas.sort((a, b) => new Date(a.fecha_donacion) - new Date(b.fecha_donacion));
+    }
+    
+    mostrarPaginaHistorial(1);
+}
+
+function limpiarFiltros() {
+    const filtroMonto = document.getElementById('filtroMonto');
+    const filtroFecha = document.getElementById('filtroFecha');
+    
+    if (filtroMonto) filtroMonto.value = '';
+    if (filtroFecha) filtroFecha.value = '';
+    
+    donacionesFiltradas = [...todasLasDonaciones];
+    mostrarPaginaHistorial(1);
+}
+
+// ============================================
+// 9. MODAL DE SUSCRIPCIÓN
+// ============================================
+
+function abrirModalSuscripcion(modo) {
+    const modal = document.getElementById('modalSuscripcion');
+    if (!modal) return;
+    
+    modal.classList.add('active');
+    
+    // Llenar selector de días
+    const selectDia = document.getElementById('diaCargoInput');
+    if (selectDia && selectDia.children.length === 1) {
+        for (let i = 1; i <= 28; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Día ${i}`;
+            selectDia.appendChild(option);
+        }
+    }
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const form = document.getElementById('formSuscripcion');
+    
+    if (modo === 'editar' && suscripcionActual) {
+        if (modalTitle) modalTitle.textContent = 'Editar Suscripción Mensual';
+        
+        const montoInput = document.getElementById('montoInput');
+        const diaCargoInput = document.getElementById('diaCargoInput');
+        const tipoTarjetaRadio = document.querySelector(`input[name="tipoTarjeta"][value="${suscripcionActual.tipo_tarjeta}"]`);
+        
+        if (montoInput) montoInput.value = suscripcionActual.monto;
+        if (diaCargoInput) diaCargoInput.value = suscripcionActual.dia_cargo;
+        if (tipoTarjetaRadio) tipoTarjetaRadio.checked = true;
+    } else {
+        if (modalTitle) modalTitle.textContent = 'Nueva Suscripción Mensual';
+        if (form) form.reset();
+    }
+}
+
+function cerrarModal() {
+    const modal = document.getElementById('modalSuscripcion');
+    if (modal) modal.classList.remove('active');
+}
+
+async function guardarSuscripcion(e) {
+    e.preventDefault();
+    
+    const socioId = sessionStorage.getItem('socioId');
+    const montoInput = document.getElementById('montoInput');
+    const diaCargoInput = document.getElementById('diaCargoInput');
+    const tipoTarjetaChecked = document.querySelector('input[name="tipoTarjeta"]:checked');
+    const numeroTarjetaInput = document.getElementById('numeroTarjetaInput');
+    const bancoNombreEl = document.getElementById('bancoNombre');
+    
+    if (!montoInput || !diaCargoInput || !tipoTarjetaChecked || !numeroTarjetaInput) {
+        mostrarMensaje('Por favor completa todos los campos', 'error');
+        return;
+    }
+    
+    const monto = montoInput.value;
+    const diaCargo = diaCargoInput.value;
+    const tipoTarjeta = tipoTarjetaChecked.value;
+    const numeroTarjeta = numeroTarjetaInput.value.replace(/\s/g, '');
+    const ultimos4 = numeroTarjeta.slice(-4);
+    const banco = bancoNombreEl ? bancoNombreEl.textContent || 'Otro' : 'Otro';
+    
+    // Calcular próxima fecha de cargo
+    const proximaFecha = new Date();
+    if (proximaFecha.getDate() > parseInt(diaCargo)) {
+        proximaFecha.setMonth(proximaFecha.getMonth() + 1);
+    }
+    proximaFecha.setDate(parseInt(diaCargo));
+    
+    const dataSuscripcion = {
+        socio_id: socioId,
+        monto: parseFloat(monto),
+        tipo_tarjeta: tipoTarjeta,
+        ultimos_digitos: ultimos4,
+        banco: banco,
+        dia_cargo: parseInt(diaCargo),
+        estado: 'activa',
+        proxima_fecha_cargo: proximaFecha.toISOString().split('T')[0]
+    };
+    
+    try {
+        if (suscripcionActual) {
+            // Actualizar
+            const { error } = await window.supabaseClient
+                .from('suscripciones_mensuales')
+                .update(dataSuscripcion)
+                .eq('id', suscripcionActual.id);
+            
+            if (error) throw error;
+            mostrarMensaje('Suscripción actualizada exitosamente', 'success');
+        } else {
+            // Crear nueva
+            const { error } = await window.supabaseClient
+                .from('suscripciones_mensuales')
+                .insert(dataSuscripcion);
+            
+            if (error) throw error;
+            mostrarMensaje('Suscripción creada exitosamente', 'success');
+        }
+        
+        cerrarModal();
+        await cargarSuscripcion(socioId);
+    } catch (error) {
+        console.error('Error al guardar suscripción:', error);
+        mostrarMensaje('Error al guardar suscripción: ' + error.message, 'error');
+    }
+}
+
+async function cancelarSuscripcion(socioId) {
+    try {
+        const { error } = await window.supabaseClient
+            .from('suscripciones_mensuales')
+            .update({ 
+                estado: 'cancelada',
+                fecha_cancelacion: new Date().toISOString()
+            })
+            .eq('socio_id', socioId)
+            .eq('estado', 'activa');
+        
+        if (error) throw error;
+        
+        const statusSection = document.getElementById('suscripcionStatus');
+        if (statusSection) statusSection.style.display = 'none';
+        
+        suscripcionActual = null;
+        mostrarMensaje('Suscripción cancelada exitosamente', 'success');
+    } catch (error) {
+        console.error('Error al cancelar suscripción:', error);
+        mostrarMensaje('Error al cancelar suscripción: ' + error.message, 'error');
+    }
+}
+
+// ============================================
+// 10. DETECCIÓN DE BANCO
+// ============================================
+
+function detectarBanco(e) {
+    const numero = e.target.value.replace(/\s/g, '');
+    const primeros4 = numero.substring(0, 4);
+    
+    let bancoDetectado = null;
+    
+    for (const [nombre, info] of Object.entries(BANCOS_MEXICO)) {
+        if (info.bins.some(bin => primeros4.startsWith(bin))) {
+            bancoDetectado = nombre;
+            break;
+        }
+    }
+    
+    const bancoLogo = document.getElementById('bancoLogo');
+    const bancoNombre = document.getElementById('bancoNombre');
+    
+    if (bancoDetectado && bancoLogo && bancoNombre) {
+        bancoLogo.style.display = 'flex';
+        bancoNombre.textContent = bancoDetectado;
+        bancoNombre.style.color = BANCOS_MEXICO[bancoDetectado].color;
+    } else if (bancoLogo) {
+        bancoLogo.style.display = 'none';
+    }
+}
+
+function formatearNumeroTarjeta(e) {
+    let valor = e.target.value.replace(/\s/g, '');
+    let formateado = valor.match(/.{1,4}/g)?.join(' ') || valor;
+    e.target.value = formateado;
+}
+
+// ============================================
+// 11. EVENT LISTENERS
+// ============================================
+
+function configurarEventListeners(socioId) {
+    // Botones principales
+    const btnDonacionUnica = document.getElementById('btnDonacionUnica');
+    if (btnDonacionUnica) {
+        btnDonacionUnica.addEventListener('click', () => {
+            window.location.href = 'socio-donar.html?tipo=unica';
+        });
+    }
+    
+    const btnSuscripcionMensual = document.getElementById('btnSuscripcionMensual');
+    if (btnSuscripcionMensual) {
+        btnSuscripcionMensual.addEventListener('click', () => {
+            if (suscripcionActual) {
+                mostrarMensaje('Ya tienes una suscripción activa. Puedes editarla o cancelarla.', 'info');
+            } else {
+                abrirModalSuscripcion('crear');
+            }
+        });
+    }
+    
+    // Gestión de suscripción
+    const btnEditar = document.getElementById('btnEditarSuscripcion');
+    if (btnEditar) {
+        btnEditar.addEventListener('click', () => {
+            abrirModalSuscripcion('editar');
+        });
+    }
+    
+    const btnCancelar = document.getElementById('btnCancelarSuscripcion');
+    if (btnCancelar) {
+        btnCancelar.addEventListener('click', async () => {
+            if (confirm('¿Estás seguro de cancelar tu suscripción mensual? Esta acción no se puede deshacer.')) {
+                await cancelarSuscripcion(socioId);
+            }
+        });
+    }
+    
+    // Paginación
+    const btnPrev = document.getElementById('btnPrevHistorial');
+    if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+            if (paginaActualHistorial > 1) {
+                mostrarPaginaHistorial(paginaActualHistorial - 1);
+            }
+        });
+    }
+    
+    const btnNext = document.getElementById('btnNextHistorial');
+    if (btnNext) {
+        btnNext.addEventListener('click', () => {
+            const totalPaginas = Math.ceil(donacionesFiltradas.length / DONACIONES_POR_PAGINA);
+            if (paginaActualHistorial < totalPaginas) {
+                mostrarPaginaHistorial(paginaActualHistorial + 1);
+            }
+        });
+    }
+    
+    // Filtros
+    const filtroMonto = document.getElementById('filtroMonto');
+    if (filtroMonto) filtroMonto.addEventListener('change', aplicarFiltros);
+    
+    const filtroFecha = document.getElementById('filtroFecha');
+    if (filtroFecha) filtroFecha.addEventListener('change', aplicarFiltros);
+    
+    const btnLimpiar = document.getElementById('btnLimpiarFiltros');
+    if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFiltros);
+    
+    // Modal
+    const btnCerrarModal = document.getElementById('btnCerrarModal');
+    if (btnCerrarModal) btnCerrarModal.addEventListener('click', cerrarModal);
+    
+    const btnCancelarModal = document.getElementById('btnCancelarModal');
+    if (btnCancelarModal) btnCancelarModal.addEventListener('click', cerrarModal);
+    
+    const formSuscripcion = document.getElementById('formSuscripcion');
+    if (formSuscripcion) formSuscripcion.addEventListener('submit', guardarSuscripcion);
+    
+    // Detección de banco
+    const numeroTarjetaInput = document.getElementById('numeroTarjetaInput');
+    if (numeroTarjetaInput) {
+        numeroTarjetaInput.addEventListener('input', function(e) {
+            formatearNumeroTarjeta(e);
+            detectarBanco(e);
+        });
+    }
+    
+    // Cerrar modal al hacer clic fuera
+    const modalOverlay = document.getElementById('modalSuscripcion');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target.id === 'modalSuscripcion') {
+                cerrarModal();
+            }
+        });
+    }
+    
+    // Cerrar sesión
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
+        logoutBtn.addEventListener('click', () => {
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
                 sessionStorage.clear();
                 window.location.href = 'login.html';
             }
         });
     }
-    
-    console.log('Event listeners configurados');
 }
 
-// ============================================================================
-// 11. FUNCIONES AUXILIARES
-// ============================================================================
-
-function obtenerBadgeEstado(estado) {
-    const badges = {
-        'completado': { clase: 'completada', texto: 'Completada' },
-        'pendiente': { clase: 'pendiente', texto: 'Pendiente' },
-        'fallido': { clase: 'fallida', texto: 'Fallida' },
-        'reembolsado': { clase: 'reembolsada', texto: 'Reembolsada' }
-    };
-    
-    return badges[estado] || { clase: 'pendiente', texto: estado };
-}
-
-function formatearFechaDonacion(fecha) {
-    const date = new Date(fecha);
-    const opciones = { 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric' 
-    };
-    return date.toLocaleDateString('es-MX', opciones);
-}
-
-// ============================================================================
-// 12. FUNCIONES DE UI - MENSAJES
-// ============================================================================
-
-function mostrarMensajeError(mensaje) {
-    mostrarMensaje(mensaje, 'error');
-}
-
-function mostrarMensajeExito(mensaje) {
-    mostrarMensaje(mensaje, 'success');
-}
+// ============================================
+// 12. UTILIDADES
+// ============================================
 
 function mostrarMensaje(mensaje, tipo) {
-    // Crear contenedor si no existe
-    let container = document.getElementById('messageContainer');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'messageContainer';
-        container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
-        document.body.appendChild(container);
-    }
+    const colores = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#3b82f6'
+    };
     
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message message-${tipo}`;
-    messageDiv.textContent = mensaje;
-    messageDiv.style.cssText = `
+    const mensajeDiv = document.createElement('div');
+    mensajeDiv.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: ${colores[tipo] || colores.info};
+        color: white;
         padding: 1rem 1.5rem;
-        margin-bottom: 0.5rem;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        animation: slideIn 0.3s ease-out;
-        min-width: 300px;
-        ${tipo === 'error' ? 'background: #fee2e2; color: #dc2626; border: 1px solid #fecaca;' : ''}
-        ${tipo === 'success' ? 'background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;' : ''}
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        max-width: 400px;
     `;
-    
-    container.appendChild(messageDiv);
+    mensajeDiv.textContent = mensaje;
+    document.body.appendChild(mensajeDiv);
     
     setTimeout(() => {
-        messageDiv.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => messageDiv.remove(), 300);
-    }, 5000);
+        mensajeDiv.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => mensajeDiv.remove(), 300);
+    }, 4000);
 }
 
-// ============================================================================
-// 13. ESTILOS ADICIONALES
-// ============================================================================
-
+// Agregar estilos de animación
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
-        from { transform: translateX(400px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
-    
     @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(400px); opacity: 0; }
-    }
-    
-    /* Estilos para badges de estado */
-    .badge-completada {
-        background: #fad1faff;
-        color: #5f0d51;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    
-    .badge-pendiente {
-        background: #fef3c7;
-        color: #92400e;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    
-    .badge-fallida {
-        background: #fee2e2;
-        color: #dc2626;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    
-    .badge-reembolsada {
-        background: #e0e7ff;
-        color: #3730a3;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    
-    /* Mejorar la tabla */
-    .donaciones-table tbody tr {
-        transition: background-color 0.2s;
-    }
-    
-    .donaciones-table tbody tr:hover {
-        background-color: #f9fafb;
-    }
-    
-    .amount-cell {
-        font-weight: 600;
-        color: #5f0d51;
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
     }
 `;
 document.head.appendChild(style);

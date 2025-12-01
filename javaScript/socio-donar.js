@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // ============================================
+    // ================================
     // OBTENER TELÉFONO DEL SOCIO
     // ============================================
     let userPhone = null;

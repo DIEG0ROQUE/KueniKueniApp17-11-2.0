@@ -123,6 +123,19 @@
 
         <!-- Vista Lista -->
         <div class="list-view" id="list-view" style="display: none;">
+            <div class="list-view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600; color: #18181b;">Eventos por Mes</h3>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="font-size: 0.875rem; color: #71717a; font-weight: 500;">Mes:</label>
+                        <select id="month-select-list" class="month-select" style="padding: 0.5rem 2rem 0.5rem 1rem; border: 2px solid #e4e4e7; border-radius: 8px; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer;"></select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="font-size: 0.875rem; color: #71717a; font-weight: 500;">Año:</label>
+                        <select id="year-select-list" class="year-select" style="padding: 0.5rem 2rem 0.5rem 1rem; border: 2px solid #e4e4e7; border-radius: 8px; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer;"></select>
+                    </div>
+                </div>
+            </div>
             <div class="events-list-container" id="events-list-container">
                 <!-- Se llenará dinámicamente -->
             </div>

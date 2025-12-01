@@ -1,4 +1,4 @@
-// socio-calendario.js - RENOVADO con mejores prácticas UI/UX
+// socio-calendario.js - CORREGIDO sin errores de fecha
 // ============================================================================
 
 let mesActual = new Date();
@@ -9,12 +9,39 @@ let socioIdGlobal = null;
 let filtroActivo = 'all';
 let vistaActual = 'calendar';
 
+// Selectores de mes y año para vista lista
+let mesListaSeleccionado = new Date().getMonth();
+let anoListaSeleccionado = new Date().getFullYear();
+
+// ============================================================================
+// FUNCIONES DE FECHA SEGURAS (SIN DESFASES)
+// ============================================================================
+
+// Crear fecha desde string YYYY-MM-DD SIN desfase de zona horaria
+function crearFechaLocal(fechaStr) {
+    const [year, month, day] = fechaStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+}
+
+// Obtener fecha en formato YYYY-MM-DD desde Date
+function obtenerFechaStr(fecha) {
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Obtener fecha de hoy en formato YYYY-MM-DD
+function obtenerHoy() {
+    return obtenerFechaStr(new Date());
+}
+
 // ============================================================================
 // INICIALIZACIÓN
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🎯 Inicializando calendario renovado...');
+    console.log('🎯 Inicializando calendario...');
     
     if (!verificarSesion()) {
         window.location.href = 'login.html';
@@ -43,6 +70,7 @@ async function inicializarCalendario() {
         await actualizarEstados();
         await cargarEventos();
         inicializarSelectores();
+        inicializarSelectoresLista();
         aplicarFiltro();
         renderizarCalendario();
         actualizarEstadisticas();
@@ -55,7 +83,7 @@ async function inicializarCalendario() {
 }
 
 async function actualizarEstados() {
-    const hoy = new Date().toISOString().split('T')[0];
+    const hoy = obtenerHoy();
     
     await window.supabaseClient
         .from('eventos')
@@ -91,15 +119,15 @@ async function cargarEventos() {
     todosEventos = await Promise.all(
         eventos.map(async (evento) => {
             const { data: asistencia } = await window.supabaseClient
-                .from('asistencias_eventos')
-                .select('estado')
+                .from('asistencias')
+                .select('estado_asistencia')
                 .eq('evento_id', evento.id)
                 .eq('socio_id', socioIdGlobal)
                 .maybeSingle();
             
             return {
                 ...evento,
-                registrado: asistencia?.estado === 'confirmado'
+                registrado: asistencia?.estado_asistencia === 'confirmado'
             };
         })
     );
@@ -109,14 +137,15 @@ async function cargarEventos() {
 }
 
 // ============================================================================
-// SELECTORES DE MES Y AÑO
+// SELECTORES DE MES Y AÑO (CALENDARIO)
 // ============================================================================
 
 function inicializarSelectores() {
     const monthSelect = document.getElementById('month-select');
     const yearSelect = document.getElementById('year-select');
     
-    // Poblar meses
+    if (!monthSelect || !yearSelect) return;
+    
     const meses = [
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -126,7 +155,6 @@ function inicializarSelectores() {
         `<option value="${i}" ${i === mesActual.getMonth() ? 'selected' : ''}>${mes}</option>`
     ).join('');
     
-    // Poblar años (2020-2030)
     const anoActual = new Date().getFullYear();
     yearSelect.innerHTML = Array.from({length: 11}, (_, i) => {
         const year = 2020 + i;
@@ -143,6 +171,45 @@ function inicializarSelectores() {
         mesActual.setFullYear(parseInt(e.target.value));
         renderizarCalendario();
         actualizarEstadisticas();
+    });
+}
+
+// ============================================================================
+// SELECTORES DE MES Y AÑO PARA VISTA LISTA
+// ============================================================================
+
+function inicializarSelectoresLista() {
+    const monthSelectList = document.getElementById('month-select-list');
+    const yearSelectList = document.getElementById('year-select-list');
+    
+    if (!monthSelectList || !yearSelectList) return;
+    
+    const meses = [
+        'Todos', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
+    monthSelectList.innerHTML = meses.map((mes, i) => 
+        `<option value="${i - 1}" ${i === mesListaSeleccionado + 1 ? 'selected' : ''}>${mes}</option>`
+    ).join('');
+    
+    const anoActual = new Date().getFullYear();
+    yearSelectList.innerHTML = `
+        <option value="-1">Todos</option>
+        ${Array.from({length: 11}, (_, i) => {
+            const year = 2020 + i;
+            return `<option value="${year}" ${year === anoListaSeleccionado ? 'selected' : ''}>${year}</option>`;
+        }).join('')}
+    `;
+    
+    monthSelectList.addEventListener('change', (e) => {
+        mesListaSeleccionado = parseInt(e.target.value);
+        renderizarVistaLista();
+    });
+    
+    yearSelectList.addEventListener('change', (e) => {
+        anoListaSeleccionado = parseInt(e.target.value);
+        renderizarVistaLista();
     });
 }
 
@@ -180,17 +247,21 @@ function renderizarCalendario() {
     const ano = mesActual.getFullYear();
     
     // Actualizar selectores
-    document.getElementById('month-select').value = mes;
-    document.getElementById('year-select').value = ano;
+    const monthSelect = document.getElementById('month-select');
+    const yearSelect = document.getElementById('year-select');
+    if (monthSelect) monthSelect.value = mes;
+    if (yearSelect) yearSelect.value = ano;
     
     const primerDia = new Date(ano, mes, 1);
     const diasMes = new Date(ano, mes + 1, 0).getDate();
     const diaSemanaInicio = primerDia.getDay();
     
     const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
+    
     grid.innerHTML = '';
     
-    // Crear contenedor de headers
+    // Crear headers
     const headersContainer = document.createElement('div');
     headersContainer.className = 'day-headers';
     const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -202,28 +273,35 @@ function renderizarCalendario() {
     });
     grid.appendChild(headersContainer);
     
-    // Crear contenedor de días
+    // Crear días
     const daysContainer = document.createElement('div');
     daysContainer.className = 'days-grid';
     
-    // Días mes anterior
+    // Días del mes anterior
     const ultimoDiaMesAnterior = new Date(ano, mes, 0).getDate();
     for (let i = diaSemanaInicio - 1; i >= 0; i--) {
-        daysContainer.appendChild(crearCeldaDia(ultimoDiaMesAnterior - i, mes - 1, ano, true));
+        const diaAnterior = ultimoDiaMesAnterior - i;
+        const mesAnterior = mes - 1;
+        const anoAnterior = mesAnterior < 0 ? ano - 1 : ano;
+        const mesCorregido = mesAnterior < 0 ? 11 : mesAnterior;
+        daysContainer.appendChild(crearCeldaDia(diaAnterior, mesCorregido, anoAnterior, true));
     }
     
-    // Días mes actual
+    // Días del mes actual
     const hoy = new Date();
     for (let dia = 1; dia <= diasMes; dia++) {
         const esHoy = dia === hoy.getDate() && mes === hoy.getMonth() && ano === hoy.getFullYear();
         daysContainer.appendChild(crearCeldaDia(dia, mes, ano, false, esHoy));
     }
     
-    // Días mes siguiente
+    // Días del mes siguiente
     const totalCeldas = daysContainer.children.length;
     const celdasRestantes = Math.ceil(totalCeldas / 7) * 7 - totalCeldas;
     for (let dia = 1; dia <= celdasRestantes; dia++) {
-        daysContainer.appendChild(crearCeldaDia(dia, mes + 1, ano, true));
+        const mesSiguiente = mes + 1;
+        const anoSiguiente = mesSiguiente > 11 ? ano + 1 : ano;
+        const mesCorregido = mesSiguiente > 11 ? 0 : mesSiguiente;
+        daysContainer.appendChild(crearCeldaDia(dia, mesCorregido, anoSiguiente, true));
     }
     
     grid.appendChild(daysContainer);
@@ -235,8 +313,9 @@ function crearCeldaDia(dia, mes, ano, otroMes = false, esHoy = false) {
     if (otroMes) cell.classList.add('other-month');
     if (esHoy) cell.classList.add('today');
     
+    // Crear fecha correctamente
     const fecha = new Date(ano, mes, dia);
-    const fechaStr = fecha.toISOString().split('T')[0];
+    const fechaStr = obtenerFechaStr(fecha);
     cell.dataset.fecha = fechaStr;
     
     const numero = document.createElement('div');
@@ -249,7 +328,6 @@ function crearCeldaDia(dia, mes, ano, otroMes = false, esHoy = false) {
     if (eventosDelDia.length > 0) {
         cell.classList.add('has-events');
         
-        // Indicador de evento registrado
         const tieneRegistrado = eventosDelDia.some(e => e.registrado);
         if (tieneRegistrado) {
             const indicator = document.createElement('div');
@@ -258,7 +336,6 @@ function crearCeldaDia(dia, mes, ano, otroMes = false, esHoy = false) {
             cell.appendChild(indicator);
         }
         
-        // Dots de eventos
         const dotsContainer = document.createElement('div');
         dotsContainer.className = 'event-dots';
         
@@ -273,7 +350,6 @@ function crearCeldaDia(dia, mes, ano, otroMes = false, esHoy = false) {
         
         cell.appendChild(dotsContainer);
         
-        // Contador
         if (eventosDelDia.length > 0) {
             const count = document.createElement('div');
             count.className = 'event-count';
@@ -288,7 +364,7 @@ function crearCeldaDia(dia, mes, ano, otroMes = false, esHoy = false) {
 }
 
 // ============================================================================
-// SELECCIÓN DE DÍA Y DETALLES
+// SELECCIÓN DE DÍA
 // ============================================================================
 
 function seleccionarDia(fecha, cell) {
@@ -309,7 +385,9 @@ function mostrarDetallesDia(fecha) {
     const content = document.getElementById('details-content');
     const dateElement = document.getElementById('details-date');
     
-    const fechaObj = new Date(fecha + 'T00:00:00');
+    if (!panel || !content || !dateElement) return;
+    
+    const fechaObj = crearFechaLocal(fecha);
     dateElement.textContent = fechaObj.toLocaleDateString('es-MX', { 
         weekday: 'long', 
         day: 'numeric', 
@@ -350,9 +428,6 @@ function mostrarDetallesDia(fecha) {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/></svg>
                             <span>${evento.asistentes_confirmados}/${evento.cupo_maximo}</span>
                         </div>
-                        <div class="meta-item">
-                            <span class="badge ${evento.estado === 'proximo' ? 'deportes' : evento.estado === 'activo' ? 'emprendimiento' : 'ambiente'}">${formatearEstado(evento.estado)}</span>
-                        </div>
                     </div>
                 </div>
             `;
@@ -364,7 +439,7 @@ function mostrarDetallesDia(fecha) {
 
 function cerrarDetalles() {
     const panel = document.getElementById('details-panel');
-    panel.classList.remove('show');
+    if (panel) panel.classList.remove('show');
     
     document.querySelectorAll('.day-cell.selected').forEach(c => {
         c.classList.remove('selected');
@@ -374,13 +449,31 @@ function cerrarDetalles() {
 }
 
 // ============================================================================
-// VISTA LISTA
+// VISTA LISTA CON FILTROS DE MES Y AÑO
 // ============================================================================
 
 function renderizarVistaLista() {
     const container = document.getElementById('events-list-container');
+    if (!container) return;
     
-    if (eventosFiltrados.length === 0) {
+    // Filtrar por mes y año seleccionados
+    let eventosFiltradosLista = [...eventosFiltrados];
+    
+    if (anoListaSeleccionado !== -1) {
+        eventosFiltradosLista = eventosFiltradosLista.filter(e => {
+            const fecha = crearFechaLocal(e.fecha_evento);
+            return fecha.getFullYear() === anoListaSeleccionado;
+        });
+    }
+    
+    if (mesListaSeleccionado !== -1) {
+        eventosFiltradosLista = eventosFiltradosLista.filter(e => {
+            const fecha = crearFechaLocal(e.fecha_evento);
+            return fecha.getMonth() === mesListaSeleccionado;
+        });
+    }
+    
+    if (eventosFiltradosLista.length === 0) {
         container.innerHTML = `
             <div class="empty-details" style="padding: 4rem 2rem;">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" fill="#d4d4d8"/></svg>
@@ -392,8 +485,8 @@ function renderizarVistaLista() {
     
     // Agrupar por mes
     const eventosPorMes = {};
-    eventosFiltrados.forEach(evento => {
-        const fecha = new Date(evento.fecha_evento);
+    eventosFiltradosLista.forEach(evento => {
+        const fecha = crearFechaLocal(evento.fecha_evento);
         const mesKey = `${fecha.getFullYear()}-${fecha.getMonth()}`;
         if (!eventosPorMes[mesKey]) {
             eventosPorMes[mesKey] = [];
@@ -411,7 +504,7 @@ function renderizarVistaLista() {
                 <h3 style="font-size: 1.25rem; font-weight: 600; color: #18181b; margin-bottom: 1rem; text-transform: capitalize;">${mesNombre}</h3>
                 ${eventos.map(evento => {
                     const badge = getBadge(evento.categoria);
-                    const fecha = new Date(evento.fecha_evento);
+                    const fecha = crearFechaLocal(evento.fecha_evento);
                     return `
                         <div class="event-list-item" style="cursor: pointer;" onclick="irAEvento('${evento.fecha_evento}')">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
@@ -452,10 +545,11 @@ function renderizarVistaLista() {
 
 function irAEvento(fechaStr) {
     // Cambiar a vista calendario
-    document.querySelector('[data-view="calendar"]').click();
+    const btnCalendar = document.querySelector('[data-view="calendar"]');
+    if (btnCalendar) btnCalendar.click();
     
     // Ir a la fecha
-    const fecha = new Date(fechaStr + 'T00:00:00');
+    const fecha = crearFechaLocal(fechaStr);
     mesActual = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
     renderizarCalendario();
     
@@ -477,7 +571,7 @@ function actualizarEstadisticas() {
     const ano = mesActual.getFullYear();
     
     const eventosMes = eventosFiltrados.filter(e => {
-        const fecha = new Date(e.fecha_evento);
+        const fecha = crearFechaLocal(e.fecha_evento);
         return fecha.getMonth() === mes && fecha.getFullYear() === ano;
     });
     
@@ -486,15 +580,20 @@ function actualizarEstadisticas() {
     const hoy = new Date();
     const proximos3Dias = new Date(hoy);
     proximos3Dias.setDate(proximos3Dias.getDate() + 3);
+    const hoyStr = obtenerFechaStr(hoy);
+    const proximos3Str = obtenerFechaStr(proximos3Dias);
     
     const proximosTres = eventosFiltrados.filter(e => {
-        const fecha = new Date(e.fecha_evento);
-        return fecha >= hoy && fecha <= proximos3Dias;
+        return e.fecha_evento >= hoyStr && e.fecha_evento <= proximos3Str;
     });
     
-    document.getElementById('total-eventos-mes').textContent = eventosMes.length;
-    document.getElementById('mis-eventos-mes').textContent = misEventosMes.length;
-    document.getElementById('proximos-3').textContent = proximosTres.length;
+    const statTotal = document.getElementById('total-eventos-mes');
+    const statMis = document.getElementById('mis-eventos-mes');
+    const statProx = document.getElementById('proximos-3');
+    
+    if (statTotal) statTotal.textContent = eventosMes.length;
+    if (statMis) statMis.textContent = misEventosMes.length;
+    if (statProx) statProx.textContent = proximosTres.length;
 }
 
 // ============================================================================
@@ -502,30 +601,41 @@ function actualizarEstadisticas() {
 // ============================================================================
 
 function configurarEventListeners() {
-    // Navegación del calendario
-    document.getElementById('btn-prev').addEventListener('click', () => {
-        mesActual.setMonth(mesActual.getMonth() - 1);
-        renderizarCalendario();
-        actualizarEstadisticas();
-    });
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnToday = document.getElementById('btn-today');
+    const btnCloseDetails = document.getElementById('btn-close-details');
+    const logoutBtn = document.getElementById('logoutBtn');
     
-    document.getElementById('btn-next').addEventListener('click', () => {
-        mesActual.setMonth(mesActual.getMonth() + 1);
-        renderizarCalendario();
-        actualizarEstadisticas();
-    });
+    if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+            mesActual.setMonth(mesActual.getMonth() - 1);
+            renderizarCalendario();
+            actualizarEstadisticas();
+        });
+    }
     
-    document.getElementById('btn-today').addEventListener('click', () => {
-        mesActual = new Date();
-        renderizarCalendario();
-        actualizarEstadisticas();
-        
-        const hoy = new Date().toISOString().split('T')[0];
-        const cellHoy = document.querySelector(`[data-fecha="${hoy}"]`);
-        if (cellHoy) {
-            seleccionarDia(hoy, cellHoy);
-        }
-    });
+    if (btnNext) {
+        btnNext.addEventListener('click', () => {
+            mesActual.setMonth(mesActual.getMonth() + 1);
+            renderizarCalendario();
+            actualizarEstadisticas();
+        });
+    }
+    
+    if (btnToday) {
+        btnToday.addEventListener('click', () => {
+            mesActual = new Date();
+            renderizarCalendario();
+            actualizarEstadisticas();
+            
+            const hoy = obtenerHoy();
+            const cellHoy = document.querySelector(`[data-fecha="${hoy}"]`);
+            if (cellHoy) {
+                seleccionarDia(hoy, cellHoy);
+            }
+        });
+    }
     
     // Toggle de vista
     document.querySelectorAll('.toggle-btn').forEach(btn => {
@@ -536,12 +646,15 @@ function configurarEventListeners() {
             document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
+            const calendarView = document.getElementById('calendar-view');
+            const listView = document.getElementById('list-view');
+            
             if (vista === 'calendar') {
-                document.getElementById('calendar-view').style.display = 'block';
-                document.getElementById('list-view').style.display = 'none';
+                if (calendarView) calendarView.style.display = 'block';
+                if (listView) listView.style.display = 'none';
             } else {
-                document.getElementById('calendar-view').style.display = 'none';
-                document.getElementById('list-view').style.display = 'block';
+                if (calendarView) calendarView.style.display = 'none';
+                if (listView) listView.style.display = 'block';
                 renderizarVistaLista();
             }
         });
@@ -559,16 +672,18 @@ function configurarEventListeners() {
         });
     });
     
-    // Cerrar detalles
-    document.getElementById('btn-close-details').addEventListener('click', cerrarDetalles);
+    if (btnCloseDetails) {
+        btnCloseDetails.addEventListener('click', cerrarDetalles);
+    }
     
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        if (confirm('¿Cerrar sesión?')) {
-            sessionStorage.clear();
-            window.location.href = 'login.html';
-        }
-    });
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('¿Cerrar sesión?')) {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        });
+    }
 }
 
 function configurarNavegacionTeclado() {
@@ -595,21 +710,14 @@ function getBadge(categoria) {
     const badges = {
         'Medio Ambiente': { clase: 'ambiente', texto: 'Ambiente' },
         'Deportes': { clase: 'deportes', texto: 'Deportes' },
+        'Deporte': { clase: 'deportes', texto: 'Deporte' },
         'Cultura': { clase: 'cultura', texto: 'Cultura' },
         'Emprendimiento': { clase: 'emprendimiento', texto: 'Emprendimiento' },
         'Salud': { clase: 'salud', texto: 'Salud' },
-        'Educación': { clase: 'educacion', texto: 'Educación' }
+        'Educación': { clase: 'educacion', texto: 'Educación' },
+        'Otro': { clase: 'otro', texto: 'Otro' }
     };
-    return badges[categoria] || { clase: '', texto: categoria };
-}
-
-function formatearEstado(estado) {
-    const estados = {
-        'proximo': 'Próximo',
-        'activo': 'En Curso',
-        'completado': 'Completado'
-    };
-    return estados[estado] || estado;
+    return badges[categoria] || { clase: 'otro', texto: categoria };
 }
 
 function mostrarMensaje(mensaje, tipo) {
@@ -641,4 +749,4 @@ function mostrarMensaje(mensaje, tipo) {
 // Exponer funciones globales
 window.irAEvento = irAEvento;
 
-console.log('🎨 Calendario renovado cargado correctamente');
+console.log('🎨 Calendario corregido cargado correctamente');

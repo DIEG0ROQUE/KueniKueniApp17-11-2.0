@@ -72,7 +72,7 @@ async function cargarTodosLosEventos(socioId) {
         const { data: enCurso, error: errorEnCurso } = await window.supabaseClient
             .from('eventos')
             .select('*')
-            .eq('estado', 'en_curso')
+            .eq('estado', 'activo')
             .order('fecha_evento', { ascending: true });
         
         if (errorEnCurso) {

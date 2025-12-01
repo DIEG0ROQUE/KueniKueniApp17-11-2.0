@@ -1,6 +1,5 @@
-// socio-donar.js - Sistema de donaciones para socios (CORREGIDO)
+// socio-donar.js - Sistema de donaciones para socios (CORREGIDO - Mensual)
 // ============================================================================
-
 
 const EMAIL_SERVER_URL = 'http://localhost:3000';
 
@@ -170,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // ================================
+    // ============================================
     // OBTENER TELÉFONO DEL SOCIO
     // ============================================
     let userPhone = null;
@@ -203,6 +202,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         donationForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            console.log('📝 Iniciando proceso de donación...');
+            
             if (selectedAmount === 0 || selectedAmount < 10) {
                 mostrarMensaje('Por favor selecciona un monto de donación válido (mínimo $10 MXN)', 'error');
                 return;
@@ -212,21 +213,66 @@ document.addEventListener('DOMContentLoaded', async function() {
                 return;
             }
             
-            // Preparar datos para la BD (CORREGIDO - sin campo es_socio)
+            // Obtener el tipo de donación desde el input oculto o radio buttons
+            let tipoDonacion = 'unica';
+            
+            // Primero intentar obtener de radio buttons (si existen)
+            const radioTipo = document.querySelector('input[name="tipo"]:checked');
+            if (radioTipo) {
+                tipoDonacion = radioTipo.value;
+                console.log('Tipo obtenido de radio:', tipoDonacion);
+            } else {
+                // Si no hay radio, usar el input hidden
+                const hiddenTipo = document.getElementById('tipoDonacion');
+                if (hiddenTipo) {
+                    tipoDonacion = hiddenTipo.value;
+                    console.log('Tipo obtenido de hidden input:', tipoDonacion);
+                }
+            }
+            
+            const esMensual = tipoDonacion === 'mensual';
+            
+            // Obtener destino
+            const destinoValue = destinoSelect.value;
+            const destinoTexto = destinoSelect.options[destinoSelect.selectedIndex].text;
+            
+            console.log('📊 Datos de donación:', {
+                monto: selectedAmount,
+                tipo: tipoDonacion,
+                destino: destinoTexto,
+                esMensual: esMensual
+            });
+            
+            // Calcular fecha de próximo cobro (si es mensual)
+            let proximoCobroFecha = null;
+            if (esMensual) {
+                const hoy = new Date();
+                proximoCobroFecha = new Date(hoy.getFullYear(), hoy.getMonth() + 1, hoy.getDate());
+            }
+            
+            // Preparar datos para la BD (SOLO campos que existen en la tabla)
             const donacionData = {
                 donante_nombre: userName,
                 donante_email: userEmail,
-                donante_telefono: userPhone,
-                monto: selectedAmount,
+                donante_telefono: userPhone || 'No especificado',
+                monto: parseFloat(selectedAmount),
                 moneda: 'MXN',
                 metodo_pago: 'tarjeta',
                 estado_pago: 'completado',
-                descripcion: obtenerDescripcionDonacion(),
+                descripcion: obtenerDescripcionDonacion(destinoTexto, tipoDonacion),
                 referencia_pago: generarReferenciaPago(),
-                socio_id: socioId  // Este campo ya identifica que es un socio
+                socio_id: socioId,
+                tipo_donacion: tipoDonacion,
+                fecha_donacion: new Date().toISOString()
+                // CAMPOS REMOVIDOS (no existen en la tabla):
+                // - destino
+                // - es_recurrente
+                // - frecuencia_recurrencia
+                // - proximo_cobro
+                // - estado_recurrencia
             };
             
-            console.log('Datos de donación del socio:', donacionData);
+            console.log('💾 Datos a guardar:', donacionData);
             
             await guardarDonacion(donacionData);
         });
@@ -276,16 +322,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     // GUARDAR DONACIÓN EN SUPABASE
     // ============================================
     async function guardarDonacion(datos) {
+        console.log('\n=== INICIANDO GUARDADO DE DONACIÓN ===');
+        
         if (!window.supabaseClient) {
+            console.error('❌ Supabase no está configurado');
             mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
-            console.error('Supabase no está configurado');
             return;
         }
         
         try {
             mostrarCargando(true);
             
-            console.log('Guardando donación del socio en la base de datos...');
+            console.log('📊 Datos a insertar en la base de datos:');
+            console.table(datos);
             
             const { data, error } = await window.supabaseClient
                 .from('donaciones')
@@ -293,49 +342,68 @@ document.addEventListener('DOMContentLoaded', async function() {
                 .select();
             
             if (error) {
-                console.error('Error al guardar donación del socio:', error);
-                console.error('Detalles del error:', error.message, error.details);
-                mostrarMensaje(`Error al procesar la donación: ${error.message}`, 'error');
+                console.error('❌ ERROR AL GUARDAR DONACIÓN:', error);
+                console.error('Mensaje:', error.message);
+                console.error('Detalles:', error.details);
+                console.error('Hint:', error.hint);
+                console.error('Código:', error.code);
+                
+                let mensajeError = 'Error al procesar la donación';
+                
+                // Mensajes de error más descriptivos
+                if (error.message.includes('violates not-null')) {
+                    mensajeError = 'Faltan campos requeridos. Por favor completa todos los datos.';
+                } else if (error.message.includes('foreign key')) {
+                    mensajeError = 'Error de referencia. Por favor intenta nuevamente.';
+                } else {
+                    mensajeError = `Error: ${error.message}`;
+                }
+                
+                mostrarMensaje(mensajeError, 'error');
                 return;
             }
             
-            console.log('Donación del socio guardada exitosamente:', data);
+            console.log('✅ DONACIÓN GUARDADA EXITOSAMENTE');
+            console.log('Datos guardados:', data);
+            
             // Enviar comprobante por correo
-   try {
-       console.log('📧 Enviando comprobante...');
-       const emailResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-receipt`, {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({
-               email: sessionStorage.getItem('userEmail'),
-               nombre: sessionStorage.getItem('userName'),
-               monto: datos.monto,
-               fecha: datos.fecha_donacion,
-               folio: datos.referencia_pago,
-               metodo_pago: datos.metodo_pago
-           })
-       });
-       
-       if (emailResponse.ok) {
-           console.log('✅ Comprobante enviado');
-       }
-   } catch (emailError) {
-       console.log('⚠️ Error al enviar comprobante:', emailError);
-   }
-
-
-
-
+            try {
+                console.log('📧 Enviando comprobante por correo...');
+                const emailResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-receipt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: datos.donante_email,
+                        nombre: datos.donante_nombre,
+                        monto: datos.monto,
+                        fecha: new Date().toISOString(),
+                        folio: datos.referencia_pago,
+                        metodo_pago: datos.metodo_pago,
+                        tipo_donacion: datos.tipo_donacion
+                    })
+                });
+                
+                if (emailResponse.ok) {
+                    console.log('✅ Comprobante enviado correctamente');
+                } else {
+                    console.log('⚠️ No se pudo enviar el comprobante');
+                }
+            } catch (emailError) {
+                console.log('⚠️ Error al enviar comprobante:', emailError.message);
+            }
+            
+            console.log('=== PROCESO COMPLETADO EXITOSAMENTE ===\n');
+            
             mostrarMensajeExito(datos);
             
             setTimeout(() => {
-                // Redirigir al dashboard del socio después del éxito
-                window.location.href = 'socio-dashboard.html';
+                window.location.href = 'socio-donaciones.html';
             }, 4000);
             
         } catch (error) {
-            console.error('Error inesperado:', error);
-            mostrarMensaje('Error inesperado al procesar la donación', 'error');
+            console.error('❌ ERROR INESPERADO:', error);
+            console.error('Stack:', error.stack);
+            mostrarMensaje('Error inesperado al procesar la donación. Por favor inténtalo de nuevo.', 'error');
         } finally {
             mostrarCargando(false);
         }
@@ -344,12 +412,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ============================================
     // FUNCIONES AUXILIARES
     // ============================================
-    function obtenerDescripcionDonacion() {
-        const destino = destinoSelect.options[destinoSelect.selectedIndex].text;
-        const tipo = document.querySelector('input[name="tipo"]:checked').value;
-        const mensaje = document.getElementById('mensaje').value.trim();
+    function obtenerDescripcionDonacion(destinoTexto, tipoDonacion) {
+        const mensaje = document.getElementById('mensaje')?.value.trim() || '';
         
-        let descripcion = `Donación ${tipo === 'unica' ? 'única' : 'mensual'} para ${destino} - Socio`;
+        let descripcion = `Donación ${tipoDonacion === 'unica' ? 'única' : 'mensual'} para ${destinoTexto} - Socio`;
         if (mensaje) {
             descripcion += ` - Mensaje: ${mensaje}`;
         }
@@ -378,7 +444,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         container.innerHTML = `
             <div class="message message-${tipo}">
                 <div class="message-icon">
-                    ${tipo === 'error' ? '' : '✓'}
+                    ${tipo === 'error' ? '⚠' : '✓'}
                 </div>
                 <div class="message-text">${mensaje}</div>
             </div>
@@ -404,14 +470,20 @@ document.addEventListener('DOMContentLoaded', async function() {
             donationForm.insertBefore(container, donationForm.firstChild);
         }
         
+        const tipoTexto = datos.tipo_donacion === 'mensual' ? 'mensual' : 'única';
+        const esMensual = datos.tipo_donacion === 'mensual';
+        const recurrenteInfo = esMensual ? 
+            `<p class="success-recurrent">📋 Tu donación mensual ha sido registrada</p>` : '';
+        
         container.innerHTML = `
             <div class="message message-success">
-                <div class="success-icon"></div>
-                <h3 class="success-title">¡Donación Exitosa!</h3>
+                <div class="success-icon">✓</div>
+                <h3 class="success-title">¡Donación ${tipoTexto.charAt(0).toUpperCase() + tipoTexto.slice(1)} Exitosa!</h3>
                 <p class="success-text">
-                    Gracias <strong>${datos.donante_nombre}</strong> por tu donación de 
+                    Gracias <strong>${datos.donante_nombre}</strong> por tu donación ${tipoTexto} de 
                     <strong>$${datos.monto.toLocaleString('es-MX')} MXN</strong> como socio
                 </p>
+                ${recurrenteInfo}
                 <p class="success-reference">
                     Referencia: <span>${datos.referencia_pago}</span>
                 </p>
@@ -419,7 +491,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     Recibirás un comprobante fiscal en <strong>${datos.donante_email}</strong>
                 </p>
                 <p class="success-impact">
-                    Tu apoyo como socio fortalece nuestra comunidad 
+                    Tu apoyo como socio fortalece nuestra comunidad 💚
                 </p>
                 <p class="success-redirect">
                     Redirigiendo al dashboard...
@@ -449,7 +521,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // CONFIGURAR EVENT LISTENERS ADICIONALES
     // ============================================
     function configurarEventListeners() {
-        // Botón de cerrar sesión
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function() {
@@ -543,6 +614,16 @@ styles.textContent = `
         margin: 0.5rem 0;
         font-size: 1rem;
         line-height: 1.5;
+    }
+    
+    .success-recurrent {
+        margin: 0.75rem 0;
+        padding: 0.75rem;
+        background: rgba(95, 13, 81, 0.1);
+        border-radius: 6px;
+        font-weight: 600;
+        color: #5f0d51;
+        font-size: 0.95rem;
     }
     
     .success-reference {

@@ -38,11 +38,16 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // 5. Usa esa contraseña de 16 caracteres en GMAIL_APP_PASSWORD
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true para puerto 465
     auth: {
         user: process.env.GMAIL_USER, // Tu correo de Gmail
         pass: process.env.GMAIL_APP_PASSWORD // Contraseña de aplicación (NO tu contraseña normal)
-    }
+    },
+    connectionTimeout: 60000, // 60 segundos de timeout
+    greetingTimeout: 30000,
+    socketTimeout: 60000
 });
 
 // Verificar conexión con Gmail

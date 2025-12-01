@@ -39,15 +39,20 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true para puerto 465
+    port: 587,
+    secure: false, // false para puerto 587 (STARTTLS)
     auth: {
-        user: process.env.GMAIL_USER, // Tu correo de Gmail
-        pass: process.env.GMAIL_APP_PASSWORD // Contraseña de aplicación (NO tu contraseña normal)
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
     },
-    connectionTimeout: 60000, // 60 segundos de timeout
+    tls: {
+        rejectUnauthorized: false // A veces necesario en servicios cloud
+    },
+    connectionTimeout: 60000,
     greetingTimeout: 30000,
-    socketTimeout: 60000
+    socketTimeout: 60000,
+    debug: true, // Ver logs detallados
+    logger: true
 });
 
 // Verificar conexión con Gmail

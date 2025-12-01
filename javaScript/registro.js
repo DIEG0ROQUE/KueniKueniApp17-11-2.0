@@ -1,6 +1,6 @@
 // registro.js - Sistema de registro con validaciones completas y diseño mejorado
 
-const EMAIL_SERVER_URL = 'http://localhost:3000';
+const EMAIL_SERVER_URL = 'https://kuenikueniapp17-11-2-0.onrender.com';
 
 document.addEventListener('DOMContentLoaded', function() {
     const registroForm = document.getElementById('registroForm');

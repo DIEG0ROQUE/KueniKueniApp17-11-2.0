@@ -1,80 +1,253 @@
-# 🚀 INICIO RÁPIDO - Servidor de Correos Gmail
+# 📧 Sistema de Correos - Kueni Kueni
 
-## ¿Qué es esto?
+## ✅ Estado Actual
 
-Este servidor te permite enviar correos desde Gmail sin las limitaciones de Supabase.
+El servidor de correos está **funcionando correctamente** usando **Brevo API**.
+
+**URL del servidor:** https://kuenikueniapp17-11-2-0.onrender.com
 
 ---
 
-## 📝 PASOS RÁPIDOS
+## 🚀 Configuración del Servidor de Correos
 
-### 1️⃣ Crear contraseña de aplicación en Gmail
+### Tecnologías Usadas
 
-1. Ve a: https://myaccount.google.com/security
-2. Activa "Verificación en dos pasos"
-3. Busca "Contraseñas de aplicaciones"
-4. Crea una nueva para "Correo"
-5. Copia la contraseña de 16 caracteres
+- **Plataforma:** Render.com (plan gratuito)
+- **Servicio de correos:** Brevo (antes Sendinblue)
+- **Método:** API HTTP (puerto 443)
+- **Base de datos:** Supabase
 
-### 2️⃣ Configurar el archivo .env
+### Por qué usamos Brevo API y no SMTP
 
-1. Renombra `.env.example` a `.env`
-2. Abre `.env` con un editor
-3. Completa:
-   - `GMAIL_USER` = tu correo de Gmail
-   - `GMAIL_APP_PASSWORD` = la contraseña que generaste
-   - `SUPABASE_URL` y `SUPABASE_ANON_KEY` de tu proyecto Supabase
+Render bloquea conexiones SMTP (puertos 587 y 465) en el plan gratuito. Por eso usamos la API HTTP de Brevo que funciona perfectamente.
 
-### 3️⃣ Instalar y ejecutar
+---
 
-Abre una terminal en esta carpeta (`email-server`) y ejecuta:
+## 🔧 Configuración para Desarrollo Local
+
+### 1. Instalar dependencias
 
 ```bash
+cd email-server
 npm install
-npm start
 ```
 
-Verás:
+### 2. Configurar variables de entorno
+
+Crea un archivo `.env` en la carpeta `email-server/` con:
+
+```env
+PORT=3000
+BREVO_USER=kuenikueni.contacto@gmail.com
+BREVO_API_KEY=xkeysib-[TU-API-KEY]
+SUPABASE_URL=https://yceoopbgzmzjtyzbozst.supabase.co
+SUPABASE_ANON_KEY=[TU-SUPABASE-KEY]
+FRONTEND_URL=http://localhost:5500
 ```
-╔═══════════════════════════════════════╗
-║  🚀 SERVIDOR DE CORREOS ACTIVO       ║
-║  📧 Puerto: 3000                      ║
-║  💜 Kueni Kueni Email Service        ║
-╚═══════════════════════════════════════╝
+
+**IMPORTANTE:** Pide las credenciales al equipo. NO las subas a GitHub.
+
+### 3. Iniciar el servidor
+
+```bash
+node email-server.js
 ```
 
-### 4️⃣ Actualizar el frontend
-
-En tu archivo `javaScript/login.js`:
-
-1. Busca la función `recuperarContrasena`
-2. Cámbiala por `recuperarContrasenaConGmail` (ver GUIA-INSTALACION.md)
-3. O simplemente copia el código del archivo `login-nuevo.js` que está en la raíz del proyecto
+El servidor estará disponible en: `http://localhost:3000`
 
 ---
 
-## ✅ Probar
+## 🌐 Configuración en Producción (Render)
 
-1. Servidor corriendo: http://localhost:3000
-2. Abre login.html
-3. Click "¿Olvidaste tu contraseña?"
-4. Ingresa un email registrado
-5. Revisa tu bandeja de entrada
+### Variables de Entorno Necesarias
+
+En Render → Environment, configurar:
+
+| Variable | Valor |
+|----------|-------|
+| `PORT` | 3000 |
+| `BREVO_USER` | kuenikueni.contacto@gmail.com |
+| `BREVO_API_KEY` | [Pedir al equipo] |
+| `SUPABASE_URL` | https://yceoopbgzmzjtyzbozst.supabase.co |
+| `SUPABASE_ANON_KEY` | [Pedir al equipo] |
+| `FRONTEND_URL` | https://kuenikueni.netlify.app |
+
+### Comandos de Deploy
+
+Render detecta cambios automáticamente cuando haces push a `main`:
+
+```bash
+git add .
+git commit -m "Descripción del cambio"
+git push origin main
+```
+
+Render redesplegará en 2-3 minutos.
 
 ---
 
-## 📚 Documentación completa
+## 📨 Endpoints Disponibles
 
-Lee `GUIA-INSTALACION.md` para instrucciones detalladas, solución de problemas y deployment en producción.
+### 1. Recuperación de Contraseña
+
+**POST** `/send-recovery-email`
+
+```json
+{
+  "email": "usuario@example.com"
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "success": true,
+  "message": "Correo de recuperación enviado exitosamente",
+  "email": "usuario@example.com"
+}
+```
+
+### 2. Correo de Bienvenida
+
+**POST** `/send-welcome-email`
+
+```json
+{
+  "email": "usuario@example.com",
+  "nombre": "Juan Pérez"
+}
+```
+
+### 3. Comprobante de Donación
+
+**POST** `/send-donation-receipt`
+
+```json
+{
+  "email": "donante@example.com",
+  "nombre": "María González",
+  "monto": 500,
+  "fecha": "2025-12-01",
+  "folio": "DON-12345",
+  "metodo_pago": "Tarjeta"
+}
+```
+
+### 4. Confirmación de Evento
+
+**POST** `/send-event-confirmation`
+
+```json
+{
+  "email": "participante@example.com",
+  "nombre": "Pedro López",
+  "evento_nombre": "Abrigatón 2025",
+  "evento_fecha": "15 de Enero 2025",
+  "evento_lugar": "Plaza Principal"
+}
+```
 
 ---
 
-## 🆘 Problemas comunes
+## 🧪 Probar el Servidor
 
-- **"No se puede conectar"**: El servidor no está corriendo → ejecuta `npm start`
-- **"Invalid login"**: Contraseña de app incorrecta → verifica en `.env`
-- **Correo no llega**: Revisa spam o logs del servidor
+### En Desarrollo Local
+
+```bash
+# Usando curl
+curl -X POST http://localhost:3000/send-welcome-email \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","nombre":"Test User"}'
+```
+
+### En Producción
+
+```bash
+curl -X POST https://kuenikueniapp17-11-2-0.onrender.com/send-welcome-email \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","nombre":"Test User"}'
+```
 
 ---
 
-¡Listo! Ya no hay límites de Supabase para enviar correos 🎉
+## 🔐 Seguridad
+
+### Credenciales
+
+- ✅ El archivo `.env` está en `.gitignore` (nunca se sube a GitHub)
+- ✅ Las API Keys se configuran como variables de entorno en Render
+- ✅ Las credenciales se comparten solo por canales seguros (no por commits)
+
+### Obtener Credenciales
+
+Si necesitas las credenciales de Brevo o Supabase:
+
+1. Contacta al líder del proyecto
+2. O revisa el dashboard de Render si tienes acceso
+
+---
+
+## 🐛 Solución de Problemas
+
+### El servidor no envía correos
+
+1. **Verifica las variables de entorno en Render**
+   - Todas deben estar configuradas
+   - La API Key debe ser válida
+
+2. **Revisa los logs en Render**
+   ```
+   Dashboard → Tu servicio → Logs
+   ```
+
+3. **Verifica el email remitente en Brevo**
+   - Debe estar verificado en Brevo
+   - Ve a: Brevo → Senders & IP
+
+### Error: "sender is not valid"
+
+El email remitente no está verificado en Brevo:
+
+1. Ve a https://app.brevo.com
+2. Senders & IP → Add sender
+3. Verifica el email que quieres usar
+
+### Cambios no se reflejan en Render
+
+1. Verifica que el push se hizo correctamente:
+   ```bash
+   git log --oneline -n 5
+   ```
+
+2. Verifica en GitHub que el código está actualizado
+
+3. Fuerza un redespliegue manual en Render:
+   - Dashboard → Manual Deploy → Clear build cache & deploy
+
+---
+
+## 📚 Recursos
+
+- **Render Docs:** https://render.com/docs
+- **Brevo API Docs:** https://developers.brevo.com/
+- **Supabase Docs:** https://supabase.com/docs
+
+---
+
+## 👥 Equipo
+
+Si tienes dudas o problemas, contacta al equipo del proyecto.
+
+---
+
+## 📝 Historial de Cambios
+
+### 2025-12-01
+- ✅ Implementado sistema de correos con Brevo API
+- ✅ Servidor desplegado en Render
+- ✅ 4 endpoints funcionando: recuperación, bienvenida, donaciones, eventos
+- ✅ Email remitente verificado: kuenikueni.contacto@gmail.com
+
+---
+
+**Última actualización:** 01 de Diciembre, 2025

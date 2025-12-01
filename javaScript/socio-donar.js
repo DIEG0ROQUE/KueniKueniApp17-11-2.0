@@ -1,7 +1,9 @@
 // socio-donar.js - Sistema de donaciones para socios (CORREGIDO - Mensual)
 // ============================================================================
 
-const EMAIL_SERVER_URL = 'http://localhost:3000';
+
+const EMAIL_SERVER_URL = 'https://kuenikueniapp17-11-2-0.onrender.com';
+
 
 document.addEventListener('DOMContentLoaded', async function() {
     // ============================================

@@ -1,4 +1,5 @@
 // login.js - Sistema de login con recuperación de contraseña CORREGIDO
+const EMAIL_SERVER_URL = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar si ya hay sesión activa
@@ -182,81 +183,46 @@ async function recuperarContrasena(email) {
     const recoveryError = document.getElementById('recoveryError');
     const recoveryMessage = document.getElementById('recoveryMessage');
     
-    if (!window.supabaseClient) {
-        recoveryError.textContent = 'Error de configuración del servidor.';
-        return;
-    }
-    
     try {
-        // Mostrar loader
         recoveryBtn.disabled = true;
         btnText.style.display = 'none';
         btnLoader.style.display = 'inline-flex';
         
-        console.log('Solicitando restablecimiento de contraseña para:', email);
-        
-        // OBTENER LA URL ACTUAL DINÁMICAMENTE
-        const currentUrl = window.location.href;
-        const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
-        const redirectUrl = `${baseUrl}/reset-password.html`;
-        
-        console.log('URL de redirección:', redirectUrl);
-        
-        // Función de Supabase que envía el correo con el enlace de token
-        const { data, error } = await window.supabaseClient.auth
-            .resetPasswordForEmail(email, {
-                redirectTo: redirectUrl,
-            });
+        // Llamar al servidor de correos
+        const response = await fetch(`${EMAIL_SERVER_URL}/send-recovery-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
 
-        if (error) {
-            console.error('Error de Supabase Auth:', error);
-            
-            // Mensajes de error más específicos
-            if (error.message.includes('Email not found') || error.message.includes('User not found')) {
-                recoveryError.textContent = 'No existe una cuenta con este correo electrónico.';
-            } else if (error.message.includes('Email rate limit exceeded')) {
-                recoveryError.textContent = 'Demasiados intentos. Espera unos minutos e intenta de nuevo.';
-            } else {
-                recoveryError.textContent = 'Error al procesar la solicitud. Intenta más tarde.';
-            }
+        const data = await response.json();
+
+        if (!response.ok) {
+            recoveryError.textContent = data.error || 'Error al enviar correo';
             return;
         }
         
-        console.log('Correo de restablecimiento solicitado:', data);
-        
-        // Mostrar mensaje de éxito
+        // Mostrar éxito
         recoveryMessage.innerHTML = `
             <div class="recovery-success">
                 <div class="success-icon">✉️</div>
-                <h3>¡Correo de restablecimiento enviado!</h3>
-                <p>Hemos enviado un enlace a <strong>${email}</strong></p>
-                <p class="recovery-note">
-                    Revisa tu bandeja de entrada y sigue las instrucciones para cambiar tu contraseña. 
-                    Si no lo ves, revisa la carpeta de spam.
-                </p>
-                <div class="recovery-timer">
-                    Este mensaje se cerrará en <span id="countdown">10</span> segundos
-                </div>
+                <h3>¡Correo enviado!</h3>
+                <p>Hemos enviado tu contraseña a <strong>${email}</strong></p>
+                <p class="recovery-note">Revisa tu bandeja de entrada.</p>
             </div>
         `;
         
-        // Countdown y cerrar modal
-        let segundos = 10;
-        const countdownElement = document.getElementById('countdown');
-        const interval = setInterval(() => {
-            segundos--;
-            if (countdownElement) {
-                countdownElement.textContent = segundos;
-            }
-            if (segundos <= 0) {
-                clearInterval(interval);
-                document.getElementById('recoveryModal').style.display = 'none';
-            }
-        }, 1000);
+        // Cerrar modal después de 5 segundos
+        setTimeout(() => {
+            document.getElementById('recoveryModal').style.display = 'none';
+        }, 5000);
         
     } catch (error) {
-        console.error('Error general:', error);
-        recoveryError.textContent = 'Error al procesar la solicitud. Verifica tu conexión.';
+        if (error.message.includes('Failed to fetch')) {
+            recoveryError.textContent = '⚠️ Servidor de correos no disponible';
+        } else {
+            recoveryError.textContent = 'Error de conexión';
+        }
     } finally {
         recoveryBtn.disabled = false;
         btnText.style.display = 'inline';

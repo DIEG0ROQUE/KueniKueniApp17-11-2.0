@@ -1,58 +1,39 @@
-// ============================================
-// DONATION.JS - VERSIÓN CON VALIDACIONES AVANZADAS (SIN SESIÓN)
-// ============================================
+// donation.js - Sistema de donaciones con validación de tarjetas y conexión a Supabase
 
-let montoSeleccionado = 0;
-let tipoDonacion = 'unica';
-let currentCardType = null;
-
-// ============================================
-// TIPOS DE TARJETAS CON PATRONES Y VALIDACIONES
-// ============================================
+// Definir tipos de tarjetas con sus patrones
 const cardTypes = {
     visa: {
         pattern: /^4/,
         lengths: [13, 16, 19],
         cvvLength: 3,
         name: 'Visa',
-        color: '#1434CB'
+       logo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNy45ODI0MzkwMjQzOTAyNDIiIHZpZXdCb3g9IjAgMCAxMDI1IDc2OCI+PHBhdGggZmlsbD0iIzRmNDZlNSIgZD0iTTk2MC4zMSA3NjhoLTg5NnEtMjYgMC00NS0xOC41VCAuMzEgNzA0VjU3NmgxMDI0djEyOHEwIDI3LTE4LjUgNDUuNXQtNDUuNSAxOC41TS4zMSA2NHEwLTI2IDE4LjUtNDV0NDUuNS0xOWg4OTZxMjcgMCA0NS41IDE5dDE4LjUgNDV2NjRILjMxem0zMjkgNDQ4bDUyLTMyMGg4M2wtNTIgMzIwem01MjktMzIwaDY3bDY3IDMyMGgtNzdsLTE5LTMyaC05NmwtMTggMzJoLTg3bDEyNC0yOTZsMS0yLjVsNC02bDctN2wxMS02em0zOCAyMjRsLTI5LTEzN2wtMzUgMTM3em0tMzM4IDk2cS0yNSAwLTQ5LTQuNXQtMzQtOC41bC0xMS00bDEyLTcwcTE3IDE0IDUwIDE5LjV0NjAuNS0xdDI3LjUtMjYuNXEwLTEzLTE4LTI1LjV0LTQwLTIxLjV0LTQwLTI5dC0xOC00N3EwLTI5IDE1LjUtNTF0MzkuNS0zMnQ0NS0xNC41dDQwLTQuNXExNyAwIDM2IDMuNXQyOSA2LjVsMTAgM2wtMTIgNjdxLTI2LTE2LTcxLjUtMTQuNXQtNDUuNSAyNS41cTAgMTIgMTguNSAyMy41dDQwLjUgMjF0NDAgMzAuNXQxOCA0OHEwIDM2LTI0LjUgNjEuNXQtNTUuNSAzNXQtNjMgOS41bS00NTYtMzIwcTE2IDAgMjUuNSA3LjV0MTEuNSAxNC41bDIgN2wyOCAxNDRsMTAgNDdsNzktMjIwaDkwbC0xMzMgMzIwaC04N2wtNzItMjc4cS0yMi0xMy01Ni0yNHYtMTh6Ii8+PC9zdmc+'
     },
     mastercard: {
         pattern: /^(5[1-5]|2[2-7])/,
         lengths: [16],
         cvvLength: 3,
         name: 'Mastercard',
-        color: '#EB001B'
+        logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCA0MCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHJ4PSIzIiBmaWxsPSIjRUIwMDFCIi8+CiAgPGNpcmNsZSBjeD0iMTUiIGN5PSIxMi41IiByPSI1IiBmaWxsPSIjRkY1RjAwIi8+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSIxMi41IiByPSI1IiBmaWxsPSIjRkY1RjAwIi8+CiAgPHBhdGggZD0iTSAyMCAxMi41IEEgNSA1IDAgMCAwIDE1IDE3LjUgQSA1IDUgMCAwIDAgMjUgMTcuNSBBIDUgNSAwIDAgMCAyMCAxMi41IFoiIGZpbGw9IiNGRjVGMDAiLz4KPC9zdmc+'
     },
     amex: {
         pattern: /^3[47]/,
         lengths: [15],
         cvvLength: 4,
         name: 'American Express',
-        color: '#006FCF'
+        logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCA0MCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHJ4PSIzIiBmaWxsPSIjMDA2RkNGIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFNRVg8L3RleHQ+Cjwvc3ZnPg=='
     },
     discover: {
         pattern: /^6(?:011|5)/,
         lengths: [16, 19],
         cvvLength: 3,
         name: 'Discover',
-        color: '#FF6000'
+        logo: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCA0MCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMjUiIHJ4PSIzIiBmaWxsPSIjRkY2MDAwIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIxMi41IiByPSI1IiBmaWxsPSIjRkZDRDAwIi8+Cjwvc3ZnPg=='
     }
 };
 
-// Bancos detectables mexicanos
-const BANCOS_MEXICO = {
-    'BBVA': { bins: ['4152', '4772'], color: '#004481' },
-    'Santander': { bins: ['5579'], color: '#EC0000' },
-    'Banorte': { bins: ['5465', '5492'], color: '#DA291C' },
-    'HSBC': { bins: ['4051', '5469'], color: '#DB0011' },
-    'Citibanamex': { bins: ['5256', '4915'], color: '#003B71' },
-    'ScotiaBank': { bins: ['4571'], color: '#EC1C24' },
-    'Inbursa': { bins: ['5204'], color: '#C8102E' }
-};
-
 // ============================================
-// FUNCIONES DE VALIDACIÓN AVANZADA
+// FUNCIONES DE VALIDACIÓN DE TARJETA
 // ============================================
 
 // Detectar tipo de tarjeta
@@ -68,7 +49,18 @@ function detectCardType(number) {
     return null;
 }
 
-// Algoritmo de Luhn mejorado
+function getCardType(number) {
+    number = number.replace(/\s+/g, '');
+
+    if (/^4/.test(number)) return "visa";
+    if (/^5[1-5]/.test(number)) return "mastercard";
+    if (/^3[47]/.test(number)) return "amex";
+    if (/^6(?:011|5)/.test(number)) return "discover";
+
+    return "";
+}
+
+// Validar usando algoritmo de Luhn
 function luhnCheck(number) {
     const cleanNumber = number.replace(/\s/g, '');
     let sum = 0;
@@ -91,7 +83,7 @@ function luhnCheck(number) {
     return sum % 10 === 0;
 }
 
-// Formatear número de tarjeta según tipo
+// Formatear número de tarjeta
 function formatCardNumber(value, cardType) {
     const cleanValue = value.replace(/\s/g, '');
     
@@ -115,7 +107,6 @@ function formatExpiry(value) {
     return cleanValue;
 }
 
-// Validar fecha de expiración mejorada
 function validateExpiry(value) {
     const parts = value.split('/');
     if (parts.length !== 2) return false;
@@ -129,588 +120,615 @@ function validateExpiry(value) {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
 
-    // Validar que no esté vencida
+  
     if (year < currentYear) return false;
+
+  
     if (year === currentYear && month < currentMonth) return false;
 
-    // Validar que no sea muy futura (15 años máximo)
+    
     if (year > currentYear + 15) return false;
 
     return true;
 }
 
-// ============================================
-// INICIALIZACIÓN
-// ============================================
 
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Inicializando formulario de donación (sin sesión)...');
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedAmount = 0;
+    let isCustomAmount = false;
+    let currentCardType = null;
+
+    // Elementos del DOM
+    const amountButtons = document.querySelectorAll('.amount-btn');
+    const customAmountInput = document.getElementById('customAmount');
+    const donationForm = document.getElementById('donationForm');
+    const summaryAmount = document.getElementById('summaryAmount');
+    const donateAmountBtn = document.getElementById('donateAmount');
+    const impactAmount = document.getElementById('impactAmount');
+    const destinoSelect = document.getElementById('destino');
+    const tipoDonacion = document.querySelectorAll('input[name="tipo-donacion"]');
     
-    detectarTipoDonacion();
-    configurarEventListeners();
-    inicializarValidacionesTarjeta();
+    // Card inputs
+    const cardNumber = document.getElementById('card-number');
+    const expiry = document.getElementById('expiry');
+    const cvv = document.getElementById('cvv');
+
+    // ============================================
+    // AGREGAR CONTENEDOR PARA LOGO DE TARJETA
+    // ============================================
+    if (cardNumber) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-input-wrapper';
+        cardNumber.parentNode.insertBefore(wrapper, cardNumber);
+        wrapper.appendChild(cardNumber);
+        
+        const logoContainer = document.createElement('div');
+        logoContainer.className = 'card-logo';
+        logoContainer.id = 'card-logo';
+        wrapper.appendChild(logoContainer);
+        
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.id = 'card-error';
+        wrapper.appendChild(errorMsg);
+    }
+
+    // ============================================
+    // MANEJO DE SELECCIÓN DE MONTOS
+    // ============================================
+    amountButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+           
+            amountButtons.forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+
+            const amount = this.dataset.amount;
+
+            if (amount === 'custom') {
+                isCustomAmount = true;
+                customAmountInput.style.display = 'block';
+                customAmountInput.focus();
+                selectedAmount = parseFloat(customAmountInput.value) || 0;
+            } else {
+                isCustomAmount = false;
+                customAmountInput.style.display = 'none';
+                selectedAmount = parseFloat(amount);
+            }
+
+            updateSummary();
+        });
+    });
+
+    // Monto personalizado
+    customAmountInput.addEventListener('input', function() {
+        selectedAmount = parseFloat(this.value) || 0;
+        updateSummary();
+    });
+
+    // Actualizar resumen cuando cambia destino o tipo
+    destinoSelect.addEventListener('change', updateSummary);
+    tipoDonacion.forEach(radio => {
+        radio.addEventListener('change', updateSummary);
+    });
+
+    // ============================================
+    // FORMATEO Y VALIDACIÓN DE TARJETA
+    // ============================================
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            
+            // Limitar solo a números
+            value = value.replace(/\D/g, '');
+            
+            // Detectar tipo de tarjeta
+            const detectedCard = detectCardType(value);
+            currentCardType = detectedCard;
+            
+            // ==== PLACEHOLDER DINÁMICO SEGÚN TIPO DE TARJETA ====
+if (detectedCard) {
+    let placeholder = '';
+
+    switch (detectedCard.type) {
+        case 'visa':
+        case 'mastercard':
+        case 'discover':
+            placeholder = '#### #### #### ####';
+            break;
+        case 'amex':
+            placeholder = '#### ###### #####';
+            break;
+    }
+
+    cardNumber.placeholder = placeholder;
+} else {
+    // Placeholder genérico cuando aún no detecta tarjeta
+    cardNumber.placeholder = '#### #### #### ####';
+}
+
+
+            // Mostrar logo
+            const logoContainer = document.getElementById('card-logo');
+            if (detectedCard && logoContainer) {
+                logoContainer.innerHTML = `<img src="${detectedCard.config.logo}" alt="${detectedCard.config.name}">`;
+                logoContainer.classList.add('active');
+            } else if (logoContainer) {
+                logoContainer.classList.remove('active');
+            }
+            
+            // Limitar longitud según tipo de tarjeta
+            let maxLength = 16;
+            if (detectedCard) {
+                maxLength = Math.max(...detectedCard.config.lengths);
+            }
+            
+            if (value.length > maxLength) {
+                value = value.slice(0, maxLength);
+            }
+            
+            // Formatear
+            const formatted = formatCardNumber(value, detectedCard);
+            e.target.value = formatted;
+            
+            // Validar
+            const errorMsg = document.getElementById('card-error');
+            
+            if (value.length >= 13) {
+                const isValidLength = detectedCard ? 
+                    detectedCard.config.lengths.includes(value.length) : 
+                    value.length === 16;
+                
+                const isValidLuhn = luhnCheck(value);
+                
+                if (isValidLength && isValidLuhn) {
+                    e.target.classList.add('valid');
+                    e.target.classList.remove('invalid');
+                    if (errorMsg) {
+                        errorMsg.classList.remove('active');
+                    }
+                } else {
+                    e.target.classList.add('invalid');
+                    e.target.classList.remove('valid');
+                    if (errorMsg) {
+                        errorMsg.textContent = 'Número de tarjeta inválido';
+                        errorMsg.classList.add('active');
+                    }
+                }
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+                if (errorMsg) {
+                    errorMsg.classList.remove('active');
+                }
+            }
+            
+            // Actualizar longitud de CVV
+            if (cvv && detectedCard) {
+                cvv.maxLength = detectedCard.config.cvvLength;
+                cvv.placeholder = detectedCard.config.cvvLength === 4 ? '1234' : '123';
+            }
+        });
+    }
+
+    // Validar fecha de expiración
+    if (expiry) {
+        expiry.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 4) {
+                value = value.slice(0, 4);
+            }
+            
+            e.target.value = formatExpiry(value);
+            
+            if (value.length === 4) {
+                if (validateExpiry(e.target.value)) {
+                    e.target.classList.add('valid');
+                    e.target.classList.remove('invalid');
+                } else {
+                    e.target.classList.add('invalid');
+                    e.target.classList.remove('valid');
+                }
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+            }
+        });
+    }
+
+    // Validar CVV
+    if (cvv) {
+        cvv.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            const expectedLength = currentCardType?.config.cvvLength || 3;
+            
+            if (value.length > expectedLength) {
+                value = value.slice(0, expectedLength);
+            }
+            
+            e.target.value = value;
+            
+            if (value.length === expectedLength) {
+                e.target.classList.add('valid');
+                e.target.classList.remove('invalid');
+            } else if (value.length > 0) {
+                e.target.classList.add('invalid');
+                e.target.classList.remove('valid');
+            } else {
+                e.target.classList.remove('valid', 'invalid');
+            }
+        });
+    }
+
+    // ============================================
+    // ACTUALIZAR RESUMEN
+    // ============================================
+    function updateSummary() {
+        const formattedAmount = selectedAmount.toLocaleString('es-MX');
+        summaryAmount.textContent = `$${formattedAmount} MXN`;
+        donateAmountBtn.textContent = formattedAmount;
+        impactAmount.textContent = formattedAmount;
+
+        // Actualizar tipo
+        const tipoSeleccionado = document.querySelector('input[name="tipo-donacion"]:checked').value;
+        const tipoBadge = document.querySelector('.summary-badge');
+        tipoBadge.textContent = tipoSeleccionado === 'unica' ? 'Única' : 'Mensual';
+
+        // Actualizar destino
+        const destinoText = destinoSelect.options[destinoSelect.selectedIndex].text;
+        document.querySelector('.summary-value-small').textContent = destinoText;
+    }
+
+    // ============================================
+    // VALIDAR TARJETA MEJORADO
+    // ============================================
+    function validarTarjeta() {
+        const cardNum = cardNumber.value.replace(/\s/g, '');
+        const expiryVal = expiry.value;
+        const cvvVal = cvv.value;
+
+        // Validar número de tarjeta con Luhn
+        if (cardNum.length < 13 || !luhnCheck(cardNum)) {
+            mostrarMensaje('Número de tarjeta inválido', 'error');
+            cardNumber.classList.add('invalid');
+            return false;
+        }
+
+        // Validar longitud según tipo de tarjeta
+        if (currentCardType) {
+            if (!currentCardType.config.lengths.includes(cardNum.length)) {
+                mostrarMensaje(`Número de tarjeta ${currentCardType.config.name} debe tener ${currentCardType.config.lengths.join(' o ')} dígitos`, 'error');
+                return false;
+            }
+        }
+
+        // Validar formato de fecha
+        if (!/^\d{2}\/\d{2}$/.test(expiryVal)) {
+            mostrarMensaje('Fecha de expiración inválida (MM/AA)', 'error');
+            expiry.classList.add('invalid');
+            return false;
+        }
+
+        // Validar que no esté vencida
+        if (!validateExpiry(expiryVal)) {
+            mostrarMensaje('La tarjeta está vencida', 'error');
+            expiry.classList.add('invalid');
+            return false;
+        }
+
+        // Validar CVV según tipo de tarjeta
+        const expectedCvvLength = currentCardType?.config.cvvLength || 3;
+        if (cvvVal.length !== expectedCvvLength) {
+            mostrarMensaje(`CVV debe tener ${expectedCvvLength} dígitos`, 'error');
+            cvv.classList.add('invalid');
+            return false;
+        }
+
+        return true;
+    }
+
+    // ============================================
+    // ENVIAR FORMULARIO
+    // ============================================
+    donationForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Validar que se haya seleccionado un monto
+        if (selectedAmount <= 0) {
+            mostrarMensaje('Por favor selecciona un monto de donación', 'error');
+            return;
+        }
+
+        // Validar campos de tarjeta
+        if (!validarTarjeta()) {
+            return;
+        }
+
+        // Obtener datos del formulario
+        const formData = {
+            donante_nombre: document.getElementById('nombre').value.trim(),
+            donante_email: document.getElementById('email').value.trim(),
+            donante_telefono: null,
+            monto: selectedAmount,
+            moneda: 'MXN',
+            metodo_pago: 'tarjeta',
+            estado_pago: 'completado',
+            descripcion: obtenerDescripcionDonacion(),
+            referencia_pago: generarReferenciaPago(),
+            socio_id: obtenerSocioId()
+        };
+
+        console.log('Datos de donación:', formData);
+
+        // Guardar en Supabase
+        await guardarDonacion(formData);
+    });
+
+    // ============================================
+    // GUARDAR DONACIÓN EN SUPABASE
+    // ============================================
+    async function guardarDonacion(datos) {
+        if (!window.supabaseClient) {
+            mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
+            console.error('Supabase no está configurado');
+            return;
+        }
+
+        try {
+            mostrarCargando(true);
+
+            console.log('Guardando donación...');
+
+            const { data, error } = await window.supabaseClient
+                .from('donaciones')
+                .insert([datos])
+                .select();
+
+            if (error) {
+                console.error('Error al guardar donación:', error);
+                mostrarMensaje('Error al procesar la donación. Intenta nuevamente.', 'error');
+                return;
+            }
+
+            console.log('Donación guardada exitosamente:', data);
+
+            // Mostrar mensaje de éxito
+            mostrarMensajeExito(datos);
+
+            // Limpiar formulario después de 3 segundos
+            setTimeout(() => {
+                donationForm.reset();
+                selectedAmount = 0;
+                currentCardType = null;
+                updateSummary();
+                amountButtons.forEach(btn => btn.classList.remove('selected'));
+                customAmountInput.style.display = 'none';
+                
+                // Limpiar estados de validación
+                cardNumber.classList.remove('valid', 'invalid');
+                expiry.classList.remove('valid', 'invalid');
+                cvv.classList.remove('valid', 'invalid');
+                
+                const logoContainer = document.getElementById('card-logo');
+                if (logoContainer) {
+                    logoContainer.classList.remove('active');
+                }
+            }, 3000);
+
+        } catch (error) {
+            console.error('Error inesperado:', error);
+            mostrarMensaje('Error al procesar la donación', 'error');
+        } finally {
+            mostrarCargando(false);
+        }
+    }
+
+    // ============================================
+    // FUNCIONES AUXILIARES
+    // ============================================
+    function obtenerDescripcionDonacion() {
+        const destino = destinoSelect.options[destinoSelect.selectedIndex].text;
+        const tipo = document.querySelector('input[name="tipo-donacion"]:checked').value;
+        const mensaje = document.getElementById('mensaje').value.trim();
+        
+        let descripcion = `Donación ${tipo === 'unica' ? 'única' : 'mensual'} para ${destino}`;
+        if (mensaje) {
+            descripcion += ` - Mensaje: ${mensaje}`;
+        }
+        
+        return descripcion;
+    }
+
+    function generarReferenciaPago() {
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000);
+        return `DON-${timestamp}-${random}`;
+    }
+
+    function obtenerSocioId() {
+        return sessionStorage.getItem('socioId') || null;
+    }
+
+    // ============================================
+    // MENSAJES Y UI
+    // ============================================
+    function mostrarMensaje(mensaje, tipo) {
+        let container = document.querySelector('.message-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'message-container';
+            donationForm.insertBefore(container, donationForm.firstChild);
+        }
+
+        container.innerHTML = `
+            <div class="message message-${tipo}">
+                ${tipo === 'error' ? '⚠️' : '✓'} ${mensaje}
+            </div>
+        `;
+
+        setTimeout(() => {
+            const msg = container.querySelector('.message');
+            if (msg) {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    function mostrarMensajeExito(datos) {
+        const container = document.querySelector('.message-container') || (() => {
+            const el = document.createElement('div');
+            el.className = 'message-container';
+            donationForm.insertBefore(el, donationForm.firstChild);
+            return el;
+        })();
+
+        container.innerHTML = `
+            <div class="message message-success">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎉</div>
+                <h4 style="margin: 0 0 0.5rem 0;">¡Donación exitosa!</h4>
+                <p style="margin: 0;">Gracias <strong>${datos.donante_nombre}</strong> por tu donación de <strong>$${datos.monto.toLocaleString('es-MX')} MXN</strong></p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; opacity: 0.8;">
+                    Referencia: ${datos.referencia_pago}
+                </p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">
+                    Recibirás un correo de confirmación en <strong>${datos.donante_email}</strong>
+                </p>
+            </div>
+        `;
+    }
+
+    function mostrarCargando(mostrar) {
+        const submitBtn = donationForm.querySelector('button[type="submit"]');
+        
+        if (mostrar) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="loader-inline"></span>
+                Procesando donación...
+            `;
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `Donar $<span id="donateAmount">${selectedAmount.toLocaleString('es-MX')}</span> MXN`;
+        }
+    }
+
+    // Inicializar resumen
+    updateSummary();
 });
 
 // ============================================
-// DETECTAR TIPO DE DONACIÓN
+// ESTILOS PARA MENSAJES Y VALIDACIÓN
 // ============================================
+const styles = document.createElement('style');
+styles.textContent = `
+    .message-container {
+        margin-bottom: 1.5rem;
+    }
 
-function detectarTipoDonacion() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tipo = urlParams.get('tipo');
-    
-    if (tipo === 'mensual') {
-        tipoDonacion = 'mensual';
-        configurarFormularioMensual();
-    } else {
-        tipoDonacion = 'unica';
-        configurarFormularioUnica();
-    }
-}
-
-function configurarFormularioUnica() {
-    const tipoTexto = document.getElementById('tipoTexto');
-    const pageTitle = document.getElementById('pageTitle');
-    const summaryType = document.getElementById('summaryType');
-    const btnText = document.getElementById('btnText');
-    
-    if (tipoTexto) tipoTexto.textContent = 'Donación Única';
-    if (pageTitle) pageTitle.textContent = 'Hacer una Donación Única';
-    if (summaryType) summaryType.textContent = 'Única';
-    if (btnText) btnText.textContent = 'Realizar Donación';
-}
-
-function configurarFormularioMensual() {
-    const tipoTexto = document.getElementById('tipoTexto');
-    const pageTitle = document.getElementById('pageTitle');
-    const summaryType = document.getElementById('summaryType');
-    const btnText = document.getElementById('btnText');
-    
-    if (tipoTexto) tipoTexto.textContent = 'Suscripción Mensual';
-    if (pageTitle) pageTitle.textContent = 'Configurar Suscripción Mensual';
-    if (summaryType) summaryType.textContent = 'Mensual';
-    if (btnText) btnText.textContent = 'Activar Suscripción';
-}
-
-// ============================================
-// VALIDACIONES AVANZADAS DE TARJETA
-// ============================================
-
-function inicializarValidacionesTarjeta() {
-    const cardNumber = document.getElementById('cardNumber') || document.getElementById('card-number');
-    const expiry = document.getElementById('expiry');
-    const cvv = document.getElementById('cvv');
-    
-    if (!cardNumber || !expiry || !cvv) {
-        console.error('Campos de tarjeta no encontrados');
-        return;
-    }
-    
-    // Crear contenedor para indicador de tipo de tarjeta
-    const cardWrapper = cardNumber.parentElement;
-    if (!cardWrapper.querySelector('.card-type-indicator')) {
-        const indicator = document.createElement('div');
-        indicator.className = 'card-type-indicator';
-        indicator.id = 'cardTypeIndicator';
-        cardWrapper.appendChild(indicator);
-    }
-    
-    // Validación de número de tarjeta
-    cardNumber.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\s/g, '');
-        
-        // Limitar solo a números
-        value = value.replace(/\D/g, '');
-        
-        // Detectar tipo de tarjeta
-        const detectedCard = detectCardType(value);
-        currentCardType = detectedCard;
-        
-        // Mostrar indicador de tipo
-        const indicator = document.getElementById('cardTypeIndicator');
-        if (detectedCard && indicator) {
-            indicator.textContent = detectedCard.config.name;
-            indicator.style.color = detectedCard.config.color;
-            indicator.style.display = 'block';
-        } else if (indicator) {
-            indicator.style.display = 'none';
-        }
-        
-        // Actualizar placeholder según tipo
-        if (detectedCard) {
-            let placeholder = '';
-            switch (detectedCard.type) {
-                case 'amex':
-                    placeholder = '#### ###### #####';
-                    break;
-                default:
-                    placeholder = '#### #### #### ####';
-            }
-            cardNumber.placeholder = placeholder;
-        } else {
-            cardNumber.placeholder = '#### #### #### ####';
-        }
-        
-        // Limitar longitud según tipo de tarjeta
-        let maxLength = 16;
-        if (detectedCard) {
-            maxLength = Math.max(...detectedCard.config.lengths);
-        }
-        
-        if (value.length > maxLength) {
-            value = value.slice(0, maxLength);
-        }
-        
-        // Formatear
-        const formatted = formatCardNumber(value, detectedCard);
-        e.target.value = formatted;
-        
-        // Validar
-        if (value.length >= 13) {
-            const isValidLength = detectedCard ? 
-                detectedCard.config.lengths.includes(value.length) : 
-                value.length === 16;
-            
-            const isValidLuhn = luhnCheck(value);
-            
-            if (isValidLength && isValidLuhn) {
-                e.target.classList.add('valid');
-                e.target.classList.remove('invalid');
-            } else {
-                e.target.classList.add('invalid');
-                e.target.classList.remove('valid');
-            }
-        } else {
-            e.target.classList.remove('valid', 'invalid');
-        }
-        
-        // Actualizar longitud de CVV según tipo de tarjeta
-        if (detectedCard) {
-            cvv.maxLength = detectedCard.config.cvvLength;
-            cvv.placeholder = detectedCard.config.cvvLength === 4 ? '1234' : '123';
-        }
-    });
-    
-    // Validación de fecha de expiración
-    expiry.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        if (value.length > 4) {
-            value = value.slice(0, 4);
-        }
-        
-        e.target.value = formatExpiry(value);
-        
-        if (value.length === 4) {
-            if (validateExpiry(e.target.value)) {
-                e.target.classList.add('valid');
-                e.target.classList.remove('invalid');
-            } else {
-                e.target.classList.add('invalid');
-                e.target.classList.remove('valid');
-            }
-        } else {
-            e.target.classList.remove('valid', 'invalid');
-        }
-    });
-    
-    // Validación de CVV
-    cvv.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        const expectedLength = currentCardType?.config.cvvLength || 3;
-        
-        if (value.length > expectedLength) {
-            value = value.slice(0, expectedLength);
-        }
-        
-        e.target.value = value;
-        
-        if (value.length === expectedLength) {
-            e.target.classList.add('valid');
-            e.target.classList.remove('invalid');
-        } else if (value.length > 0) {
-            e.target.classList.add('invalid');
-            e.target.classList.remove('valid');
-        } else {
-            e.target.classList.remove('valid', 'invalid');
-        }
-    });
-}
-
-// ============================================
-// EVENT LISTENERS
-// ============================================
-
-function configurarEventListeners() {
-    // Botones de monto
-    document.querySelectorAll('.amount-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const amount = this.dataset.amount;
-            
-            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-            
-            if (amount === 'otro' || amount === 'custom') {
-                this.classList.add('active');
-                const customInput = document.getElementById('customAmount');
-                if (customInput) {
-                    customInput.style.display = 'block';
-                    customInput.focus();
-                }
-                montoSeleccionado = 0;
-            } else {
-                this.classList.add('active');
-                const customInput = document.getElementById('customAmount');
-                if (customInput) {
-                    customInput.style.display = 'none';
-                }
-                montoSeleccionado = parseInt(amount);
-            }
-            
-            actualizarResumen();
-        });
-    });
-    
-    const customAmount = document.getElementById('customAmount');
-    if (customAmount) {
-        customAmount.addEventListener('input', function() {
-            montoSeleccionado = parseInt(this.value) || 0;
-            actualizarResumen();
-        });
-    }
-    
-    const destino = document.getElementById('destino');
-    if (destino) {
-        destino.addEventListener('change', function() {
-            const destinos = {
-                'general': 'Apoyo General',
-                'reforestacion': 'Reforestación',
-                'artesanias': 'Artesanías',
-                'deportivo': 'Deportivo',
-                'asistencia': 'Asistencia Social',
-                'cuota': 'Cuota de Socio'
-            };
-            const summaryDestino = document.getElementById('summaryDestino');
-            if (summaryDestino) {
-                summaryDestino.textContent = destinos[this.value] || 'Apoyo General';
-            }
-        });
-    }
-    
-    const form = document.getElementById('donationForm');
-    if (form) {
-        form.addEventListener('submit', procesarDonacion);
-    }
-}
-
-// ============================================
-// ACTUALIZAR RESUMEN
-// ============================================
-
-function actualizarResumen() {
-    const summaryAmount = document.getElementById('summaryAmount');
-    const donationAmount = document.getElementById('donationAmount') || document.getElementById('donateAmount');
-    const impactAmount = document.getElementById('impactAmount');
-    
-    if (summaryAmount) summaryAmount.textContent = `$${montoSeleccionado.toLocaleString('es-MX')} MXN`;
-    if (donationAmount) donationAmount.textContent = montoSeleccionado.toLocaleString('es-MX');
-    if (impactAmount) impactAmount.textContent = montoSeleccionado.toLocaleString('es-MX');
-}
-
-// ============================================
-// VALIDACIÓN COMPLETA DE TARJETA
-// ============================================
-
-function validarTarjetaCompleta() {
-    const cardNumber = document.getElementById('cardNumber') || document.getElementById('card-number');
-    const expiry = document.getElementById('expiry');
-    const cvv = document.getElementById('cvv');
-    
-    const cardNum = cardNumber.value.replace(/\s/g, '');
-    const expiryVal = expiry.value;
-    const cvvVal = cvv.value;
-    
-    // Validar número de tarjeta con Luhn
-    if (cardNum.length < 13 || !luhnCheck(cardNum)) {
-        mostrarMensaje('Número de tarjeta inválido', 'error');
-        cardNumber.classList.add('invalid');
-        cardNumber.focus();
-        return false;
-    }
-    
-    // Validar longitud según tipo de tarjeta
-    if (currentCardType) {
-        if (!currentCardType.config.lengths.includes(cardNum.length)) {
-            mostrarMensaje(`Número de tarjeta ${currentCardType.config.name} debe tener ${currentCardType.config.lengths.join(' o ')} dígitos`, 'error');
-            cardNumber.focus();
-            return false;
-        }
-    }
-    
-    // Validar formato de fecha
-    if (!/^\d{2}\/\d{2}$/.test(expiryVal)) {
-        mostrarMensaje('Fecha de expiración inválida (MM/AA)', 'error');
-        expiry.classList.add('invalid');
-        expiry.focus();
-        return false;
-    }
-    
-    // Validar que no esté vencida
-    if (!validateExpiry(expiryVal)) {
-        mostrarMensaje('La tarjeta está vencida', 'error');
-        expiry.classList.add('invalid');
-        expiry.focus();
-        return false;
-    }
-    
-    // Validar CVV según tipo de tarjeta
-    const expectedCvvLength = currentCardType?.config.cvvLength || 3;
-    if (cvvVal.length !== expectedCvvLength) {
-        mostrarMensaje(`CVV debe tener ${expectedCvvLength} dígitos`, 'error');
-        cvv.classList.add('invalid');
-        cvv.focus();
-        return false;
-    }
-    
-    return true;
-}
-
-// ============================================
-// PROCESAR DONACIÓN
-// ============================================
-
-async function procesarDonacion(e) {
-    e.preventDefault();
-    
-    // Validar monto
-    if (montoSeleccionado < 50) {
-        mostrarMensaje('El monto mínimo de donación es $50 MXN', 'error');
-        return;
-    }
-    
-    // Validar campos de tarjeta con validación completa
-    if (!validarTarjetaCompleta()) {
-        return;
-    }
-    
-    const userName = document.getElementById('nombre').value.trim();
-    const userEmail = document.getElementById('email').value.trim();
-    const cardNumber = document.getElementById('cardNumber') || document.getElementById('card-number');
-    const tipoTarjetaInput = document.querySelector('input[name="tipoTarjeta"]:checked') || 
-                             document.querySelector('input[name="tipo-tarjeta"]:checked');
-    
-    const numeroTarjeta = cardNumber.value.replace(/\s/g, '');
-    const ultimos4 = numeroTarjeta.slice(-4);
-    const banco = currentCardType?.config.name || 'Otro';
-    const tipoTarjeta = tipoTarjetaInput ? tipoTarjetaInput.value : 'credito';
-    
-    try {
-        await guardarDonacionUnica({
-            userName,
-            userEmail,
-            monto: montoSeleccionado,
-            tipoTarjeta,
-            ultimos4,
-            banco
-        });
-    } catch (error) {
-        console.error('Error:', error);
-        mostrarMensaje('Ocurrió un error: ' + error.message, 'error');
-    }
-}
-
-// ============================================
-// GUARDAR DONACIÓN ÚNICA
-// ============================================
-async function guardarDonacionUnica(datos) {
-    const destinoSelect = document.getElementById('destino');
-    const mensajeInput = document.getElementById('mensaje');
-    
-    const destinoValue = destinoSelect ? destinoSelect.value : 'general';
-    const mensajeUsuario = mensajeInput ? mensajeInput.value.trim() : '';
-    
-    const destinosTexto = {
-        'general': 'Apoyo General',
-        'reforestacion': 'Programa de Reforestación',
-        'artesanias': 'Taller de Artesanías',
-        'deportivo': 'Torneo Deportivo',
-        'asistencia': 'Asistencia Social',
-        'cuota': 'Cuota de Socio'
-    };
-    
-    let descripcionCompleta;
-    if (mensajeUsuario) {
-        descripcionCompleta = `Donación única para ${destinosTexto[destinoValue]} - Donante - Mensaje: ${mensajeUsuario}`;
-    } else {
-        descripcionCompleta = `Donación única para ${destinosTexto[destinoValue]} - Donante`;
-    }
-    
-    const dataDonacion = {
-        donante_nombre: datos.userName,
-        donante_email: datos.userEmail,
-        monto: parseFloat(datos.monto),
-        moneda: 'MXN',
-        metodo_pago: 'tarjeta',
-        estado_pago: 'completado',
-        descripcion: descripcionCompleta,
-        tipo_donacion: 'unica',
-        fecha_donacion: new Date().toISOString()
-    };
-    
-    console.log('Guardando donación única:', dataDonacion);
-    
-    const { data, error } = await window.supabaseClient
-        .from('donaciones')
-        .insert(dataDonacion)
-        .select();
-    
-    if (error) {
-        console.error('Error al guardar donación:', error);
-        throw new Error(error.message);
-    }
-    
-    console.log('Donación guardada exitosamente:', data);
-    
-    mostrarMensaje('¡Donación realizada exitosamente! Gracias por tu apoyo.', 'success');
-    
-    // Limpiar formulario
-    limpiarFormulario();
-    
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 3000);
-}
-
-// ============================================
-// LIMPIAR FORMULARIO
-// ============================================
-function limpiarFormulario() {
-    // Limpiar monto
-    montoSeleccionado = 0;
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-    
-    const customAmount = document.getElementById('customAmount');
-    if (customAmount) {
-        customAmount.value = '';
-        customAmount.style.display = 'none';
-    }
-    
-    // Limpiar destino
-    const destino = document.getElementById('destino');
-    if (destino) destino.value = 'general';
-    
-    // Limpiar mensaje
-    const mensaje = document.getElementById('mensaje');
-    if (mensaje) mensaje.value = '';
-    
-    // Limpiar tarjeta
-    const cardNumber = document.getElementById('cardNumber') || document.getElementById('card-number');
-    const expiry = document.getElementById('expiry');
-    const cvv = document.getElementById('cvv');
-    
-    if (cardNumber) {
-        cardNumber.value = '';
-        cardNumber.classList.remove('valid', 'invalid');
-    }
-    if (expiry) {
-        expiry.value = '';
-        expiry.classList.remove('valid', 'invalid');
-    }
-    if (cvv) {
-        cvv.value = '';
-        cvv.classList.remove('valid', 'invalid');
-    }
-    
-    // Limpiar indicador de tipo de tarjeta
-    const indicator = document.getElementById('cardTypeIndicator');
-    if (indicator) {
-        indicator.style.display = 'none';
-    }
-    
-    currentCardType = null;
-    
-    // Actualizar resumen
-    actualizarResumen();
-    
-    console.log('Formulario limpiado');
-}
-
-// ============================================
-// MENSAJES
-// ============================================
-
-function mostrarMensaje(mensaje, tipo) {
-    const colores = {
-        success: '#10b981',
-        error: '#ef4444',
-        info: '#3b82f6'
-    };
-    
-    const mensajeDiv = document.createElement('div');
-    mensajeDiv.style.cssText = `
-        position: fixed;
-        top: 2rem;
-        right: 2rem;
-        background: ${colores[tipo] || colores.info};
-        color: white;
-        padding: 1rem 1.5rem;
+    .message {
+        padding: 1rem 1.25rem;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        max-width: 400px;
-        font-weight: 500;
-    `;
-    mensajeDiv.textContent = mensaje;
-    document.body.appendChild(mensajeDiv);
-    
-    setTimeout(() => {
-        mensajeDiv.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => mensajeDiv.remove(), 300);
-    }, 5000);
-}
+        font-size: 0.9rem;
+        transition: opacity 0.3s;
+    }
 
-// ============================================
-// ESTILOS ADICIONALES PARA VALIDACIONES
-// ============================================
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+    .message-error {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
     }
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
+
+    .message-success {
+        background: #f9d1faff;
+        color: #58065fff;
+        border: 1px solid #f3a7e0ff;
+        text-align: center;
     }
-    
-    .card-type-indicator {
+
+    .message-success h4 {
+        color: #5f0d51;
+        font-size: 1.1rem;
+    }
+
+    .loader-inline {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .amount-btn.selected {
+        background: #5f0d51;
+        color: white;
+        border-color: #5f0d51;
+        transform: scale(1.05);
+    }
+
+    /* Estilos de validación de tarjeta */
+    .card-input-wrapper {
+        position: relative;
+    }
+
+    .card-input-wrapper .form-input {
+        padding-right: 50px;
+    }
+
+    .card-logo {
         position: absolute;
-        right: 1rem;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 0.25rem 0.5rem;
-        background: white;
-        border-radius: 4px;
+        width: 40px;
+        height: 25px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-logo.active {
+        display: flex;
+    }
+
+    .card-logo img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .form-input.valid {
+        border-color: #22c55e;
+    }
+
+    .form-input.invalid {
+        border-color: #ef4444;
+    }
+
+    .form-input.valid:focus {
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+    }
+
+    .form-input.invalid:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .error-message {
+        font-size: 12px;
+        color: #ef4444;
+        margin-top: 4px;
         display: none;
     }
-    
-    .form-input.valid {
-        border-color: #22c55e !important;
-    }
-    
-    .form-input.invalid {
-        border-color: #ef4444 !important;
-    }
-    
-    .form-input.valid:focus {
-        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1) !important;
-    }
-    
-    .form-input.invalid:focus {
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+
+    .error-message.active {
+        display: block;
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(styles);

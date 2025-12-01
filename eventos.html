@@ -3,210 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/eventos.css">
     <title>Eventos - Kueni Kueni</title>
     
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-        }
-
-        /* Header */
-        .header {
-            background: white;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: #6b7280;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        .tab {
-            padding: 1rem 1.5rem;
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #6b7280;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tab:hover {
-            color: #5f0d4d;
-        }
-
-        .tab.active {
-            color: #5f0d4d;
-            border-bottom-color: #5f0d4d;
-        }
-
-        .tab-badge {
-            display: inline-block;
-            margin-left: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            background: #e5e7eb;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .tab.active .tab-badge {
-            background: #5f0d4d;
-            color: white;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Eventos Grid */
-        .eventos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .evento-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: all 0.2s;
-        }
-
-        .evento-card:hover {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-
-        .evento-categoria {
-            display: inline-block;
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .evento-titulo {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
-        .evento-descripcion {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .evento-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: #4b5563;
-        }
-
-        .evento-info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .evento-progress {
-            margin-top: 1rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #5f0d4d;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-            display: block;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #9ca3af;
-        }
-
-        .loading-message {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #9ca3af;
-        }
-
-        @media (max-width: 768px) {
-            .eventos-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tabs {
-                overflow-x: auto;
-            }
-        }
-    </style>
+    
 </head>
 <body>
-    <div class="header">
+    <!-- Header / Navegación -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo-section">
+                    <a href="index.html">
+                        <div class="logo-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="logo-text">
+                            <h1>Kueni Kueni</h1>
+                            <p>Paso a paso</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="acerca-de.html">Acerca de</a>
+                    <a href="eventos.html" class="active">Eventos</a>
+                    <a href="noticias.html">Noticias</a>
+                    <a href="donar.html" class="btn-donate-animated">
+                        <span class="heart-icon">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
+                            </svg>
+                        </span>
+                        Donar
+                    </a>
+                </nav>
+                <div class="nav-buttons">
+                    <a href="login.html" class="btn-secondary">Iniciar Sesión</a>
+                    <a href="registro.html" class="btn-primary">Registrarse</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="header1">
         <h1>Eventos</h1>
         <p>Participa en las actividades de la comunidad</p>
     </div>
@@ -244,6 +89,52 @@
             </div>
         </div>
     </div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Kueni Kueni</h4>
+                <p>Asociación Civil sin fines de lucro dedicada al desarrollo integral de la región Mixteca.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Ubicación</h4>
+                <p>Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca<br>México</p>
+                <br> 
+                <h4>Contacto</h4>
+                <p>kuenikuenicolectivo@gmail.com<br>+52 951 244 09 01</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces</h4>
+                <ul>
+                    <li><a href="acerca-de.html">Acerca de</a></li>
+                    <li><a href="noticias.html">Noticias</a></li>
+                    <li><a href="eventos.html">Eventos</a></li>
+                    <li><a href="donar.html">Donar</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>Síguenos</h4>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/cuenicuenicolectivo" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#5f0d51"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/kueni.kuenicolectivo?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" fill="#5f0d51"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Kueni Kueni. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
 
     <script src="javaScript/supabase-config.js"></script>
     <script>

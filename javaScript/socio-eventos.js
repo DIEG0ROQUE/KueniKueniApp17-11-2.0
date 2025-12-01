@@ -9,6 +9,59 @@
 // 1. VERIFICACIÓN DE SESIÓN Y CONFIGURACIÓN INICIAL
 // ============================================================================
 
+
+
+
+
+
+
+
+
+
+const EMAIL_SERVER_URL = 'http://localhost:3000';
+
+async function enviarConfirmacionEvento(registro) {
+    try {
+        const response = await fetch(`${EMAIL_SERVER_URL}/send-event-confirmation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: registro.email,
+                nombre: registro.nombre,
+                evento_nombre: registro.evento_nombre,
+                evento_fecha: registro.evento_fecha,
+                evento_lugar: registro.evento_lugar,
+                evento_hora: registro.evento_hora
+            })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log('✅ Confirmación enviada');
+            return true;
+        } else {
+            console.error('❌ Error:', data.error);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error al enviar confirmación:', error);
+        return false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Inicializando vista de eventos...');
     

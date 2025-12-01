@@ -143,6 +143,9 @@ function validateExpiry(value) {
 // INICIALIZACIÓN
 // ============================================
 
+const EMAIL_SERVER_URL = 'http://localhost:3000';
+
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Inicializando formulario de donación...');
     
@@ -491,13 +494,80 @@ function validarTarjetaCompleta() {
         }
     }
     
+
     // Validar formato de fecha
     if (!/^\d{2}\/\d{2}$/.test(expiryVal)) {
         mostrarMensaje('Fecha de expiración inválida (MM/AA)', 'error');
         expiry.classList.add('invalid');
         expiry.focus();
         return false;
-    }
+
+    // ============================================
+    // GUARDAR DONACIÓN EN SUPABASE
+    // ============================================
+    async function guardarDonacion(datos) {
+        if (!window.supabaseClient) {
+            mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
+            console.error('Supabase no está configurado');
+            return;
+        }
+        
+        try {
+            mostrarCargando(true);
+            
+            console.log('Guardando donación en la base de datos...');
+            
+            const { data, error } = await window.supabaseClient
+                .from('donaciones')
+                .insert([datos])
+                .select();
+            
+            if (error) {
+                console.error('Error al guardar donación:', error);
+                mostrarMensaje('Error al procesar la donación. Por favor intenta nuevamente.', 'error');
+                return;
+            }
+            
+            console.log('Donación guardada exitosamente:', data);
+            // Enviar comprobante por correo
+   try {
+       console.log('📧 Enviando comprobante...');
+       const emailResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-receipt`, {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+               email: sessionStorage.getItem('userEmail'),
+               nombre: sessionStorage.getItem('userName'),
+               monto: datos.monto,
+               fecha: datos.fecha_donacion,
+               folio: datos.referencia_pago,
+               metodo_pago: datos.metodo_pago
+           })
+       });
+       
+       if (emailResponse.ok) {
+           console.log('✅ Comprobante enviado');
+       }
+   } catch (emailError) {
+       console.log('⚠️ Error al enviar comprobante:', emailError);
+   }
+
+
+
+
+            mostrarMensajeExito(datos);
+            
+            setTimeout(() => {
+                limpiarFormulario();
+            }, 4000);
+            
+        } catch (error) {
+            console.error('Error inesperado:', error);
+            mostrarMensaje('Error al procesar la donación', 'error');
+        } finally {
+            mostrarCargando(false);
+        }
+ }
     
     // Validar que no esté vencida
     if (!validateExpiry(expiryVal)) {
@@ -751,4 +821,4 @@ style.textContent = `
         box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(style);}

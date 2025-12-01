@@ -1,0 +1,35 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Archivos de entorno (CONTRASEÑAS)
+.env
+*.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Archivos locales de prueba
+test-*.js
+test-*.html
+verificar-*.js

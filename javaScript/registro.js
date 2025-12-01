@@ -1,4 +1,6 @@
-// registro.js - Sistema de registro con validaciones completas
+// registro.js - Sistema de registro con validaciones completas y diseño mejorado
+
+const EMAIL_SERVER_URL = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', function() {
     const registroForm = document.getElementById('registroForm');
@@ -21,8 +23,17 @@ document.addEventListener('DOMContentLoaded', function() {
         validarPassword();
         mostrarRequisitosPassword();
     });
+    
     passwordInput.addEventListener('focus', () => {
         document.getElementById('passwordRequirements').style.display = 'block';
+    });
+    
+    passwordInput.addEventListener('blur', () => {
+        // Solo ocultar si la contraseña está vacía
+        if (!passwordInput.value) {
+            document.getElementById('passwordRequirements').style.display = 'none';
+            document.getElementById('passwordStrength').style.display = 'none';
+        }
     });
     
     passwordConfirmInput.addEventListener('input', () => validarPasswordConfirm());
@@ -136,7 +147,7 @@ function validarPassword() {
         special: /[@$!%*?&]/.test(password)
     };
     
-    // Actualizar visualización de requisitos
+    // Actualizar visualización de requisitos con iconos
     document.getElementById('req-length').className = requisitos.length ? 'requirement valid' : 'requirement invalid';
     document.getElementById('req-uppercase').className = requisitos.uppercase ? 'requirement valid' : 'requirement invalid';
     document.getElementById('req-lowercase').className = requisitos.lowercase ? 'requirement valid' : 'requirement invalid';
@@ -148,11 +159,15 @@ function validarPassword() {
     
     if (!password) {
         passwordError.textContent = 'La contraseña es obligatoria';
+        document.getElementById('passwordStrength').style.display = 'none';
         return false;
     }
     
     if (!todosValidos) {
-        passwordError.textContent = 'La contraseña no cumple con todos los requisitos';
+        passwordError.textContent = '';
+        // Mostrar fortaleza aunque no esté completa
+        const fortaleza = calcularFortaleza(requisitos);
+        mostrarFortaleza(fortaleza);
         return false;
     }
     
@@ -185,7 +200,7 @@ function mostrarFortaleza(fortaleza) {
     const textos = {
         weak: 'Contraseña débil',
         medium: 'Contraseña media',
-        strong: 'Contraseña fuerte'
+        strong: '¡Contraseña fuerte!'
     };
     
     strengthDiv.textContent = textos[fortaleza];
@@ -315,10 +330,33 @@ async function procesarRegistro() {
             }
         }
         
+        // Enviar correo de bienvenida
+        try {
+            console.log('Enviando correo de bienvenida...');
+            const emailResponse = await fetch(`${EMAIL_SERVER_URL}/send-welcome-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: nuevoUsuario.email,
+                    nombre: nuevoUsuario.nombre_completo
+                })
+            });
+            
+            if (emailResponse.ok) {
+                console.log('Correo de bienvenida enviado');
+            } else {
+                console.log('No se pudo enviar correo (no crítico)');
+            }
+        } catch (emailError) {
+            console.log('Error al enviar correo (no crítico):', emailError);
+        }
+        
         mostrarMensaje(`¡Cuenta de ${tipoUsuario} creada exitosamente!`, 'success');
         
         // Limpiar formulario
         document.getElementById('registroForm').reset();
+        document.getElementById('passwordRequirements').style.display = 'none';
+        document.getElementById('passwordStrength').style.display = 'none';
         
         // Redirigir al login después de 2 segundos
         setTimeout(() => {
@@ -373,18 +411,19 @@ style.textContent = `
         to { transform: rotate(360deg); }
     }
     
-    #btnLoader {
+    #btnLoader, .btn-loader-content {
         display: inline-flex;
         align-items: center;
         gap: 8px;
     }
     
     .message {
-        padding: 1rem;
+        padding: 1rem 1.25rem;
         margin-bottom: 1rem;
         border-radius: 8px;
         font-size: 0.9rem;
         transition: opacity 0.3s;
+        text-align: center;
     }
     
     .message-error {
@@ -394,9 +433,10 @@ style.textContent = `
     }
     
     .message-success {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
+        background: linear-gradient(135deg, #fdf0fb 0%, #f9d1fa 100%);
+        color: #5f0d51;
+        border: 1px solid #f3a7e0;
+        font-weight: 600;
     }
 `;
 document.head.appendChild(style);

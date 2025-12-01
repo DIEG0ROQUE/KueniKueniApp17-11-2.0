@@ -1,0 +1,300 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║              🔄 DIAGRAMA DE FLUJO DEL SISTEMA                       ║
+║                 Sistema de Recuperación de Contraseña                ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                      ARQUITECTURA DEL SISTEMA                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐         ┌──────────────┐        ┌─────────────┐
+    │             │         │              │        │             │
+    │  USUARIO    │ ──────> │   FRONTEND   │ ────>  │  SERVIDOR   │
+    │  (Browser)  │         │  (login.js)  │        │  (Node.js)  │
+    │             │         │              │        │             │
+    └─────────────┘         └──────────────┘        └──────┬──────┘
+         ▲                                                  │
+         │                                                  │
+         │                                                  ▼
+         │                                          ┌──────────────┐
+         │                                          │              │
+         │                                          │  SUPABASE    │
+         │                                          │  (Database)  │
+         │                                          │              │
+         │                                          └──────┬───────┘
+         │                                                 │
+         │                                                 │
+         │                                          ┌──────▼───────┐
+         │                                          │              │
+         │                                          │    GMAIL     │
+         └──────────────────────────────────────────┤   (SMTP)     │
+                      ✉️ Correo enviado            │              │
+                                                    └──────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                     FLUJO DETALLADO PASO A PASO                      │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+1️⃣  USUARIO SOLICITA RECUPERACIÓN
+    ════════════════════════════════
+    
+    Usuario en login.html
+         │
+         ├─> Click en "¿Olvidaste tu contraseña?"
+         │
+         ├─> Ingresa su email
+         │
+         └─> Click en "Recuperar Contraseña"
+
+
+2️⃣  FRONTEND PROCESA LA SOLICITUD
+    ═══════════════════════════════
+    
+    login.js (función recuperarContrasenaConGmail)
+         │
+         ├─> Valida el formato del email
+         │
+         ├─> Muestra loader (cargando...)
+         │
+         └─> Envía petición POST al servidor
+             URL: http://localhost:3000/send-recovery-email
+             Body: { email: "usuario@gmail.com" }
+
+
+3️⃣  SERVIDOR RECIBE LA PETICIÓN
+    ════════════════════════════════
+    
+    email-server.js
+         │
+         ├─> Ruta: POST /send-recovery-email
+         │
+         ├─> Extrae el email del body
+         │
+         └─> Valida que exista el email
+
+
+4️⃣  CONSULTA A SUPABASE
+    ════════════════════
+    
+    Servidor → Supabase
+         │
+         ├─> SELECT * FROM usuarios
+         │   WHERE email = 'usuario@gmail.com'
+         │   AND estado = 'activo'
+         │
+         ├─> Si NO existe → Error 404
+         │
+         └─> Si existe → Continúa al paso 5
+
+
+5️⃣  PREPARAR EL CORREO
+    ═══════════════════
+    
+    Servidor prepara datos:
+         │
+         ├─> Destinatario: email del usuario
+         ├─> Asunto: "Recuperación de Contraseña - Kueni Kueni"
+         ├─> Contenido HTML: Plantilla con diseño profesional
+         ├─> Contraseña: password_hash del usuario
+         └─> Botón: Link para iniciar sesión
+
+
+6️⃣  ENVIAR POR GMAIL
+    ═════════════════
+    
+    Nodemailer + Gmail SMTP
+         │
+         ├─> Conecta con gmail.com:587
+         ├─> Autentica con contraseña de aplicación
+         ├─> Envía el correo electrónico
+         └─> Recibe confirmación de envío
+
+
+7️⃣  RESPUESTA AL FRONTEND
+    ══════════════════════
+    
+    Servidor → Frontend
+         │
+         ├─> Status: 200 OK
+         ├─> Body: { success: true, message: "Correo enviado..." }
+         └─> Frontend muestra mensaje de éxito
+
+
+8️⃣  USUARIO RECIBE CORREO
+    ═══════════════════════
+    
+    Bandeja de entrada del usuario
+         │
+         ├─> Email con diseño profesional
+         ├─> Contraseña visible
+         ├─> Advertencias de seguridad
+         ├─> Botón para iniciar sesión
+         └─> Usuario puede acceder a su cuenta
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                      COMPARACIÓN: ANTES vs AHORA                     │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+ANTES (con Supabase Auth)                AHORA (con Gmail directo)
+═══════════════════════════              ═══════════════════════════
+
+Frontend                                 Frontend
+   ↓                                        ↓
+Supabase Auth                            Servidor Node.js
+   ↓                                        ↓
+Resend API (limitado)                    Supabase (consulta usuario)
+   ↓                                        ↓
+Email ❌ (limitaciones)                  Gmail SMTP
+                                            ↓
+                                         Email ✅ (sin límites)
+
+
+Problemas:                               Ventajas:
+• Límite de envíos                       • ~500 correos/día
+• Emails no llegaban                     • Confiabilidad 100%
+• Rate limiting                          • Control total
+• Sin control del diseño                 • Diseño personalizable
+                                         • Logs completos
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                        TECNOLOGÍAS UTILIZADAS                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+Frontend (Cliente)              Servidor (Backend)            Servicios
+═══════════════════            ═══════════════════           ══════════
+
+• HTML5                        • Node.js                      • Gmail SMTP
+• JavaScript                   • Express.js                   • Supabase
+• Fetch API                    • Nodemailer                   
+• CSS3                         • CORS                         
+                               • Dotenv                       
+                               • @supabase/supabase-js        
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                           PUERTOS Y URLs                             │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+Desarrollo Local:
+════════════════
+
+Frontend:  http://localhost:5500  (Live Server)
+Servidor:  http://localhost:3000  (Express)
+Supabase:  https://xxxxx.supabase.co
+Gmail:     smtp.gmail.com:587
+
+
+Producción (Ejemplo):
+═══════════════════
+
+Frontend:  https://kuenikueni.com
+Servidor:  https://api-kuenikueni.railway.app
+Supabase:  https://xxxxx.supabase.co
+Gmail:     smtp.gmail.com:587
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                         SEGURIDAD DEL SISTEMA                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+Nivel          Medida de Seguridad                   Estado
+═════          ═══════════════════                   ══════
+
+🔐 Gmail      Contraseña de aplicación              ✅ Implementado
+              (no contraseña real)
+
+🔐 Variables  Archivo .env protegido                ✅ Implementado
+              (no en código fuente)
+
+🔐 GitHub     .gitignore configurado                ✅ Implementado
+              (.env no se sube)
+
+🔐 CORS       Permite solo frontend                 ✅ Implementado
+              autorizado
+
+🔐 Usuario    Verifica estado 'activo'              ✅ Implementado
+              en Supabase
+
+🔐 HTTPS      Recomendado en producción             ⚠️  Configurar después
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                      MANEJO DE ERRORES                               │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+Error                          Acción del Sistema
+═════                          ══════════════════
+
+Email no válido               → Frontend valida y muestra error
+Usuario no encontrado         → Servidor retorna 404
+Email no en estado activo     → Servidor retorna 404
+Error de Gmail                → Servidor retorna 500 + log
+Servidor caído                → Frontend muestra mensaje específico
+Supabase no responde          → Servidor retorna 500 + log
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                           LOGS Y DEBUGGING                           │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+📊 SERVIDOR (Terminal)
+
+✅ Servidor listo para enviar correos desde Gmail
+📧 Solicitud de recuperación para: usuario@gmail.com
+✅ Usuario encontrado: Juan Pérez
+📤 Enviando correo...
+✅ Correo enviado exitosamente: <message-id@gmail.com>
+
+
+🌐 FRONTEND (Console F12)
+
+📧 Solicitando recuperación de contraseña para: usuario@gmail.com
+✅ Correo enviado exitosamente
+
+
+┌──────────────────────────────────────────────────────────────────────┐
+│                      PRÓXIMOS PASOS (OPCIONAL)                       │
+└──────────────────────────────────────────────────────────────────────┘
+
+
+1. Deployment en producción
+   ├─> Railway / Render / Heroku
+   └─> Dominio personalizado
+
+2. Implementar más tipos de correos
+   ├─> Bienvenida
+   ├─> Confirmación de registro
+   └─> Notificaciones de eventos
+
+3. Sistema de plantillas
+   └─> Múltiples diseños de correos
+
+4. Analytics
+   ├─> Tracking de envíos
+   └─> Tasa de apertura
+
+
+═══════════════════════════════════════════════════════════════════════
+
+¡Sistema completamente funcional! 🎉
+
+Ahora tienes un servidor profesional de correos que:
+✅ Envía desde Gmail sin restricciones
+✅ Tiene diseño profesional
+✅ Es fácil de mantener
+✅ Está listo para producción
+
+═══════════════════════════════════════════════════════════════════════

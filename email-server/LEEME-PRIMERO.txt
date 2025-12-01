@@ -1,0 +1,177 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║     📧 SERVIDOR DE CORREOS GMAIL - KUENI KUENI               ║
+║                                                               ║
+║  Solución para enviar correos sin limitaciones de Supabase   ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  📁 ARCHIVOS CREADOS                                        │
+└─────────────────────────────────────────────────────────────┘
+
+Tu proyecto ahora tiene una nueva carpeta:
+📂 email-server/
+  ├── 📄 email-server.js        → Servidor Node.js
+  ├── 📄 package.json           → Dependencias
+  ├── 📄 .env.example           → Plantilla de configuración
+  ├── 📄 .gitignore             → Protege info sensible
+  ├── 📄 README.md              → Inicio rápido
+  ├── 📄 GUIA-INSTALACION.md    → Guía completa
+  └── 📄 CODIGO-PARA-LOGIN.txt  → Código para copiar
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  🚀 PASOS PARA EMPEZAR (5 minutos)                          │
+└─────────────────────────────────────────────────────────────┘
+
+1️⃣  CREAR CONTRASEÑA DE APLICACIÓN EN GMAIL
+    
+    → Ve a: https://myaccount.google.com/security
+    → Activa "Verificación en dos pasos"
+    → Busca "Contraseñas de aplicaciones"
+    → Genera una para "Correo"
+    → Copia los 16 caracteres (sin espacios)
+
+
+2️⃣  CONFIGURAR EL SERVIDOR
+
+    → Abre la carpeta: email-server/
+    → Renombra: .env.example → .env
+    → Edita .env con tus datos:
+      
+      GMAIL_USER=tu-email@gmail.com
+      GMAIL_APP_PASSWORD=abcdefghijklmnop  ← Los 16 caracteres
+      SUPABASE_URL=https://xxx.supabase.co
+      SUPABASE_ANON_KEY=eyJ...
+      FRONTEND_URL=http://localhost:5500
+
+
+3️⃣  INSTALAR DEPENDENCIAS
+
+    → Abre terminal en la carpeta email-server/
+    → Ejecuta:
+      
+      npm install
+
+
+4️⃣  INICIAR EL SERVIDOR
+
+    → En la misma terminal, ejecuta:
+      
+      npm start
+
+    → Deberías ver:
+      ╔═══════════════════════════════════════╗
+      ║  🚀 SERVIDOR DE CORREOS ACTIVO       ║
+      ║  📧 Puerto: 3000                      ║
+      ║  💜 Kueni Kueni Email Service        ║
+      ╚═══════════════════════════════════════╝
+
+
+5️⃣  ACTUALIZAR EL CÓDIGO DEL LOGIN
+
+    Opción A - Copia manual:
+    → Abre: email-server/CODIGO-PARA-LOGIN.txt
+    → Sigue las instrucciones para actualizar login.js
+
+    Opción B - Reemplazo completo:
+    → Haz backup de: javaScript/login.js
+    → Tendrás que agregar la función manualmente
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  ✅ PROBAR QUE FUNCIONA                                      │
+└─────────────────────────────────────────────────────────────┘
+
+1. Servidor corriendo: http://localhost:3000
+   (Deberías ver un mensaje JSON)
+
+2. Abre tu login.html
+
+3. Click en "¿Olvidaste tu contraseña?"
+
+4. Ingresa un email registrado en tu sistema
+
+5. ¡Revisa tu bandeja de entrada! 📧
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  ⚠️  IMPORTANTE                                              │
+└─────────────────────────────────────────────────────────────┘
+
+→ El servidor DEBE estar corriendo para enviar correos
+→ No cierres la terminal donde corre "npm start"
+→ NUNCA subas el archivo .env a GitHub
+→ La contraseña de app es DIFERENTE a tu contraseña de Gmail
+→ Gmail permite ~500 correos por día (suficiente)
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  🐛 SOLUCIÓN RÁPIDA DE PROBLEMAS                            │
+└─────────────────────────────────────────────────────────────┘
+
+❌ "No se puede conectar con el servidor"
+   → El servidor no está corriendo
+   → Ejecuta: npm start
+
+❌ "Invalid login" o error de autenticación
+   → La contraseña de app está mal
+   → Verifica que no tenga espacios
+   → Revisa el archivo .env
+
+❌ "Cannot find module"
+   → Falta instalar dependencias
+   → Ejecuta: npm install
+
+❌ El correo no llega
+   → Revisa la carpeta de SPAM
+   → Verifica los logs en la terminal
+   → Confirma que GMAIL_USER sea correcto
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  📚 DOCUMENTACIÓN                                            │
+└─────────────────────────────────────────────────────────────┘
+
+README.md              → Inicio rápido (este archivo)
+GUIA-INSTALACION.md    → Guía paso a paso detallada
+CODIGO-PARA-LOGIN.txt  → Código para actualizar login.js
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  🎯 VENTAJAS DE ESTA SOLUCIÓN                                │
+└─────────────────────────────────────────────────────────────┘
+
+✅ Sin límites de Supabase
+✅ Envío directo desde tu Gmail
+✅ Diseño profesional de correos
+✅ Control total del proceso
+✅ Gratis (dentro del límite de Gmail)
+✅ Fácil de desplegar en producción
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  🚀 PRÓXIMOS PASOS (OPCIONAL)                                │
+└─────────────────────────────────────────────────────────────┘
+
+Para poner el servidor en producción 24/7:
+
+1. Sube el código a GitHub
+2. Despliega en Railway, Render o Heroku (gratis)
+3. Actualiza EMAIL_SERVER_URL en login.js
+4. ¡Listo! Ya no necesitas tu computadora prendida
+
+
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║  ¿Necesitas ayuda?                                            ║
+║                                                               ║
+║  1. Lee GUIA-INSTALACION.md (soluciona el 99% de problemas) ║
+║  2. Revisa los logs del servidor (terminal)                  ║
+║  3. Revisa la consola del navegador (F12)                    ║
+║                                                               ║
+║  ¡Éxito con tu proyecto Kueni Kueni! 💜                      ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝

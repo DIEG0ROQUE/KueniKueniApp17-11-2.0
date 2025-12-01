@@ -1,0 +1,29 @@
+# ===================================================
+# GITIGNORE PARA SERVIDOR DE CORREOS
+# ===================================================
+
+# Variables de entorno (CRÍTICO - nunca subir a GitHub)
+.env
+.env.local
+.env.production
+
+# Dependencias de Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos temporales
+*.tmp
+*.temp

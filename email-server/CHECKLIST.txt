@@ -1,0 +1,195 @@
+┌────────────────────────────────────────────────────────────────┐
+│                                                                │
+│  ✅ CHECKLIST DE INSTALACIÓN                                  │
+│     Servidor de Correos Gmail - Kueni Kueni                   │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+
+
+📋 ANTES DE EMPEZAR
+═══════════════════
+
+□ Node.js instalado (https://nodejs.org/)
+□ Cuenta de Gmail activa
+□ Acceso a Supabase dashboard
+□ Editor de texto (Notepad, VSCode, etc.)
+
+
+🔧 CONFIGURACIÓN DE GMAIL (5 minutos)
+═════════════════════════════════════
+
+□ Ir a https://myaccount.google.com/security
+□ Activar "Verificación en dos pasos"
+□ Buscar "Contraseñas de aplicaciones"
+□ Crear nueva contraseña para "Correo"
+□ Copiar los 16 caracteres (sin espacios)
+  Formato: abcd efgh ijkl mnop → abcdefghijklmnop
+
+
+⚙️  CONFIGURACIÓN DEL SERVIDOR (3 minutos)
+═══════════════════════════════════════════
+
+□ Ir a la carpeta: email-server/
+□ Renombrar: .env.example → .env
+□ Abrir .env con editor de texto
+□ Completar GMAIL_USER con tu correo
+□ Completar GMAIL_APP_PASSWORD con los 16 caracteres
+□ Completar SUPABASE_URL (de tu dashboard Supabase)
+□ Completar SUPABASE_ANON_KEY (de tu dashboard Supabase)
+□ Completar FRONTEND_URL (ej: http://localhost:5500)
+□ Guardar el archivo .env
+
+
+💻 INSTALACIÓN DE DEPENDENCIAS (2 minutos)
+═══════════════════════════════════════════
+
+□ Abrir terminal/CMD
+□ Navegar a: cd C:\Users\diego\Downloads\KueniKueniApp17-11-2.0-1\email-server
+□ Ejecutar: npm install
+□ Esperar a que termine (se crea carpeta node_modules)
+
+
+🚀 INICIAR EL SERVIDOR (1 minuto)
+═══════════════════════════════════
+
+Opción A - Archivo BAT:
+□ Doble clic en: INICIAR-SERVIDOR.bat
+
+Opción B - Terminal:
+□ En la terminal, ejecutar: npm start
+
+□ Verificar mensaje de éxito:
+  ╔═══════════════════════════════════════╗
+  ║  🚀 SERVIDOR DE CORREOS ACTIVO       ║
+  ║  📧 Puerto: 3000                      ║
+  ║  💜 Kueni Kueni Email Service        ║
+  ╚═══════════════════════════════════════╝
+
+
+🌐 VERIFICAR SERVIDOR (30 segundos)
+════════════════════════════════════
+
+□ Abrir navegador
+□ Ir a: http://localhost:3000
+□ Verificar respuesta JSON:
+  {
+    "status": "OK",
+    "message": "Servidor de correos Kueni Kueni funcionando",
+    ...
+  }
+
+
+🔄 ACTUALIZAR CÓDIGO DEL FRONTEND (5 minutos)
+══════════════════════════════════════════════
+
+□ Hacer backup de: javaScript/login.js
+  (Renombrar a: login-backup.js)
+
+□ Abrir: email-server/CODIGO-PARA-LOGIN.txt
+
+□ Seguir las 3 instrucciones del archivo:
+  1. Agregar constante EMAIL_SERVER_URL
+  2. Agregar función recuperarContrasenaConGmail
+  3. Cambiar llamada en el evento del formulario
+
+□ Guardar cambios en login.js
+
+
+✅ PRUEBA FINAL (1 minuto)
+═══════════════════════════
+
+□ Servidor corriendo (no cerrar terminal)
+□ Abrir login.html en navegador
+□ Click en "¿Olvidaste tu contraseña?"
+□ Ingresar email registrado en el sistema
+□ Click en "Recuperar Contraseña"
+□ Revisar bandeja de entrada del correo
+□ Verificar que llega el correo con la contraseña
+
+
+🎉 ¡INSTALACIÓN COMPLETA!
+═══════════════════════════
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+📝 NOTAS IMPORTANTES
+════════════════════
+
+⚠️  NO CERRAR la terminal donde corre el servidor
+    El servidor debe estar activo para enviar correos
+
+⚠️  NO SUBIR el archivo .env a GitHub
+    Ya está protegido con .gitignore
+
+⚠️  Contraseña de aplicación ≠ Tu contraseña de Gmail
+    Es una contraseña especial de 16 caracteres
+
+⚠️  Límite de Gmail: ~500 correos por día
+    Más que suficiente para recuperación de contraseñas
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+🐛 SI ALGO NO FUNCIONA
+═══════════════════════
+
+1. Lee: GUIA-INSTALACION.md
+2. Revisa los logs del servidor (terminal)
+3. Revisa la consola del navegador (F12)
+4. Verifica que .env tenga toda la info correcta
+5. Asegúrate de que el servidor esté corriendo
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+📚 DOCUMENTACIÓN DISPONIBLE
+════════════════════════════
+
+□ README.md               → Inicio rápido
+□ GUIA-INSTALACION.md     → Guía paso a paso completa
+□ LEEME-PRIMERO.txt       → Instrucciones visuales
+□ CODIGO-PARA-LOGIN.txt   → Código para copiar
+□ RESUMEN.md              → Resumen técnico completo
+□ CHECKLIST.txt           → Este archivo
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+💡 COMANDOS ÚTILES
+═══════════════════
+
+Instalar dependencias:
+  npm install
+
+Iniciar servidor:
+  npm start
+
+Verificar servidor:
+  http://localhost:3000
+
+Detener servidor:
+  Ctrl + C en la terminal
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+🎯 RESULTADO ESPERADO
+═════════════════════
+
+✅ Servidor corriendo sin errores
+✅ Frontend puede conectarse al servidor
+✅ Correos se envían correctamente desde Gmail
+✅ Usuario recibe correo con diseño profesional
+✅ Sin límites de Supabase
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+¡Éxito con tu proyecto Kueni Kueni! 💜

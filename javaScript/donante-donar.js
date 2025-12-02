@@ -2,7 +2,7 @@
 // DONANTE-DONAR.JS - VERSIÓN MEJORADA SIN MENSUAL
 // ============================================
 
-const EMAIL_SERVER_URL = 'http://localhost:3000';
+const EMAIL_SERVER_URL = 'https://kuenikueniapp17-11-2-0.onrender.com';
 
 let montoSeleccionado = 0;
 let currentCardType = null;

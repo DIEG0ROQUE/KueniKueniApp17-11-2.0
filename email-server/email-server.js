@@ -635,7 +635,7 @@ app.post('/send-donation-notification', async (req, res) => {
 
     try {
         // Correo(s) del administrador - puedes poner varios separados por coma
-        const adminEmails = 'caballeroitzel507@gmail.com';
+        const adminEmails = 'kuenikuenicolectivo@gmail.com';
 
         const mailOptions = {
             from: process.env.EMAIL_USER,

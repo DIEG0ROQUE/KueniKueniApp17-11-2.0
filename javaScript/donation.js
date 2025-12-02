@@ -1,6 +1,5 @@
 // donation.js - Sistema de donaciones con validación de tarjetas y conexión a Supabase
 const EMAIL_SERVER_URL = 'https://kuenikueniapp17-11-2-0.onrender.com';
-// Definir tipos de tarjetas con sus patrones
 const cardTypes = {
     visa: {
         pattern: /^4/,

@@ -425,7 +425,7 @@ function exportarReporte() {
                 justify-content:center;
                 gap:0.4rem;
             ">
-                <span>📄 PDF profesional</span>
+                <span>📄 PDF </span>
             </button>
             <button id="btnExportCSV" style="
                 width:100%;
@@ -442,7 +442,7 @@ function exportarReporte() {
                 justify-content:center;
                 gap:0.4rem;
             ">
-                <span>📊 CSV detallado</span>
+                <span>📊 CSV </span>
             </button>
         </div>
         <button id="btnExportCancelar" style="

@@ -595,7 +595,7 @@ function cerrarModal() {
 }
 
 // ============================================
-// GUARDAR NOTICIA
+// GUARDAR NOTICIA - CORREGIDO SIN CAMPO 'autor'
 // ============================================
 
 async function guardarNoticia() {
@@ -614,17 +614,26 @@ async function guardarNoticia() {
             imagenUrl = await subirImagen(imagenSubida);
         }
         
-        const autor = sessionStorage.getItem('userName') || 'Coordinador';
+        // Leer la fecha del campo o usar la fecha actual
+        let fechaPublicacion = document.getElementById('fechaPublicacion').value;
+        if (!fechaPublicacion) {
+            fechaPublicacion = new Date().toISOString().split('T')[0];
+        }
         
+        // CAMBIO IMPORTANTE: Se eliminó el campo 'autor' porque no existe en la tabla de Supabase
         const datos = {
-            titulo: document.getElementById('titulo').value,
+            titulo: document.getElementById('titulo').value.trim(),
             categoria: document.getElementById('categoria').value,
-            contenido: document.getElementById('contenido').value,
+            contenido: document.getElementById('contenido').value.trim(),
             imagen_url: imagenUrl || null,
             estado: document.getElementById('estado').value,
-            autor: autor,
-            fecha_publicacion: new Date().toISOString().split('T')[0]
+            fecha_publicacion: fechaPublicacion
         };
+
+        // Validar que los campos requeridos no estén vacíos
+        if (!datos.titulo || !datos.categoria || !datos.contenido || !datos.estado) {
+            throw new Error('Todos los campos requeridos deben estar completos');
+        }
 
         let error;
         if (noticiaEditando) {
@@ -641,14 +650,17 @@ async function guardarNoticia() {
             error = result.error;
         }
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error de Supabase:', error);
+            throw error;
+        }
 
-        mostrarMensaje(noticiaEditando ? '✅ Noticia actualizada' : '✅ Noticia creada', 'success');
+        mostrarMensaje(noticiaEditando ? '✅ Noticia actualizada correctamente' : '✅ Noticia creada correctamente', 'success');
         cerrarModal();
         await cargarDatos();
     } catch (error) {
-        console.error('Error:', error);
-        mostrarMensaje('❌ Error al guardar', 'error');
+        console.error('Error completo:', error);
+        mostrarMensaje('❌ Error al guardar: ' + (error.message || 'Error desconocido'), 'error');
     } finally {
         btnGuardar.disabled = false;
         btnText.style.display = 'inline';
@@ -677,6 +689,11 @@ async function editarNoticia(id) {
         document.getElementById('contenido').value = noticia.contenido;
         document.getElementById('imagenUrl').value = noticia.imagen_url || '';
         document.getElementById('estado').value = noticia.estado;
+        
+        // Cargar la fecha de publicación en el campo
+        if (noticia.fecha_publicacion) {
+            document.getElementById('fechaPublicacion').value = noticia.fecha_publicacion;
+        }
         
         if (noticia.imagen_url) {
             mostrarPreviewImagen(noticia.imagen_url);
@@ -770,3 +787,4 @@ console.log('✅ Sistema MEJORADO cargado');
 console.log('✅ Paginación: 5 noticias por página');
 console.log('✅ Alertas personalizadas');
 console.log('✅ Animaciones sutiles');
+console.log('✅ CORREGIDO: Campo "autor" eliminado de guardarNoticia()');

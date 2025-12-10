@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 
     // Event Listeners generales
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', cerrarSesion);
     document.getElementById('btnExportarReporte')?.addEventListener('click', exportarReporte);
     document.getElementById('inputBuscar')?.addEventListener('input', aplicarFiltrosYRedibujar);
     document.getElementById('selectorMes')?.addEventListener('change', cambiarMes);
@@ -61,13 +60,6 @@ function verificarAutenticacion() {
     console.log('Usuario autenticado como admin');
 }
 
-function cerrarSesion() {
-    if (confirm('¿Cerrar sesión?')) {
-        console.log('Cerrando sesión...');
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-    }
-}
 
 // ================== SELECTOR DE MES ==================
 

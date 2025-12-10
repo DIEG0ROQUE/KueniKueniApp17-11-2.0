@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +9,16 @@
     <link rel="stylesheet" href="styles/socio-dashboard.css">
     <link rel="stylesheet" href="styles/socio-donaciones.css">
 </head>
+
 <body class="socio-body">
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                        fill="white" />
                 </svg>
             </div>
             <div>
@@ -24,17 +28,43 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="socio-dashboard.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/></svg><span>Inicio</span></a>
-            <a href="socio-eventos.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" fill="currentColor"/></svg><span>Eventos</span></a>
-            <a href="socio-calendario.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" fill="currentColor"/></svg><span>Calendario</span></a>
-            <a href="socio-donaciones.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/></svg><span>Mis Donaciones</span></a>
-            <a href="socio-noticias.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="currentColor"/></svg><span>Noticias</span></a>
-            <a href="socio-acerca.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/></svg><span>Acerca de</span></a>
+            <a href="socio-dashboard.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor" />
+                </svg><span>Inicio</span></a>
+            <a href="socio-eventos.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"
+                        fill="currentColor" />
+                </svg><span>Eventos</span></a>
+            <a href="socio-calendario.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                        fill="currentColor" />
+                </svg><span>Calendario</span></a>
+            <a href="socio-donaciones.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"
+                        fill="currentColor" />
+                </svg><span>Mis Donaciones</span></a>
+            <a href="socio-noticias.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+                        fill="currentColor" />
+                </svg><span>Noticias</span></a>
+            <a href="socio-acerca.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                        fill="currentColor" />
+                </svg><span>Acerca de</span></a>
         </nav>
 
-        <button class="logout-btn" id="logoutBtn">
+        <button class="logout-btn" id="btnCerrarSesion">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
+                <path
+                    d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                    fill="currentColor" />
             </svg>
             <span>Cerrar Sesión</span>
         </button>
@@ -51,14 +81,18 @@
             <div class="header-buttons">
                 <button class="btn-donacion-unica" id="btnDonacionUnica">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"
+                            fill="currentColor" />
                     </svg>
                     Donación Única
                 </button>
                 <button class="btn-suscripcion-mensual" id="btnSuscripcionMensual">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
-                        <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/>
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                            fill="currentColor" />
+                        <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor" />
                     </svg>
                     Suscripción Mensual
                 </button>
@@ -70,7 +104,7 @@
             <div class="status-card">
                 <div class="status-icon">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#10b981"/>
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#10b981" />
                     </svg>
                 </div>
                 <div class="status-info">
@@ -82,13 +116,17 @@
                 <div class="status-actions">
                     <button class="btn-editar-suscripcion" id="btnEditarSuscripcion">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                fill="currentColor" />
                         </svg>
                         Editar
                     </button>
                     <button class="btn-cancelar-suscripcion" id="btnCancelarSuscripcion">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+                            <path
+                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                                fill="currentColor" />
                         </svg>
                         Cancelar
                     </button>
@@ -101,7 +139,9 @@
             <div class="donacion-stat-card">
                 <div class="stat-icon-don money">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/>
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"
+                            fill="currentColor" />
                     </svg>
                 </div>
                 <div>
@@ -114,7 +154,9 @@
             <div class="donacion-stat-card">
                 <div class="stat-icon-don count">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="currentColor"/>
+                        <path
+                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+                            fill="currentColor" />
                     </svg>
                 </div>
                 <div>
@@ -127,7 +169,8 @@
             <div class="donacion-stat-card">
                 <div class="stat-icon-don average">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" fill="currentColor"/>
+                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"
+                            fill="currentColor" />
                     </svg>
                 </div>
                 <div>
@@ -145,7 +188,7 @@
                 <div class="filtro-group">
                     <label for="filtroMonto">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                            <path d="M7 10l5 5 5-5z" fill="currentColor" />
                         </svg>
                         Ordenar por monto:
                     </label>
@@ -155,11 +198,13 @@
                         <option value="menor">Menor a mayor</option>
                     </select>
                 </div>
-                
+
                 <div class="filtro-group">
                     <label for="filtroFecha">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" fill="currentColor"/>
+                            <path
+                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"
+                                fill="currentColor" />
                         </svg>
                         Ordenar por fecha:
                     </label>
@@ -172,7 +217,9 @@
 
                 <button class="btn-limpiar-filtros" id="btnLimpiarFiltros">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                            fill="currentColor" />
                     </svg>
                     Limpiar filtros
                 </button>
@@ -206,7 +253,7 @@
             <div class="pagination-container" id="paginacionHistorial">
                 <button class="btn-pagination" id="btnPrevHistorial" disabled>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor" />
                     </svg>
                     Anterior
                 </button>
@@ -214,7 +261,7 @@
                 <button class="btn-pagination" id="btnNextHistorial">
                     Siguiente
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
                     </svg>
                 </button>
             </div>
@@ -228,7 +275,9 @@
                 <h2 id="modalTitle">Editar Suscripción Mensual</h2>
                 <button class="btn-close-modal" id="btnCerrarModal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                            fill="currentColor" />
                     </svg>
                 </button>
             </div>
@@ -269,13 +318,8 @@
                     <div class="form-group">
                         <label for="numeroTarjetaInput">Número de Tarjeta</label>
                         <div class="tarjeta-input-container">
-                            <input 
-                                type="text" 
-                                id="numeroTarjetaInput" 
-                                placeholder="1234 5678 9012 3456"
-                                maxlength="19"
-                                required
-                            >
+                            <input type="text" id="numeroTarjetaInput" placeholder="1234 5678 9012 3456" maxlength="19"
+                                required>
                             <div class="banco-logo" id="bancoLogo" style="display: none;">
                                 <span id="bancoNombre"></span>
                             </div>
@@ -309,7 +353,7 @@
                         </button>
                         <button type="submit" class="btn-guardar" id="btnGuardarSuscripcion">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor" />
                             </svg>
                             Guardar Cambios
                         </button>
@@ -322,6 +366,8 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/cerrarsesion.js"></script>
     <script src="javaScript/socio-donaciones.js"></script>
 </body>
+
 </html>

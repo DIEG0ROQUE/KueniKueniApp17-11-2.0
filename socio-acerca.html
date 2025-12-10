@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,497 +8,515 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/socio-dashboard.css">
     <style>
-    /* Galería vertical elegante */
-    .main-description {
-        margin-bottom: 2rem;
-    }
-    
-    .image-carousel {
-        position: relative;
-        width: 100%;
-        max-height: 600px;
-        overflow: hidden;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    
-    .carousel-track {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1rem;
-        padding: 1.5rem;
-        max-height: 600px;
-        overflow-y: auto;
-        scroll-behavior: smooth;
-        scrollbar-width: thin;
-        scrollbar-color: #5f0d51 #f1f1f1;
-    }
-    
-    .carousel-track::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    .carousel-track::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-    
-    .carousel-track::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #5f0d51 0%, #7d1068 100%);
-        border-radius: 4px;
-    }
-    
-    .carousel-track::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, #4d094d 0%, #6b0d58 100%);
-    }
-    
-    .carousel-track img {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .carousel-track img:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 12px 24px rgba(95, 13, 81, 0.25);
-        z-index: 10;
-    }
-    
-    .carousel-nav-btn {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(95, 13, 81, 0.95);
-        border: none;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    
-    .carousel-nav-btn:hover {
-        background: rgba(95, 13, 81, 1);
-        transform: translateX(-50%) scale(1.15);
-        box-shadow: 0 6px 16px rgba(95, 13, 81, 0.4);
-    }
-    
-    .carousel-nav-btn:active {
-        transform: translateX(-50%) scale(0.95);
-    }
-    
-    .carousel-prev-btn {
-        top: 0.5rem;
-    }
-    
-    .carousel-prev-btn svg {
-        transform: rotate(90deg);
-    }
-    
-    .carousel-next-btn {
-        bottom: 0.5rem;
-    }
-    
-    .carousel-next-btn svg {
-        transform: rotate(90deg);
-    }
-    
-    /* Indicador de más contenido */
-    .carousel-track::before {
-        content: '';
-        position: sticky;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 20px;
-        background: linear-gradient(180deg, rgba(248,248,248,1) 0%, rgba(248,248,248,0) 100%);
-        z-index: 5;
-        pointer-events: none;
-    }
-    
-    .carousel-track::after {
-        content: '';
-        position: sticky;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 20px;
-        background: linear-gradient(0deg, rgba(248,248,248,1) 0%, rgba(248,248,248,0) 100%);
-        z-index: 5;
-        pointer-events: none;
-    }
-    
-    .description-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        display: flex;
-        gap: 1.5rem;
-        align-items: start;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border: 1px solid #e4e4e7;
-        margin-bottom: 2rem;
-        transition: all 0.3s ease;
-    }
-    
-    .description-card:hover {
-        box-shadow: 0 4px 12px rgba(95, 13, 81, 0.1);
-        transform: translateY(-2px);
-    }
-    
-    .description-icon {
-        width: 64px;
-        height: 64px;
-        background: linear-gradient(135deg, #fdf0f8 0%, #f4e4f0 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(95, 13, 81, 0.1);
-    }
-    
-    .description-content h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #18181b;
-        margin: 0 0 0.5rem 0;
-    }
-    
-    .description-content p {
-        color: #71717a;
-        line-height: 1.7;
-        margin: 0;
-    }
-    
-    /* Misión y Visión */
-    .mission-vision {
-        margin-bottom: 3rem;
-    }
-    
-    .mission-vision-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-    
-    .mission-vision-row.reverse {
-        direction: rtl;
-    }
-    
-    .mission-vision-row.reverse > * {
-        direction: ltr;
-    }
-    
-    .mission-vision-row .card {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border: 1px solid #e4e4e7;
-    }
-    
-    .card-icon {
-        width: 48px;
-        height: 48px;
-        background: #fdf0f8;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
-    
-    .card-content h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #18181b;
-        margin: 0 0 1rem 0;
-    }
-    
-    .card-content p {
-        color: #52525b;
-        line-height: 1.7;
-        margin: 0;
-    }
-    
-    .mission-images, .vision-images {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .mission-images img, .vision-images img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 12px;
-    }
-    
-    /* Áreas de trabajo */
-    .work-areas {
-        margin-bottom: 3rem;
-    }
-    
-    .section-subtitle {
-        color: #71717a;
-        font-size: 1rem;
-    }
-    
-    .grid-4 {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-    
-    .area-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border: 1px solid #e4e4e7;
-        transition: all 0.3s ease;
-    }
-    
-    .area-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(95, 13, 81, 0.15);
-    }
-    
-    .area-card-image {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-    }
-    
-    .area-card-content {
-        padding: 1.5rem;
-    }
-    
-    .area-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
-    
-    .green-bg { background: #d1fae5; }
-    .blue-bg { background: #dbeafe; }
-    .purple-bg { background: #f3e8ff; }
-    .orange-bg { background: #ffedd5; }
-    
-    .area-card-content h3 {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #18181b;
-        margin: 0 0 0.5rem 0;
-    }
-    
-    .area-card-content p {
-        font-size: 0.875rem;
-        color: #71717a;
-        line-height: 1.6;
-        margin: 0;
-    }
-    
-    /* Estadísticas */
-    .impact {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border: 1px solid #e4e4e7;
-        margin-bottom: 3rem;
-    }
-    
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-    
-    .stat-card {
-        text-align: center;
-        padding: 1.5rem;
-        border-radius: 8px;
-        background: #fafafa;
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #5f0d51;
-        margin: 0 0 0.5rem 0;
-    }
-    
-    .stat-card p {
-        color: #71717a;
-        margin: 0;
-    }
-    
-    /* Contacto */
-    .contact {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border: 1px solid #e4e4e7;
-    }
-    
-    .contact-grid-with-map {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-    
-    .contact-info {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-    
-    .contact-item {
-        display: flex;
-        gap: 1rem;
-        align-items: start;
-    }
-    
-    .contact-icon {
-        width: 48px;
-        height: 48px;
-        background: #fdf0fb;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    
-    .contact-item h3 {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #18181b;
-        margin: 0 0 0.25rem 0;
-    }
-    
-    .contact-item p {
-        font-size: 0.875rem;
-        color: #71717a;
-        line-height: 1.5;
-        margin: 0;
-    }
-    
-    .contact-map {
-        height: 300px;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    /* Responsive */
-    @media (max-width: 1024px) {
+        /* Galería vertical elegante */
+        .main-description {
+            margin-bottom: 2rem;
+        }
+
+        .image-carousel {
+            position: relative;
+            width: 100%;
+            max-height: 600px;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
         .carousel-track {
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #5f0d51 #f1f1f1;
         }
-        
-        .mission-vision-row,
-        .contact-grid-with-map {
-            grid-template-columns: 1fr;
+
+        .carousel-track::-webkit-scrollbar {
+            width: 8px;
         }
-        
+
+        .carousel-track::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .carousel-track::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #5f0d51 0%, #7d1068 100%);
+            border-radius: 4px;
+        }
+
+        .carousel-track::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4d094d 0%, #6b0d58 100%);
+        }
+
+        .carousel-track img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-track img:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(95, 13, 81, 0.25);
+            z-index: 10;
+        }
+
+        .carousel-nav-btn {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(95, 13, 81, 0.95);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-nav-btn:hover {
+            background: rgba(95, 13, 81, 1);
+            transform: translateX(-50%) scale(1.15);
+            box-shadow: 0 6px 16px rgba(95, 13, 81, 0.4);
+        }
+
+        .carousel-nav-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        .carousel-prev-btn {
+            top: 0.5rem;
+        }
+
+        .carousel-prev-btn svg {
+            transform: rotate(90deg);
+        }
+
+        .carousel-next-btn {
+            bottom: 0.5rem;
+        }
+
+        .carousel-next-btn svg {
+            transform: rotate(90deg);
+        }
+
+        /* Indicador de más contenido */
+        .carousel-track::before {
+            content: '';
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(180deg, rgba(248, 248, 248, 1) 0%, rgba(248, 248, 248, 0) 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .carousel-track::after {
+            content: '';
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(0deg, rgba(248, 248, 248, 1) 0%, rgba(248, 248, 248, 0) 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .description-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: start;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e4e4e7;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .description-card:hover {
+            box-shadow: 0 4px 12px rgba(95, 13, 81, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .description-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #fdf0f8 0%, #f4e4f0 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(95, 13, 81, 0.1);
+        }
+
+        .description-content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #18181b;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .description-content p {
+            color: #71717a;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* Misión y Visión */
+        .mission-vision {
+            margin-bottom: 3rem;
+        }
+
+        .mission-vision-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
         .mission-vision-row.reverse {
+            direction: rtl;
+        }
+
+        .mission-vision-row.reverse>* {
             direction: ltr;
         }
-        
-        .contact-map {
-            height: 250px;
+
+        .mission-vision-row .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e4e4e7;
         }
-        
-        .grid-4 {
-            grid-template-columns: repeat(2, 1fr);
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: #fdf0f8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
         }
-        
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
+
+        .card-content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #18181b;
+            margin: 0 0 1rem 0;
         }
-    }
-    
-    @media (max-width: 768px) {
-        .image-carousel {
-            max-height: 500px;
-            border-radius: 8px;
+
+        .card-content p {
+            color: #52525b;
+            line-height: 1.7;
+            margin: 0;
         }
-        
-        .carousel-track {
+
+        .mission-images,
+        .vision-images {
+            display: grid;
             grid-template-columns: 1fr;
-            max-height: 500px;
-            padding: 1rem;
+            gap: 1rem;
         }
-        
-        .carousel-track img {
+
+        .mission-images img,
+        .vision-images img {
+            width: 100%;
             height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
         }
-        
-        .carousel-nav-btn {
-            width: 40px;
-            height: 40px;
+
+        /* Áreas de trabajo */
+        .work-areas {
+            margin-bottom: 3rem;
         }
-        
-        .description-card {
-            flex-direction: column;
-            text-align: center;
+
+        .section-subtitle {
+            color: #71717a;
+            font-size: 1rem;
         }
-        
-        .description-icon {
-            margin: 0 auto;
-        }
-        
+
         .grid-4 {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
-        
+
+        .area-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e4e4e7;
+            transition: all 0.3s ease;
+        }
+
+        .area-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(95, 13, 81, 0.15);
+        }
+
+        .area-card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .area-card-content {
+            padding: 1.5rem;
+        }
+
+        .area-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .green-bg {
+            background: #d1fae5;
+        }
+
+        .blue-bg {
+            background: #dbeafe;
+        }
+
+        .purple-bg {
+            background: #f3e8ff;
+        }
+
+        .orange-bg {
+            background: #ffedd5;
+        }
+
+        .area-card-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #18181b;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .area-card-content p {
+            font-size: 0.875rem;
+            color: #71717a;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Estadísticas */
+        .impact {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e4e4e7;
+            margin-bottom: 3rem;
+        }
+
         .stats-grid {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
         }
-    }
-    
-    @media (max-width: 480px) {
-        .image-carousel {
-            max-height: 400px;
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #fafafa;
         }
-        
-        .carousel-track {
-            max-height: 400px;
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #5f0d51;
+            margin: 0 0 0.5rem 0;
         }
-        
-        .carousel-track img {
-            height: 180px;
+
+        .stat-card p {
+            color: #71717a;
+            margin: 0;
         }
-    }
+
+        /* Contacto */
+        .contact {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e4e4e7;
+        }
+
+        .contact-grid-with-map {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            background: #fdf0fb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contact-item h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #18181b;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .contact-item p {
+            font-size: 0.875rem;
+            color: #71717a;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .contact-map {
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .carousel-track {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+
+            .mission-vision-row,
+            .contact-grid-with-map {
+                grid-template-columns: 1fr;
+            }
+
+            .mission-vision-row.reverse {
+                direction: ltr;
+            }
+
+            .contact-map {
+                height: 250px;
+            }
+
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .image-carousel {
+                max-height: 500px;
+                border-radius: 8px;
+            }
+
+            .carousel-track {
+                grid-template-columns: 1fr;
+                max-height: 500px;
+                padding: 1rem;
+            }
+
+            .carousel-track img {
+                height: 200px;
+            }
+
+            .carousel-nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .description-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .description-icon {
+                margin: 0 auto;
+            }
+
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .image-carousel {
+                max-height: 400px;
+            }
+
+            .carousel-track {
+                max-height: 400px;
+            }
+
+            .carousel-track img {
+                height: 180px;
+            }
+        }
     </style>
 </head>
+
 <body class="socio-body">
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/></svg>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                        fill="white" />
+                </svg>
             </div>
             <div>
                 <h2>Kueni Kueni</h2>
@@ -505,14 +524,43 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <a href="socio-dashboard.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/></svg><span>Inicio</span></a>
-            <a href="socio-eventos.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" fill="currentColor"/></svg><span>Eventos</span></a>
-            <a href="socio-calendario.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" fill="currentColor"/></svg><span>Calendario</span></a>
-            <a href="socio-donaciones.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/></svg><span>Mis Donaciones</span></a>
-            <a href="socio-noticias.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="currentColor"/></svg><span>Noticias</span></a>
-            <a href="socio-acerca.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/></svg><span>Acerca de</span></a>
+            <a href="socio-dashboard.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor" />
+                </svg><span>Inicio</span></a>
+            <a href="socio-eventos.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"
+                        fill="currentColor" />
+                </svg><span>Eventos</span></a>
+            <a href="socio-calendario.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                        fill="currentColor" />
+                </svg><span>Calendario</span></a>
+            <a href="socio-donaciones.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"
+                        fill="currentColor" />
+                </svg><span>Mis Donaciones</span></a>
+            <a href="socio-noticias.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+                        fill="currentColor" />
+                </svg><span>Noticias</span></a>
+            <a href="socio-acerca.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                        fill="currentColor" />
+                </svg><span>Acerca de</span></a>
         </nav>
-        <button class="logout-btn" id="logoutBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/></svg><span>Cerrar Sesión</span></button>
+        <button class="logout-btn" id="btnCerrarSesion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                    fill="currentColor" />
+            </svg><span>Cerrar Sesión</span></button>
     </aside>
 
     <main class="main-content">
@@ -520,7 +568,8 @@
         <header class="dashboard-header" style="margin-bottom: 2rem;">
             <div>
                 <h1 id="org-nombre-header">Acerca de Kueni Kueni</h1>
-                <p class="subtitle" id="hero-descripcion">Conoce nuestra historia, misión y el impacto que generamos en la región</p>
+                <p class="subtitle" id="hero-descripcion">Conoce nuestra historia, misión y el impacto que generamos en
+                    la región</p>
             </div>
         </header>
 
@@ -557,12 +606,15 @@
             <div class="description-card">
                 <div class="description-icon">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#5e0652" />
+                        <path
+                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                            fill="#5e0652" />
                     </svg>
                 </div>
                 <div class="description-content">
                     <h3 id="org-nombre-desc">Kueni Kueni - Paso a Paso</h3>
-                    <p id="org-descripcion">Somos una asociación civil sin fines de lucro con más de 11 años de experiencia trabajando en la región Mixteca de Oaxaca.</p>
+                    <p id="org-descripcion">Somos una asociación civil sin fines de lucro con más de 11 años de
+                        experiencia trabajando en la región Mixteca de Oaxaca.</p>
                 </div>
             </div>
         </section>
@@ -579,7 +631,8 @@
                     </div>
                     <div class="card-content">
                         <h3>Nuestra Misión</h3>
-                        <p id="org-mision">Promover el bienestar social y el desarrollo integral de las comunidades de la región Mixteca.</p>
+                        <p id="org-mision">Promover el bienestar social y el desarrollo integral de las comunidades de
+                            la región Mixteca.</p>
                     </div>
                 </div>
                 <div class="mission-images">
@@ -592,12 +645,15 @@
                 <div class="card">
                     <div class="card-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#5e0652" />
+                            <path
+                                d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                                fill="#5e0652" />
                         </svg>
                     </div>
                     <div class="card-content">
                         <h3>Nuestra Visión</h3>
-                        <p id="org-vision">Ser una organización líder en el desarrollo comunitario de la región Mixteca.</p>
+                        <p id="org-vision">Ser una organización líder en el desarrollo comunitario de la región Mixteca.
+                        </p>
                     </div>
                 </div>
                 <div class="vision-images">
@@ -610,7 +666,8 @@
         <!-- Áreas de Trabajo -->
         <section class="work-areas" style="margin-bottom: 3rem;">
             <h2 style="text-align: center; margin-bottom: 1rem;">Nuestras Áreas de Trabajo</h2>
-            <p class="section-subtitle" style="text-align: center; margin-bottom: 2rem;">Programas y actividades que desarrollamos para la comunidad</p>
+            <p class="section-subtitle" style="text-align: center; margin-bottom: 2rem;">Programas y actividades que
+                desarrollamos para la comunidad</p>
 
             <div class="grid-4">
                 <div class="area-card">
@@ -618,7 +675,8 @@
                     <div class="area-card-content">
                         <div class="area-icon green-bg">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4-4h2v16h-2V5zm4 8h2v8h-2v-8zm4-4h2v12h-2V9z" fill="#0d5f3a" />
+                                <path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4-4h2v16h-2V5zm4 8h2v8h-2v-8zm4-4h2v12h-2V9z"
+                                    fill="#0d5f3a" />
                             </svg>
                         </div>
                         <h3>Medio Ambiente</h3>
@@ -631,7 +689,9 @@
                     <div class="area-card-content">
                         <div class="area-icon blue-bg">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#3b82f6" />
+                                <path
+                                    d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                                    fill="#3b82f6" />
                             </svg>
                         </div>
                         <h3>Deporte y Recreación</h3>
@@ -644,7 +704,9 @@
                     <div class="area-card-content">
                         <div class="area-icon purple-bg">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#a855f7" />
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                    fill="#a855f7" />
                             </svg>
                         </div>
                         <h3>Cultura y Tradiciones</h3>
@@ -657,7 +719,9 @@
                     <div class="area-card-content">
                         <div class="area-icon orange-bg">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" fill="#f97316" />
+                                <path
+                                    d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"
+                                    fill="#f97316" />
                             </svg>
                         </div>
                         <h3>Emprendimiento</h3>
@@ -670,7 +734,8 @@
         <!-- Estadísticas -->
         <section class="impact" style="margin-bottom: 3rem;">
             <h2 style="text-align: center; margin-bottom: 0.5rem;">Nuestro Impacto</h2>
-            <p class="section-subtitle" style="text-align: center; margin-bottom: 2rem;">Resultados de más de <span id="anos-exp-sub">11</span> años de trabajo comunitario</p>
+            <p class="section-subtitle" style="text-align: center; margin-bottom: 2rem;">Resultados de más de <span
+                    id="anos-exp-sub">11</span> años de trabajo comunitario</p>
 
             <div class="stats-grid">
                 <div class="stat-card">
@@ -695,26 +760,32 @@
         <!-- Contacto -->
         <section class="contact">
             <h2 style="text-align: center; margin-bottom: 0.5rem;">Información de Contacto</h2>
-            <p class="section-subtitle" style="text-align: center; margin-bottom: 2rem;">Encuéntranos y comunícate con nosotros</p>
+            <p class="section-subtitle" style="text-align: center; margin-bottom: 2rem;">Encuéntranos y comunícate con
+                nosotros</p>
 
             <div class="contact-grid-with-map">
                 <div class="contact-info">
                     <div class="contact-item">
                         <div class="contact-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#5e0652" />
+                                <path
+                                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                                    fill="#5e0652" />
                             </svg>
                         </div>
                         <div>
                             <h3>Dirección</h3>
-                            <p id="contact-direccion">Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca<br>México</p>
+                            <p id="contact-direccion">Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán,
+                                Oaxaca<br>México</p>
                         </div>
                     </div>
 
                     <div class="contact-item">
                         <div class="contact-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#5e0652" />
+                                <path
+                                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                                    fill="#5e0652" />
                             </svg>
                         </div>
                         <div>
@@ -726,7 +797,9 @@
                     <div class="contact-item">
                         <div class="contact-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#5e0652" />
+                                <path
+                                    d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                                    fill="#5e0652" />
                             </svg>
                         </div>
                         <div>
@@ -749,70 +822,73 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="javaScript/supabase-config.js"></script>
+    <script src="javaScript/cerrarsesion.js"></script>
     <script src="javaScript/socio-acerca.js"></script>
-    
+
     <script>
-    // Galería vertical con scroll suave
-    document.addEventListener('DOMContentLoaded', function () {
-        const carouselTrack = document.getElementById('carouselTrack');
-        const prevBtn = document.querySelector('.carousel-prev-btn');
-        const nextBtn = document.querySelector('.carousel-next-btn');
+        // Galería vertical con scroll suave
+        document.addEventListener('DOMContentLoaded', function () {
+            const carouselTrack = document.getElementById('carouselTrack');
+            const prevBtn = document.querySelector('.carousel-prev-btn');
+            const nextBtn = document.querySelector('.carousel-next-btn');
 
-        if (carouselTrack && prevBtn && nextBtn) {
-            const scrollAmount = 400; // Píxeles a desplazar
-            
-            // Scroll hacia abajo
-            nextBtn.addEventListener('click', function () {
-                carouselTrack.scrollBy({
-                    top: scrollAmount,
-                    behavior: 'smooth'
-                });
-            });
+            if (carouselTrack && prevBtn && nextBtn) {
+                const scrollAmount = 400; // Píxeles a desplazar
 
-            // Scroll hacia arriba
-            prevBtn.addEventListener('click', function () {
-                carouselTrack.scrollBy({
-                    top: -scrollAmount,
-                    behavior: 'smooth'
-                });
-            });
-            
-            // Actualizar estado de botones
-            function updateButtons() {
-                const maxScroll = carouselTrack.scrollHeight - carouselTrack.clientHeight;
-                
-                if (carouselTrack.scrollTop <= 10) {
-                    prevBtn.style.opacity = '0.4';
-                    prevBtn.style.pointerEvents = 'none';
-                } else {
-                    prevBtn.style.opacity = '1';
-                    prevBtn.style.pointerEvents = 'auto';
-                }
-                
-                if (carouselTrack.scrollTop >= maxScroll - 10) {
-                    nextBtn.style.opacity = '0.4';
-                    nextBtn.style.pointerEvents = 'none';
-                } else {
-                    nextBtn.style.opacity = '1';
-                    nextBtn.style.pointerEvents = 'auto';
-                }
-            }
-            
-            carouselTrack.addEventListener('scroll', updateButtons);
-            updateButtons(); // Llamar al iniciar
-            
-            // Scroll con rueda del mouse
-            carouselTrack.addEventListener('wheel', function(e) {
-                if (e.deltaY !== 0) {
-                    e.preventDefault();
+                // Scroll hacia abajo
+                nextBtn.addEventListener('click', function () {
                     carouselTrack.scrollBy({
-                        top: e.deltaY,
-                        behavior: 'auto'
+                        top: scrollAmount,
+                        behavior: 'smooth'
                     });
+                });
+
+                // Scroll hacia arriba
+                prevBtn.addEventListener('click', function () {
+                    carouselTrack.scrollBy({
+                        top: -scrollAmount,
+                        behavior: 'smooth'
+                    });
+                });
+
+                // Actualizar estado de botones
+                function updateButtons() {
+                    const maxScroll = carouselTrack.scrollHeight - carouselTrack.clientHeight;
+
+                    if (carouselTrack.scrollTop <= 10) {
+                        prevBtn.style.opacity = '0.4';
+                        prevBtn.style.pointerEvents = 'none';
+                    } else {
+                        prevBtn.style.opacity = '1';
+                        prevBtn.style.pointerEvents = 'auto';
+                    }
+
+                    if (carouselTrack.scrollTop >= maxScroll - 10) {
+                        nextBtn.style.opacity = '0.4';
+                        nextBtn.style.pointerEvents = 'none';
+                    } else {
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.pointerEvents = 'auto';
+                    }
                 }
-            });
-        }
-    });
+
+                carouselTrack.addEventListener('scroll', updateButtons);
+                updateButtons(); // Llamar al iniciar
+
+                // Scroll con rueda del mouse
+                carouselTrack.addEventListener('wheel', function (e) {
+                    if (e.deltaY !== 0) {
+                        e.preventDefault();
+                        carouselTrack.scrollBy({
+                            top: e.deltaY,
+                            behavior: 'auto'
+                        });
+                    }
+                });
+            }
+        });
     </script>
+
 </body>
+
 </html>

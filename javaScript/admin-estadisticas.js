@@ -36,12 +36,6 @@ function verificarAutenticacion() {
 }
 
 function configurarEventos() {
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', function () {
-        if (confirm('¿Cerrar sesión?')) {
-            sessionStorage.clear();
-            window.location.href = 'login.html';
-        }
-    });
 
     const yearSelect = document.getElementById('yearSelect');
     if (yearSelect) {

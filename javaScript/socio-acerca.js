@@ -249,15 +249,7 @@ async function cargarAreasTrabajo() {
 // ============================================================================
 
 function configurarEventListeners() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            if (confirm('¿Cerrar sesión?')) {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        });
-    }
+   
     
     // Animaciones al hacer scroll
     const elementos = document.querySelectorAll('.acerca-card, .mv-card, .area-card, .stats-section, .contacto-section');

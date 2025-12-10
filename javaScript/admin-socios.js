@@ -47,16 +47,9 @@ function verificarAutenticacion() {
     }
 }
 
-function cerrarSesion() {
-    if (confirm('¿Cerrar sesión?')) {
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-    }
-}
 
 // ======================= CONFIGURACIÓN DE EVENTOS ====================
 function configurarEventos() {
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', cerrarSesion);
     document.getElementById('btnAgregarSocio')?.addEventListener('click', abrirModal);
     document.getElementById('btnCerrarModal')?.addEventListener('click', cerrarModal);
     document.getElementById('btnCancelarModal')?.addEventListener('click', cerrarModal);

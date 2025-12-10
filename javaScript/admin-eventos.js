@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
     
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', cerrarSesion);
     document.getElementById('btnNuevoEvento')?.addEventListener('click', abrirModalCrear);
     document.getElementById('formEvento')?.addEventListener('submit', guardarEvento);
 
@@ -143,13 +142,6 @@ function verificarAutenticacion() {
     if (!isLoggedIn || userType !== 'admin') {
         window.location.href = 'login.html';
         return;
-    }
-}
-
-function cerrarSesion() {
-    if (confirm('¿Cerrar sesión?')) {
-        sessionStorage.clear();
-        window.location.href = 'login.html';
     }
 }
 

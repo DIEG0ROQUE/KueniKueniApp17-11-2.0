@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +9,16 @@
     <link rel="stylesheet" href="styles/socio-dashboard.css">
     <link rel="stylesheet" href="styles/socio-calendario.css">
 </head>
+
 <body class="socio-body">
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/></svg>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                        fill="white" />
+                </svg>
             </div>
             <div>
                 <h2>Kueni Kueni</h2>
@@ -20,14 +26,42 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <a href="socio-dashboard.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/></svg><span>Inicio</span></a>
-            <a href="socio-eventos.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" fill="currentColor"/></svg><span>Eventos</span></a>
-            <a href="socio-calendario.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" fill="currentColor"/></svg><span>Calendario</span></a>
-            <a href="socio-donaciones.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" fill="currentColor"/></svg><span>Mis Donaciones</span></a>
-            <a href="socio-noticias.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="currentColor"/></svg><span>Noticias</span></a>
-            <a href="socio-acerca.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/></svg><span>Acerca de</span></a>
+            <a href="socio-dashboard.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor" />
+                </svg><span>Inicio</span></a>
+            <a href="socio-eventos.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"
+                        fill="currentColor" />
+                </svg><span>Eventos</span></a>
+            <a href="socio-calendario.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                        fill="currentColor" />
+                </svg><span>Calendario</span></a>
+            <a href="socio-donaciones.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"
+                        fill="currentColor" />
+                </svg><span>Mis Donaciones</span></a>
+            <a href="socio-noticias.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+                        fill="currentColor" />
+                </svg><span>Noticias</span></a>
+            <a href="socio-acerca.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                        fill="currentColor" />
+                </svg><span>Acerca de</span></a>
         </nav>
-        <button class="logout-btn" id="logoutBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/></svg><span>Cerrar Sesión</span></button>
+        <button class="logout-btn" id="btnCerrarSesion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                    fill="currentColor" />
+            </svg><span>Cerrar Sesión</span></button>
     </aside>
 
     <main class="main-content">
@@ -38,11 +72,18 @@
             </div>
             <div class="view-toggle">
                 <button class="toggle-btn active" data-view="calendar">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" fill="currentColor"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                            fill="currentColor" />
+                    </svg>
                     Calendario
                 </button>
                 <button class="toggle-btn" data-view="list">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" fill="currentColor"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"
+                            fill="currentColor" />
+                    </svg>
                     Lista
                 </button>
             </div>
@@ -98,18 +139,22 @@
         <div class="calendar-view" id="calendar-view">
             <div class="calendar-header">
                 <button class="nav-btn" id="btn-prev">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor" />
+                    </svg>
                 </button>
-                
+
                 <div class="month-selector">
                     <select id="month-select" class="month-select"></select>
                     <select id="year-select" class="year-select"></select>
                 </div>
 
                 <button class="nav-btn-today" id="btn-today">Hoy</button>
-                
+
                 <button class="nav-btn" id="btn-next">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
+                    </svg>
                 </button>
             </div>
 
@@ -123,16 +168,19 @@
 
         <!-- Vista Lista -->
         <div class="list-view" id="list-view" style="display: none;">
-            <div class="list-view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <div class="list-view-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
                 <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600; color: #18181b;">Eventos por Mes</h3>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <label style="font-size: 0.875rem; color: #71717a; font-weight: 500;">Mes:</label>
-                        <select id="month-select-list" class="month-select" style="padding: 0.5rem 2rem 0.5rem 1rem; border: 2px solid #e4e4e7; border-radius: 8px; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer;"></select>
+                        <select id="month-select-list" class="month-select"
+                            style="padding: 0.5rem 2rem 0.5rem 1rem; border: 2px solid #e4e4e7; border-radius: 8px; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer;"></select>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <label style="font-size: 0.875rem; color: #71717a; font-weight: 500;">Año:</label>
-                        <select id="year-select-list" class="year-select" style="padding: 0.5rem 2rem 0.5rem 1rem; border: 2px solid #e4e4e7; border-radius: 8px; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer;"></select>
+                        <select id="year-select-list" class="year-select"
+                            style="padding: 0.5rem 2rem 0.5rem 1rem; border: 2px solid #e4e4e7; border-radius: 8px; font-size: 0.875rem; font-weight: 500; background: white; cursor: pointer;"></select>
                     </div>
                 </div>
             </div>
@@ -146,12 +194,20 @@
             <div class="details-header">
                 <h3 id="details-date">Selecciona un día</h3>
                 <button class="btn-close-details" id="btn-close-details">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                            fill="currentColor" />
+                    </svg>
                 </button>
             </div>
             <div class="details-content" id="details-content">
                 <div class="empty-details">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z" fill="#d4d4d8"/></svg>
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                            fill="#d4d4d8" />
+                    </svg>
                     <p>Haz clic en un día para ver sus eventos</p>
                 </div>
             </div>
@@ -159,7 +215,10 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="javaScript/cerrarsesion.js"></script>
     <script src="javaScript/supabase-config.js"></script>
     <script src="javaScript/socio-calendario.js"></script>
+    
 </body>
+
 </html>

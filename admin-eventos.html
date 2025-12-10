@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Eventos - Kueni Kueni</title>
-    
+
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <!-- CSS Comunes Admin -->
     <link rel="stylesheet" href="styles/admin-sidebar.css">
     <link rel="stylesheet" href="styles/admin-common.css">
     <link rel="stylesheet" href="styles/admin-eventos.css">
 </head>
+
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
                 <span>Kueni Kueni</span>
             </div>
             <p class="sidebar-subtitle">Administrador</p>
         </div>
-        
+
         <nav class="sidebar-nav">
             <a href="admin-dashboard.html" class="nav-item ">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -36,7 +39,7 @@
                 </svg>
                 <span>Panel</span>
             </a>
-            
+
             <a href="admin-eventos.html" class="nav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -46,7 +49,7 @@
                 </svg>
                 <span>Eventos</span>
             </a>
-            
+
             <a href="admin-donaciones.html" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -54,7 +57,7 @@
                 </svg>
                 <span>Donaciones</span>
             </a>
-            
+
             <a href="admin-socios.html" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -64,7 +67,7 @@
                 </svg>
                 <span>Socios</span>
             </a>
-            
+
             <a href="admin-noticias.html" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
@@ -75,7 +78,7 @@
                 </svg>
                 <span>Noticias</span>
             </a>
-            
+
             <a href="admin-estadisticas.html" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="20" x2="12" y2="10"></line>
@@ -159,7 +162,7 @@
             <div id="eventosProximos" class="eventos-grid">
                 <div class="loading-message">Cargando eventos próximos...</div>
             </div>
-            
+
             <!-- Paginación Próximos -->
             <div class="pagination" id="paginacionProximos">
                 <button id="btnPrevProximos" class="btn-page" disabled>
@@ -168,18 +171,18 @@
                     </svg>
                     Anterior
                 </button>
-                
+
                 <span class="pagination-info">
                     Página <span id="paginaActualProximos">1</span> de <span id="totalPaginasProximos">1</span>
                 </span>
-                
+
                 <button id="btnNextProximos" class="btn-page">
                     Siguiente
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
-                
+
                 <div class="pagination-size">
                     <label for="selectItemsPorPaginaProximos">Mostrar:</label>
                     <select id="selectItemsPorPaginaProximos">
@@ -195,7 +198,7 @@
             <div id="eventosEnCurso" class="eventos-grid">
                 <div class="loading-message">Cargando eventos en curso...</div>
             </div>
-            
+
             <!-- Paginación En Curso -->
             <div class="pagination" id="paginacionEnCurso">
                 <button id="btnPrevEnCurso" class="btn-page" disabled>
@@ -204,18 +207,18 @@
                     </svg>
                     Anterior
                 </button>
-                
+
                 <span class="pagination-info">
                     Página <span id="paginaActualEnCurso">1</span> de <span id="totalPaginasEnCurso">1</span>
                 </span>
-                
+
                 <button id="btnNextEnCurso" class="btn-page">
                     Siguiente
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
-                
+
                 <div class="pagination-size">
                     <label for="selectItemsPorPaginaEnCurso">Mostrar:</label>
                     <select id="selectItemsPorPaginaEnCurso">
@@ -231,7 +234,7 @@
             <div id="eventosCompletados" class="eventos-grid">
                 <div class="loading-message">Cargando eventos completados...</div>
             </div>
-            
+
             <!-- Paginación Completados -->
             <div class="pagination" id="paginacionCompletados">
                 <button id="btnPrevCompletados" class="btn-page" disabled>
@@ -240,18 +243,18 @@
                     </svg>
                     Anterior
                 </button>
-                
+
                 <span class="pagination-info">
                     Página <span id="paginaActualCompletados">1</span> de <span id="totalPaginasCompletados">1</span>
                 </span>
-                
+
                 <button id="btnNextCompletados" class="btn-page">
                     Siguiente
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
-                
+
                 <div class="pagination-size">
                     <label for="selectItemsPorPaginaCompletados">Mostrar:</label>
                     <select id="selectItemsPorPaginaCompletados">
@@ -273,7 +276,7 @@
             </div>
             <form id="formEvento">
                 <input type="hidden" id="eventoId">
-                
+
                 <div class="form-group">
                     <label>Título *</label>
                     <input type="text" id="titulo" required>
@@ -342,13 +345,13 @@
             </div>
             <form id="formRegistroAsistencia">
                 <input type="hidden" id="eventoIdAsistencia">
-                
+
                 <div class="modal-body">
                     <div class="asistencia-header">
                         <h3>Lista de Socios Confirmados</h3>
                         <p>Marca los socios que asistieron al evento</p>
                     </div>
-                    
+
                     <div class="socios-list-container">
                         <div id="listaSociosAsistencia" class="socios-list">
                             <!-- Los socios se cargarán dinámicamente -->
@@ -358,7 +361,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="cerrarModalRegistroAsistencia()">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="cerrarModalRegistroAsistencia()">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar Asistencia</button>
                 </div>
             </form>
@@ -366,7 +370,10 @@
     </div>
 
     <!-- Scripts -->
+    <script src="javaScript/cerrarsesion.js"></script>
     <script src="javaScript/supabase-config.js"></script>
     <script src="javaScript/admin-eventos.js"></script>
+
 </body>
+
 </html>

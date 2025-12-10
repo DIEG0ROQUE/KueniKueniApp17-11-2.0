@@ -335,21 +335,6 @@ window.cerrarModalNoticia = cerrarModalNoticia;
 // 10. CONFIGURAR EVENT LISTENERS
 // ============================================================================
 
-function configurarEventListeners() {
-    // Botón de cerrar sesión
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        });
-    }
-    
-    console.log('Event listeners configurados');
-}
-
 function configurarBotonesLeerMas() {
     const botones = document.querySelectorAll('.btn-leer-mas');
     

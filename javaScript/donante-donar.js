@@ -139,16 +139,7 @@ function configurarEventListeners() {
     // Submit del formulario
     document.getElementById('donationForm').addEventListener('submit', procesarDonacion);
     
-    // Cerrar sesión
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Estás seguro de cerrar sesión?')) {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        });
-    }
+
 }
 
 // ============================================

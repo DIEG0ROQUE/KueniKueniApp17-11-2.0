@@ -69,19 +69,11 @@ function verificarAutenticacion() {
 }
 
 function configurarEventos() {
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', cerrarSesion);
     document.getElementById('inputBuscar')?.addEventListener('input', filtrarNoticias);
     document.getElementById('filtroEstado')?.addEventListener('change', filtrarNoticias);
     document.getElementById('filtroCategoria')?.addEventListener('change', filtrarNoticias);
     
     // ELIMINADO: btnAgregarNoticia - Solo lectura
-}
-
-function cerrarSesion() {
-    if (confirm('¿Cerrar sesión?')) {
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-    }
 }
 
 async function cargarDatos() {

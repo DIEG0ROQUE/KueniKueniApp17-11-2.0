@@ -1,8 +1,27 @@
-// admin-eventos.js - CON SISTEMA DE REGISTRO DE ASISTENCIA
+// admin-eventos.js - CON SISTEMA DE REGISTRO DE ASISTENCIA Y FILTROS
 // ============================================================================
 
 let eventoEditando = null;
 let eventoSeleccionadoParaAsistencia = null;
+
+// Arrays globales
+let eventosGlobal = [];        // todos los eventos de la BD
+let eventosProximos = [];
+let eventosEnCurso = [];
+let eventosCompletados = [];
+
+// Variables de paginación
+let paginaActualProximos = 1;
+let paginaActualEnCurso = 1;
+let paginaActualCompletados = 1;
+let itemsPorPaginaProximos = 6;
+let itemsPorPaginaEnCurso = 6;
+let itemsPorPaginaCompletados = 6;
+
+// Arrays filtrados para paginación
+let eventosFiltradosProximos = [];
+let eventosFiltradosEnCurso = [];
+let eventosFiltradosCompletados = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Gestión de eventos inicializada');
@@ -19,17 +38,102 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
     
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', cerrarSesion);
-    document.getElementById('btnCrearEvento')?.addEventListener('click', abrirModalCrear);
+    document.getElementById('btnNuevoEvento')?.addEventListener('click', abrirModalCrear);
     document.getElementById('formEvento')?.addEventListener('submit', guardarEvento);
+
+    // Filtros de eventos
+    document.getElementById('btnAplicarFiltrosEventos')?.addEventListener('click', aplicarFiltrosEventos);
+    document.getElementById('btnLimpiarFiltrosEventos')?.addEventListener('click', limpiarFiltrosEventos);
+
+    document.getElementById('filtroBusqueda')?.addEventListener('input', aplicarFiltrosEventos);
+    document.getElementById('filtroFechaDesde')?.addEventListener('change', aplicarFiltrosEventos);
+    document.getElementById('filtroFechaHasta')?.addEventListener('change', aplicarFiltrosEventos);
+    document.getElementById('filtroCategoria')?.addEventListener('change', aplicarFiltrosEventos);
     
-    // Nuevos event listeners para modales de asistencia
+    // Modales de asistencia
     document.getElementById('formRegistroAsistencia')?.addEventListener('submit', guardarRegistroAsistencia);
     
+    // Tabs
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => cambiarTab(tab.dataset.tab));
     });
+    
+    // Configurar paginación
+    configurarPaginacion();
 });
+
+// ================= CONFIGURACIÓN DE PAGINACIÓN =================
+
+function configurarPaginacion() {
+    // Próximos
+    document.getElementById('btnPrevProximos')?.addEventListener('click', () => cambiarPaginaEventos('proximos', -1));
+    document.getElementById('btnNextProximos')?.addEventListener('click', () => cambiarPaginaEventos('proximos', 1));
+    document.getElementById('selectItemsPorPaginaProximos')?.addEventListener('change', (e) => {
+        itemsPorPaginaProximos = parseInt(e.target.value) || 6;
+        paginaActualProximos = 1;
+        aplicarFiltrosEventos();
+    });
+    
+    // En Curso
+    document.getElementById('btnPrevEnCurso')?.addEventListener('click', () => cambiarPaginaEventos('encurso', -1));
+    document.getElementById('btnNextEnCurso')?.addEventListener('click', () => cambiarPaginaEventos('encurso', 1));
+    document.getElementById('selectItemsPorPaginaEnCurso')?.addEventListener('change', (e) => {
+        itemsPorPaginaEnCurso = parseInt(e.target.value) || 6;
+        paginaActualEnCurso = 1;
+        aplicarFiltrosEventos();
+    });
+    
+    // Completados
+    document.getElementById('btnPrevCompletados')?.addEventListener('click', () => cambiarPaginaEventos('completados', -1));
+    document.getElementById('btnNextCompletados')?.addEventListener('click', () => cambiarPaginaEventos('completados', 1));
+    document.getElementById('selectItemsPorPaginaCompletados')?.addEventListener('change', (e) => {
+        itemsPorPaginaCompletados = parseInt(e.target.value) || 6;
+        paginaActualCompletados = 1;
+        aplicarFiltrosEventos();
+    });
+}
+
+function cambiarPaginaEventos(tipo, delta) {
+    if (tipo === 'proximos') {
+        const total = calcularTotalPaginas(eventosFiltradosProximos.length, itemsPorPaginaProximos);
+        paginaActualProximos += delta;
+        if (paginaActualProximos < 1) paginaActualProximos = 1;
+        if (paginaActualProximos > total) paginaActualProximos = total;
+        mostrarEventosPaginados(eventosFiltradosProximos, 'eventosProximos', 'badgeProximos', paginaActualProximos, itemsPorPaginaProximos, 'Proximos');
+        actualizarPaginacion('Proximos', paginaActualProximos, total);
+    } else if (tipo === 'encurso') {
+        const total = calcularTotalPaginas(eventosFiltradosEnCurso.length, itemsPorPaginaEnCurso);
+        paginaActualEnCurso += delta;
+        if (paginaActualEnCurso < 1) paginaActualEnCurso = 1;
+        if (paginaActualEnCurso > total) paginaActualEnCurso = total;
+        mostrarEventosPaginados(eventosFiltradosEnCurso, 'eventosEnCurso', 'badgeEnCurso', paginaActualEnCurso, itemsPorPaginaEnCurso, 'EnCurso');
+        actualizarPaginacion('EnCurso', paginaActualEnCurso, total);
+    } else if (tipo === 'completados') {
+        const total = calcularTotalPaginas(eventosFiltradosCompletados.length, itemsPorPaginaCompletados);
+        paginaActualCompletados += delta;
+        if (paginaActualCompletados < 1) paginaActualCompletados = 1;
+        if (paginaActualCompletados > total) paginaActualCompletados = total;
+        mostrarEventosPaginados(eventosFiltradosCompletados, 'eventosCompletados', 'badgeCompletados', paginaActualCompletados, itemsPorPaginaCompletados, 'Completados');
+        actualizarPaginacion('Completados', paginaActualCompletados, total);
+    }
+}
+
+function calcularTotalPaginas(totalItems, itemsPorPagina) {
+    return Math.max(1, Math.ceil(totalItems / itemsPorPagina));
+}
+
+function actualizarPaginacion(tipo, paginaActual, totalPaginas) {
+    document.getElementById(`paginaActual${tipo}`).textContent = String(paginaActual);
+    document.getElementById(`totalPaginas${tipo}`).textContent = String(totalPaginas);
+    
+    const btnPrev = document.getElementById(`btnPrev${tipo}`);
+    const btnNext = document.getElementById(`btnNext${tipo}`);
+    
+    if (btnPrev) btnPrev.disabled = paginaActual <= 1;
+    if (btnNext) btnNext.disabled = paginaActual >= totalPaginas;
+}
+
+// ================= AUTENTICACIÓN =================
 
 function verificarAutenticacion() {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
@@ -41,12 +145,7 @@ function verificarAutenticacion() {
     }
 }
 
-function cerrarSesion() {
-    if (confirm('¿Cerrar sesión?')) {
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-    }
-}
+// ================= TABS =================
 
 function cambiarTab(tabName) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -55,6 +154,8 @@ function cambiarTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`tab-${tabName}`).classList.add('active');
 }
+
+// ================= ESTADOS AUTOMÁTICOS =================
 
 async function actualizarEstadosAutomaticamente() {
     if (!window.supabaseClient) return;
@@ -97,6 +198,8 @@ async function actualizarEstadosAutomaticamente() {
     }
 }
 
+// ================= CARGA DE EVENTOS =================
+
 async function cargarEventos() {
     if (!window.supabaseClient) {
         console.error('Supabase no inicializado');
@@ -115,24 +218,112 @@ async function cargarEventos() {
         
         console.log('Eventos cargados:', eventos);
         
-        const proximos = eventos.filter(e => e.estado === 'proximo');
-        const enCurso = eventos.filter(e => e.estado === 'activo');
-        const completados = eventos.filter(e => e.estado === 'completado');
-        
-        mostrarEventos(proximos, 'eventosProximos', 'badgeProximos');
-        mostrarEventos(enCurso, 'eventosEnCurso', 'badgeEnCurso');
-        mostrarEventos(completados, 'eventosCompletados', 'badgeCompletados');
-        
-        console.log('Eventos clasificados');
+        eventosGlobal = eventos || [];
+        clasificarEventos(eventosGlobal);
+        aplicarFiltrosEventos();
         
     } catch (error) {
         console.error('Error al cargar eventos:', error);
     }
 }
 
-// FUNCIÓN CORREGIDA: Formatear fecha sin problemas de zona horaria
+function clasificarEventos(eventos) {
+    eventosProximos = eventos.filter(e => e.estado === 'proximo');
+    eventosEnCurso = eventos.filter(e => e.estado === 'activo');
+    eventosCompletados = eventos.filter(e => e.estado === 'completado');
+}
+
+// ================= FILTROS =================
+
+function obtenerFiltrosEventos() {
+    const fechaDesdeEl = document.getElementById('filtroFechaDesde');
+    const fechaHastaEl = document.getElementById('filtroFechaHasta');
+    const categoriaEl = document.getElementById('filtroCategoria');
+    const busquedaEl = document.getElementById('filtroBusqueda');
+
+    const fechaDesde = fechaDesdeEl?.value || '';
+    const fechaHasta = fechaHastaEl?.value || '';
+    const categoria = categoriaEl?.value || '';
+    const termino = (busquedaEl?.value || '').toLowerCase().trim();
+
+    return { fechaDesde, fechaHasta, categoria, termino };
+}
+
+function aplicarFiltrosEventos() {
+    const { fechaDesde, fechaHasta, categoria, termino } = obtenerFiltrosEventos();
+
+    console.log('=== APLICANDO FILTROS ===');
+    console.log('Categoría seleccionada:', categoria);
+    console.log('Total eventos - Próximos:', eventosProximos.length, 'En Curso:', eventosEnCurso.length, 'Completados:', eventosCompletados.length);
+
+    function pasaFiltros(evento) {
+        if (fechaDesde && evento.fecha_evento < fechaDesde) return false;
+        if (fechaHasta && evento.fecha_evento > fechaHasta) return false;
+        
+        // CORREGIDO: Comparar en minúsculas para que funcione con "Cultura" y "cultura"
+        if (categoria && categoria.trim() !== '') {
+            const eventoCategoria = (evento.categoria || '').toLowerCase();
+            const categoriaFiltro = categoria.toLowerCase();
+            if (eventoCategoria !== categoriaFiltro) return false;
+        }
+
+        if (termino) {
+            const titulo = (evento.titulo || '').toLowerCase();
+            const desc = (evento.descripcion || '').toLowerCase();
+            const ubicacion = (evento.ubicacion || '').toLowerCase();
+
+            if (!titulo.includes(termino) && !desc.includes(termino) && !ubicacion.includes(termino)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    eventosFiltradosProximos = eventosProximos.filter(pasaFiltros);
+    eventosFiltradosEnCurso = eventosEnCurso.filter(pasaFiltros);
+    eventosFiltradosCompletados = eventosCompletados.filter(pasaFiltros);
+
+    console.log('Filtrados - Próximos:', eventosFiltradosProximos.length, 'En Curso:', eventosFiltradosEnCurso.length, 'Completados:', eventosFiltradosCompletados.length);
+
+    const totalPaginasProximos = calcularTotalPaginas(eventosFiltradosProximos.length, itemsPorPaginaProximos);
+    if (paginaActualProximos > totalPaginasProximos) paginaActualProximos = totalPaginasProximos;
+    if (paginaActualProximos < 1) paginaActualProximos = 1;
+    
+    const totalPaginasEnCurso = calcularTotalPaginas(eventosFiltradosEnCurso.length, itemsPorPaginaEnCurso);
+    if (paginaActualEnCurso > totalPaginasEnCurso) paginaActualEnCurso = totalPaginasEnCurso;
+    if (paginaActualEnCurso < 1) paginaActualEnCurso = 1;
+    
+    const totalPaginasCompletados = calcularTotalPaginas(eventosFiltradosCompletados.length, itemsPorPaginaCompletados);
+    if (paginaActualCompletados > totalPaginasCompletados) paginaActualCompletados = totalPaginasCompletados;
+    if (paginaActualCompletados < 1) paginaActualCompletados = 1;
+
+    mostrarEventosPaginados(eventosFiltradosProximos, 'eventosProximos', 'badgeProximos', paginaActualProximos, itemsPorPaginaProximos, 'Proximos');
+    mostrarEventosPaginados(eventosFiltradosEnCurso, 'eventosEnCurso', 'badgeEnCurso', paginaActualEnCurso, itemsPorPaginaEnCurso, 'EnCurso');
+    mostrarEventosPaginados(eventosFiltradosCompletados, 'eventosCompletados', 'badgeCompletados', paginaActualCompletados, itemsPorPaginaCompletados, 'Completados');
+    
+    actualizarPaginacion('Proximos', paginaActualProximos, totalPaginasProximos);
+    actualizarPaginacion('EnCurso', paginaActualEnCurso, totalPaginasEnCurso);
+    actualizarPaginacion('Completados', paginaActualCompletados, totalPaginasCompletados);
+}
+
+function limpiarFiltrosEventos() {
+    const fechaDesdeEl = document.getElementById('filtroFechaDesde');
+    const fechaHastaEl = document.getElementById('filtroFechaHasta');
+    const categoriaEl = document.getElementById('filtroCategoria');
+    const busquedaEl = document.getElementById('filtroBusqueda');
+
+    if (fechaDesdeEl) fechaDesdeEl.value = '';
+    if (fechaHastaEl) fechaHastaEl.value = '';
+    if (categoriaEl) categoriaEl.value = '';
+    if (busquedaEl) busquedaEl.value = '';
+
+    aplicarFiltrosEventos();
+}
+
+// ================= UTILIDADES DE FECHA =================
+
 function formatearFechaLocal(fechaString) {
-    // Crear fecha sin conversión UTC
     const [year, month, day] = fechaString.split('-');
     const fecha = new Date(year, month - 1, day);
     
@@ -143,19 +334,26 @@ function formatearFechaLocal(fechaString) {
     });
 }
 
-function mostrarEventos(eventos, containerId, badgeId) {
+// ================= RENDER DE EVENTOS =================
+
+function mostrarEventosPaginados(eventos, containerId, badgeId, paginaActual, itemsPorPagina, tipoSufijo) {
     const container = document.getElementById(containerId);
     const badge = document.getElementById(badgeId);
     
+    if (!container || !badge) return;
+
     badge.textContent = eventos.length;
     
-    if (eventos.length === 0) {
+    if (!eventos || eventos.length === 0) {
         container.innerHTML = '<div class="empty-message">No hay eventos en esta sección</div>';
         return;
     }
     
-    container.innerHTML = eventos.map(evento => {
-        // USAR FUNCIÓN CORREGIDA
+    const inicio = (paginaActual - 1) * itemsPorPagina;
+    const fin = inicio + itemsPorPagina;
+    const eventosPagina = eventos.slice(inicio, fin);
+    
+    container.innerHTML = eventosPagina.map(evento => {
         const fechaFormateada = formatearFechaLocal(evento.fecha_evento);
         
         const hora = evento.hora_evento ? evento.hora_evento.substring(0, 5) : '00:00';
@@ -172,7 +370,9 @@ function mostrarEventos(eventos, containerId, badgeId) {
             'Otro': { bg: '#f3f4f6', text: '#374151' }
         };
         
-        const colores = categoriaColors[evento.categoria] || categoriaColors['Otro'];
+        // Normalizar categoría para buscar color
+        const catNormalizada = evento.categoria.charAt(0).toUpperCase() + evento.categoria.slice(1).toLowerCase();
+        const colores = categoriaColors[catNormalizada] || categoriaColors['Otro'];
         
         const estadoColors = {
             'proximo': { bg: '#dbeafe', text: '#1e40af', label: 'Próximo' },
@@ -183,16 +383,10 @@ function mostrarEventos(eventos, containerId, badgeId) {
         const estadoStyle = estadoColors[evento.estado] || estadoColors['proximo'];
         const estadoBadge = `<span style="background: ${estadoStyle.bg}; color: ${estadoStyle.text}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-left: 0.5rem;">${estadoStyle.label}</span>`;
         
-        // Botón de registro de asistencia solo para eventos activos y completados
-        const botonRegistroAsistencia = (evento.estado === 'activo' || evento.estado === 'completado') ? 
-          /*  `<button class="btn-registro-asistencia" onclick="abrirModalRegistroAsistencia('${evento.id}')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 12l2 2 4-4"></path>
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="8.5" cy="7" r="4"></circle>
-                </svg>
-                Registrar Asistencia
-            </button>`*/ '': ''; 
+        const botonRegistroAsistencia =
+            (evento.estado === 'activo' || evento.estado === 'completado')
+                ? ''
+                : '';
         
         return `
             <div class="evento-card">
@@ -204,19 +398,7 @@ function mostrarEventos(eventos, containerId, badgeId) {
                         ${estadoBadge}
                     </div>
                     <div class="evento-acciones">
-                        ${botonRegistroAsistencia}
-                       <!-- <button class="btn-icon" onclick="editarEvento('${evento.id}')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                        </button>
-                        <button class="btn-icon" onclick="eliminarEvento('${evento.id}')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                        </button> -->
+                     ${botonRegistroAsistencia}
                     </div>
                 </div>
                 <h3 class="evento-titulo">${evento.titulo}</h3>
@@ -246,6 +428,8 @@ function mostrarEventos(eventos, containerId, badgeId) {
     }).join('');
 }
 
+// ================= CRUD EVENTOS =================
+
 function abrirModalCrear() {
     eventoEditando = null;
     document.getElementById('modalTitle').textContent = 'Crear Evento';
@@ -269,8 +453,6 @@ async function editarEvento(id) {
         document.getElementById('eventoId').value = evento.id;
         document.getElementById('titulo').value = evento.titulo;
         document.getElementById('descripcion').value = evento.descripcion || '';
-        
-        // CORREGIDO: Mantener la fecha exacta sin conversión
         document.getElementById('fecha_evento').value = evento.fecha_evento;
         document.getElementById('hora_evento').value = evento.hora_evento;
         document.getElementById('categoria').value = evento.categoria;
@@ -288,11 +470,8 @@ async function editarEvento(id) {
 
 async function guardarEvento(e) {
     e.preventDefault();
-    
-    // CORREGIDO: Guardar fecha exacta sin conversión
     const fechaEvento = document.getElementById('fecha_evento').value;
-    
-    // Determinar el estado según la fecha
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     
@@ -310,7 +489,7 @@ async function guardarEvento(e) {
     const eventoData = {
         titulo: document.getElementById('titulo').value,
         descripcion: document.getElementById('descripcion').value,
-        fecha_evento: fechaEvento, // Guardar fecha exacta
+        fecha_evento: fechaEvento,
         hora_evento: document.getElementById('hora_evento').value,
         categoria: document.getElementById('categoria').value,
         ubicacion: document.getElementById('ubicacion').value,
@@ -376,15 +555,11 @@ function cerrarModal() {
     document.getElementById('modalEvento').classList.remove('active');
 }
 
-// ============================================================================
-// NUEVAS FUNCIONES PARA REGISTRO DE ASISTENCIA
-// ============================================================================
+// ================= REGISTRO DE ASISTENCIA =================
 
 async function abrirModalRegistroAsistencia(eventoId) {
     try {
         eventoSeleccionadoParaAsistencia = eventoId;
-        
-        // Cargar información del evento
         const { data: evento, error: errorEvento } = await window.supabaseClient
             .from('eventos')
             .select('*')
@@ -392,8 +567,7 @@ async function abrirModalRegistroAsistencia(eventoId) {
             .single();
         
         if (errorEvento) throw errorEvento;
-        
-        // Cargar lista de socios confirmados
+
         const { data: asistencias, error: errorAsistencias } = await window.supabaseClient
             .from('vista_asistencias_detalladas')
             .select('*')
@@ -401,8 +575,7 @@ async function abrirModalRegistroAsistencia(eventoId) {
             .eq('estado_asistencia', 'confirmado');
         
         if (errorAsistencias) throw errorAsistencias;
-        
-        // Actualizar el modal
+    
         document.getElementById('modalRegistroTitulo').textContent = `Registrar Asistencia - ${evento.titulo}`;
         document.getElementById('eventoIdAsistencia').value = eventoId;
         
@@ -437,8 +610,7 @@ async function abrirModalRegistroAsistencia(eventoId) {
                 </div>
             `).join('');
         }
-        
-        // Mostrar el modal
+    
         document.getElementById('modalRegistroAsistencia').classList.add('active');
         
     } catch (error) {
@@ -458,11 +630,9 @@ async function guardarRegistroAsistencia(e) {
         alert('Por favor, selecciona al menos un socio que asistió al evento.');
         return;
     }
-    
+
     try {
-        // Actualizar cada asistencia seleccionada
         const updates = Array.from(checkboxes).map(async (checkbox) => {
-            const socioId = checkbox.value;
             const asistenciaId = checkbox.dataset.asistenciaId;
             
             const { error } = await window.supabaseClient
@@ -476,17 +646,14 @@ async function guardarRegistroAsistencia(e) {
             
             if (error) throw error;
             
-            return { socioId, success: !error };
+            return { success: !error };
         });
-        
-        // Esperar a que todas las actualizaciones terminen
+    
         const resultados = await Promise.all(updates);
         const exitosas = resultados.filter(r => r.success).length;
-        
-        // Mostrar resultado
+     
         alert(`Asistencia registrada exitosamente para ${exitosas} socios.`);
-        
-        // Cerrar modal y recargar eventos
+    
         cerrarModalRegistroAsistencia();
         cargarEventos();
         
@@ -500,3 +667,5 @@ function cerrarModalRegistroAsistencia() {
     document.getElementById('modalRegistroAsistencia').classList.remove('active');
     eventoSeleccionadoParaAsistencia = null;
 }
+
+console.log('Gestión de eventos con filtros y asistencia cargada');

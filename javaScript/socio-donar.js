@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         donationForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            console.log('📝 Iniciando proceso de donación...');
+            console.log('Iniciando proceso de donación...');
             
             if (selectedAmount === 0 || selectedAmount < 10) {
                 mostrarMensaje('Por favor selecciona un monto de donación válido (mínimo $10 MXN)', 'error');
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const destinoValue = destinoSelect.value;
             const destinoTexto = destinoSelect.options[destinoSelect.selectedIndex].text;
             
-            console.log('📊 Datos de donación:', {
+            console.log(' Datos de donación:', {
                 monto: selectedAmount,
                 tipo: tipoDonacion,
                 destino: destinoTexto,
@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 // - estado_recurrencia
             };
             
-            console.log('💾 Datos a guardar:', donacionData);
+            console.log('Datos a guardar:', donacionData);
             
             await guardarDonacion(donacionData);
         });
@@ -323,93 +323,136 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ============================================
     // GUARDAR DONACIÓN EN SUPABASE
     // ============================================
-    async function guardarDonacion(datos) {
-        console.log('\n=== INICIANDO GUARDADO DE DONACIÓN ===');
+   async function guardarDonacion(datos) {
+    console.log('\n=== INICIANDO GUARDADO DE DONACIÓN ===');
+    
+    if (!window.supabaseClient) {
+        console.error('Supabase no está configurado');
+        mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
+        return;
+    }
+    
+    try {
+        mostrarCargando(true);
         
-        if (!window.supabaseClient) {
-            console.error('❌ Supabase no está configurado');
-            mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
+        console.log('Datos a insertar en la base de datos:');
+        console.table(datos);
+        
+        // 1. Guardar donación en Supabase
+        const { data, error } = await window.supabaseClient
+            .from('donaciones')
+            .insert([datos])
+            .select();
+        
+        if (error) {
+            console.error('ERROR AL GUARDAR DONACIÓN:', error);
+            console.error('Mensaje:', error.message);
+            console.error('Detalles:', error.details);
+            console.error('Hint:', error.hint);
+            console.error('Código:', error.code);
+            
+            let mensajeError = 'Error al procesar la donación';
+            
+            if (error.message.includes('violates not-null')) {
+                mensajeError = 'Faltan campos requeridos. Por favor completa todos los datos.';
+            } else if (error.message.includes('foreign key')) {
+                mensajeError = 'Error de referencia. Por favor intenta nuevamente.';
+            } else {
+                mensajeError = `Error: ${error.message}`;
+            }
+            
+            mostrarMensaje(mensajeError, 'error');
             return;
         }
         
+        console.log('DONACIÓN GUARDADA EXITOSAMENTE');
+        console.log('Datos guardados:', data);
+        
+        // 2. Preparar datos para los correos
+        const fechaFormateada = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const destinoTexto = document.getElementById('destino').options[document.getElementById('destino').selectedIndex].text;
+        const mensajeOpcional = document.getElementById('mensaje')?.value.trim() || '';
+
+        // 3. Enviar correo de agradecimiento al donante (socio)
         try {
-            mostrarCargando(true);
-            
-            console.log('📊 Datos a insertar en la base de datos:');
-            console.table(datos);
-            
-            const { data, error } = await window.supabaseClient
-                .from('donaciones')
-                .insert([datos])
-                .select();
-            
-            if (error) {
-                console.error('❌ ERROR AL GUARDAR DONACIÓN:', error);
-                console.error('Mensaje:', error.message);
-                console.error('Detalles:', error.details);
-                console.error('Hint:', error.hint);
-                console.error('Código:', error.code);
-                
-                let mensajeError = 'Error al procesar la donación';
-                
-                // Mensajes de error más descriptivos
-                if (error.message.includes('violates not-null')) {
-                    mensajeError = 'Faltan campos requeridos. Por favor completa todos los datos.';
-                } else if (error.message.includes('foreign key')) {
-                    mensajeError = 'Error de referencia. Por favor intenta nuevamente.';
-                } else {
-                    mensajeError = `Error: ${error.message}`;
-                }
-                
-                mostrarMensaje(mensajeError, 'error');
-                return;
+            console.log('📧 Enviando correo de agradecimiento al socio...');
+            const thankYouResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-thank-you`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: datos.donante_email,
+                    nombre: datos.donante_nombre,
+                    monto: datos.monto,
+                    moneda: datos.moneda,
+                    referencia: datos.referencia_pago,
+                    destino: destinoTexto,
+                    fecha: fechaFormateada
+                })
+            });
+
+            if (thankYouResponse.ok) {
+                console.log('Correo de agradecimiento enviado al socio');
+            } else {
+                console.log('No se pudo enviar correo al socio (no crítico)');
             }
-            
-            console.log('✅ DONACIÓN GUARDADA EXITOSAMENTE');
-            console.log('Datos guardados:', data);
-            
-            // Enviar comprobante por correo
-            try {
-                console.log('📧 Enviando comprobante por correo...');
-                const emailResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-receipt`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: datos.donante_email,
-                        nombre: datos.donante_nombre,
-                        monto: datos.monto,
-                        fecha: new Date().toISOString(),
-                        folio: datos.referencia_pago,
-                        metodo_pago: datos.metodo_pago,
-                        tipo_donacion: datos.tipo_donacion
-                    })
-                });
-                
-                if (emailResponse.ok) {
-                    console.log('✅ Comprobante enviado correctamente');
-                } else {
-                    console.log('⚠️ No se pudo enviar el comprobante');
-                }
-            } catch (emailError) {
-                console.log('⚠️ Error al enviar comprobante:', emailError.message);
-            }
-            
-            console.log('=== PROCESO COMPLETADO EXITOSAMENTE ===\n');
-            
-            mostrarMensajeExito(datos);
-            
-            setTimeout(() => {
-                window.location.href = 'socio-donaciones.html';
-            }, 4000);
-            
-        } catch (error) {
-            console.error('❌ ERROR INESPERADO:', error);
-            console.error('Stack:', error.stack);
-            mostrarMensaje('Error inesperado al procesar la donación. Por favor inténtalo de nuevo.', 'error');
-        } finally {
-            mostrarCargando(false);
+        } catch (emailError) {
+            console.log('Error al enviar correo al socio (no crítico):', emailError);
         }
+
+        // 4. Enviar notificación al administrador
+        try {
+            console.log('📬 Enviando notificación al administrador...');
+            const notificationResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-notification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    donante_nombre: datos.donante_nombre,
+                    donante_email: datos.donante_email,
+                    donante_telefono: datos.donante_telefono,
+                    monto: datos.monto,
+                    moneda: datos.moneda,
+                    referencia: datos.referencia_pago,
+                    destino: destinoTexto,
+                    fecha: fechaFormateada,
+                    metodo_pago: datos.metodo_pago,
+                    mensaje: mensajeOpcional || null
+                })
+            });
+
+            if (notificationResponse.ok) {
+                console.log('Notificación enviada al administrador');
+            } else {
+                console.log('No se pudo enviar notificación al administrador (no crítico)');
+            }
+        } catch (emailError) {
+            console.log('Error al enviar notificación al administrador (no crítico):', emailError);
+        }
+        
+        console.log('=== PROCESO COMPLETADO EXITOSAMENTE ===\n');
+        
+        // 5. Mostrar mensaje de éxito
+        mostrarMensajeExito(datos);
+        
+        // 6. Redireccionar después de 4 segundos
+        setTimeout(() => {
+            window.location.href = 'socio-donaciones.html';
+        }, 4000);
+        
+    } catch (error) {
+        console.error('ERROR INESPERADO:', error);
+        console.error('Stack:', error.stack);
+        mostrarMensaje('Error inesperado al procesar la donación. Por favor inténtalo de nuevo.', 'error');
+    } finally {
+        mostrarCargando(false);
     }
+}
     
     // ============================================
     // FUNCIONES AUXILIARES
@@ -475,7 +518,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const tipoTexto = datos.tipo_donacion === 'mensual' ? 'mensual' : 'única';
         const esMensual = datos.tipo_donacion === 'mensual';
         const recurrenteInfo = esMensual ? 
-            `<p class="success-recurrent">📋 Tu donación mensual ha sido registrada</p>` : '';
+            `<p class="success-recurrent">Tu donación mensual ha sido registrada</p>` : '';
         
         container.innerHTML = `
             <div class="message message-success">

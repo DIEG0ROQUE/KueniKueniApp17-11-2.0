@@ -1,9 +1,10 @@
 // ============================================
-// COORDINADOR DE EVENTOS - VERSIÓN MEJORADA
+// COORDINADOR DE EVENTOS - VERSIÓN CORREGIDA
 // ============================================
 // ✅ Paginación de 10 en 10
 // ✅ Ocultar editar en eventos completados
 // ✅ Alertas personalizadas (no del navegador)
+// ✅ Gestión de asistencias FUNCIONAL
 // ✅ 100% funcional
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -71,6 +72,53 @@ function configurarEventos() {
     document.getElementById('inputBuscar')?.addEventListener('input', filtrarEventos);
     document.getElementById('filtroEstado')?.addEventListener('change', filtrarEventos);
     document.getElementById('filtroCategoria')?.addEventListener('change', filtrarEventos);
+
+    // Configurar menú hamburguesa para móviles
+    configurarMenuMobile();
+}
+
+function configurarMenuMobile() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    if (!menuToggle || !sidebar) return;
+
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    overlay.id = 'sidebarOverlay';
+    document.body.appendChild(overlay);
+
+    // Toggle sidebar
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    // Cerrar al hacer clic en overlay
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    // Cerrar al hacer clic en un link del menú
+    const navLinks = sidebar.querySelectorAll('.nav-item, .btn-cerrar-sesion');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        });
+    });
+
+    // Cerrar sidebar al cambiar tamaño de ventana
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+    });
 }
 
 // ============================================
@@ -474,7 +522,7 @@ async function guardarEvento() {
             hora_evento: document.getElementById('horaEvento').value,
             ubicacion: document.getElementById('ubicacion').value,
             cupo_maximo: parseInt(document.getElementById('cupoMaximo').value),
-            estado: 'proximo' // Siempre próximo por defecto
+            estado: 'proximo'
         };
 
         let error;
@@ -564,7 +612,7 @@ async function eliminarEvento(id) {
 window.eliminarEvento = eliminarEvento;
 
 // ============================================
-// GESTIÓN DE ASISTENCIAS
+// GESTIÓN DE ASISTENCIAS - CORREGIDO
 // ============================================
 
 async function gestionarAsistencias(eventoId) {
@@ -572,30 +620,97 @@ async function gestionarAsistencias(eventoId) {
     asistenciasSeleccionadas.clear();
     
     try {
-        const { data: evento } = await window.supabaseClient
+        console.log('📋 Cargando asistencias para evento:', eventoId);
+        
+        // Primero obtener el evento
+        const { data: evento, error: errorEvento } = await window.supabaseClient
             .from('eventos')
             .select('*')
             .eq('id', eventoId)
             .single();
         
-        const { data: asistencias } = await window.supabaseClient
-            .from('asistencias_eventos')
+        if (errorEvento) {
+            console.error('❌ Error cargando evento:', errorEvento);
+            throw errorEvento;
+        }
+        console.log('✅ Evento cargado:', evento);
+        
+        // Obtener las asistencias del evento con JOIN de socios y usuarios en UNA SOLA QUERY
+        // Esto mejora dramáticamente el rendimiento (1 query vs 100+ queries)
+        const { data: asistencias, error: errorAsistencias } = await window.supabaseClient
+            .from('asistencias')
             .select(`
                 *,
-                socios (
+                socios!inner (
                     id,
-                    nombre_completo,
-                    usuarios (
-                        email
-                    )
+                    usuario_id,
+                    usuarios (*)
                 )
             `)
             .eq('evento_id', eventoId);
+
+        if (errorAsistencias) {
+            console.error('❌ Error cargando asistencias:', errorAsistencias);
+            throw errorAsistencias;
+        }
+
+        console.log('✅ Asistencias del evento cargadas:', asistencias?.length || 0);
+
+        // Si no hay asistencias, mostrar el modal vacío
+        if (!asistencias || asistencias.length === 0) {
+            console.log('ℹ️ No hay asistencias para este evento');
+            mostrarModalAsistencias(evento, []);
+            return;
+        }
+
+        // Obtener también los registros de asistencias_eventos (pase de lista)
+        const { data: asistenciasEventos } = await window.supabaseClient
+            .from('asistencias_eventos')
+            .select('socio_id, estado')
+            .eq('evento_id', eventoId);
+
+        // Crear un mapa para acceso rápido al estado del pase de lista
+        const paseLista = new Map();
+        if (asistenciasEventos) {
+            asistenciasEventos.forEach(ae => {
+                paseLista.set(ae.socio_id, ae.estado);
+            });
+        }
+
+        // Procesar asistencias con datos ya cargados (sin queries adicionales)
+        const asistenciasCompletas = asistencias.map(asistencia => {
+            // Obtener datos del usuario desde la relación
+            const usuario = asistencia.socios?.usuarios;
+
+            // Intentar obtener el nombre de diferentes posibles columnas
+            const nombreCompleto = usuario?.nombre_completo ||
+                                  usuario?.nombreCompleto ||
+                                  usuario?.nombre ||
+                                  usuario?.full_name ||
+                                  usuario?.name ||
+                                  'Socio sin datos';
+
+            const email = usuario?.email || 'N/A';
+
+            // Obtener estado del pase de lista (si existe)
+            const estadoPaseLista = paseLista.get(asistencia.socio_id);
+
+            return {
+                ...asistencia,
+                estado_pase_lista: estadoPaseLista || null, // null = no se ha tomado lista
+                socio: {
+                    nombre_completo: nombreCompleto,
+                    email: email
+                }
+            };
+        });
+
+        console.log('✅ Asistencias procesadas:', asistenciasCompletas.length);
+        mostrarModalAsistencias(evento, asistenciasCompletas);
         
-        mostrarModalAsistencias(evento, asistencias || []);
     } catch (error) {
-        console.error('Error:', error);
-        mostrarMensaje('❌ Error al cargar asistencias', 'error');
+        console.error('❌ Error al cargar asistencias:', error);
+        mostrarMensaje('❌ Error al cargar asistencias: ' + error.message, 'error');
     }
 }
 
@@ -603,69 +718,323 @@ window.gestionarAsistencias = gestionarAsistencias;
 
 function mostrarModalAsistencias(evento, asistencias) {
     const totalAsistentes = asistencias.length;
-    const confirmados = asistencias.filter(a => a.estado === 'confirmado').length;
-    const asistieron = asistencias.filter(a => a.estado === 'asistio').length;
+    // Contar por estado del pase de lista
+    const confirmados = asistencias.filter(a => !a.estado_pase_lista).length; // No tienen pase de lista aún
+    const asistieron = asistencias.filter(a => a.estado_pase_lista === 'asistio').length;
+    const noAsistieron = asistencias.filter(a => a.estado_pase_lista === 'no_asistio').length;
+
+    // Separar asistencias por estado del pase de lista
+    const confirmadosLista = asistencias.filter(a => !a.estado_pase_lista); // Pendientes de tomar lista
+    const asistieronLista = asistencias.filter(a => a.estado_pase_lista === 'asistio');
     
     const modalHTML = `
         <div id="modalAsistencias" class="modal" style="display:flex;">
             <div class="modal-overlay" onclick="cerrarModalAsistencias()"></div>
-            <div class="modal-content modal-large">
-                <div class="modal-header">
-                    <div>
-                        <h2>👥 Gestionar Asistencias</h2>
-                        <p>${evento.titulo}</p>
+            <div class="modal-content" style="max-width: 1200px; width: 95%; max-height: 90vh; overflow-y: auto;">
+                <!-- Header -->
+                <div style="
+                    background: linear-gradient(135deg, #5f0d51 0%, #7d1166 100%);
+                    padding: 2rem;
+                    border-radius: 16px 16px 0 0;
+                    color: white;
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <polyline points="17 11 19 13 23 9"></polyline>
+                                </svg>
+                                <h2 style="margin: 0; font-size: 1.75rem; font-weight: 700;">Gestionar Asistencias</h2>
+                            </div>
+                            <p style="margin: 0; opacity: 0.9; font-size: 1rem;">${evento.titulo}</p>
+                            <p style="margin: 0.25rem 0 0 0; opacity: 0.7; font-size: 0.875rem;">
+                                ${formatearFecha(evento.fecha_evento)} • ${evento.hora_evento ? evento.hora_evento.substring(0, 5) : 'N/A'}
+                            </p>
+                        </div>
+                        <button onclick="cerrarModalAsistencias()" style="
+                            background: rgba(255, 255, 255, 0.2);
+                            border: none;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            color: white;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">×</button>
                     </div>
-                    <button onclick="cerrarModalAsistencias()" class="btn-close">×</button>
+                    
+                    <!-- Stats Cards -->
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                        gap: 1rem;
+                        margin-top: 1.5rem;
+                    ">
+                        <div style="
+                            background: rgba(255, 255, 255, 0.15);
+                            backdrop-filter: blur(10px);
+                            padding: 1.25rem;
+                            border-radius: 12px;
+                            border: 1px solid rgba(255, 255, 255, 0.2);
+                        ">
+                            <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Registrados</div>
+                            <div style="font-size: 2rem; font-weight: 700;">${totalAsistentes}</div>
+                        </div>
+                        <div style="
+                            background: rgba(251, 191, 36, 0.2);
+                            backdrop-filter: blur(10px);
+                            padding: 1.25rem;
+                            border-radius: 12px;
+                            border: 1px solid rgba(251, 191, 36, 0.3);
+                        ">
+                            <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Confirmados</div>
+                            <div style="font-size: 2rem; font-weight: 700;">${confirmados}</div>
+                        </div>
+                        <div style="
+                            background: rgba(16, 185, 129, 0.2);
+                            backdrop-filter: blur(10px);
+                            padding: 1.25rem;
+                            border-radius: 12px;
+                            border: 1px solid rgba(16, 185, 129, 0.3);
+                        ">
+                            <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Ya Asistieron</div>
+                            <div style="font-size: 2rem; font-weight: 700;">${asistieron}</div>
+                        </div>
+                        <div style="
+                            background: rgba(239, 68, 68, 0.2);
+                            backdrop-filter: blur(10px);
+                            padding: 1.25rem;
+                            border-radius: 12px;
+                            border: 1px solid rgba(239, 68, 68, 0.3);
+                        ">
+                            <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">No Asistieron</div>
+                            <div style="font-size: 2rem; font-weight: 700;">${noAsistieron}</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <div class="asistencias-stats">
-                        <div class="stat-mini">
-                            <span>Total Registrados:</span>
-                            <strong>${totalAsistentes}</strong>
-                        </div>
-                        <div class="stat-mini">
-                            <span>Confirmados:</span>
-                            <strong>${confirmados}</strong>
-                        </div>
-                        <div class="stat-mini">
-                            <span>Asistieron:</span>
-                            <strong>${asistieron}</strong>
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>SOCIO</th>
-                                    <th>EMAIL</th>
-                                    <th>ESTADO</th>
-                                    <th>ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${asistencias.map(a => `
-                                    <tr>
-                                        <td>${a.socios?.nombre_completo || 'N/A'}</td>
-                                        <td>${a.socios?.usuarios?.email || 'N/A'}</td>
-                                        <td>
-                                            <span class="badge-estado ${a.estado === 'asistio' ? 'estado-asistio' : 'estado-confirmado'}">
-                                                ${a.estado === 'asistio' ? '✓ Asistió' : '• Confirmado'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            ${a.estado !== 'asistio' ? `
-                                                <button onclick="marcarAsistio('${a.id}')" class="btn-icon btn-success">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                <!-- Body -->
+                <div style="padding: 2rem;">
+                    ${asistencias.length > 0 ? `
+                        <!-- Sección Confirmados -->
+                        ${confirmadosLista.length > 0 ? `
+                            <div style="margin-bottom: 2rem;">
+                                <div style="
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 0.75rem;
+                                    margin-bottom: 1rem;
+                                    padding-bottom: 0.75rem;
+                                    border-bottom: 2px solid #fbbf24;
+                                ">
+                                    <div style="
+                                        width: 32px;
+                                        height: 32px;
+                                        background: #fef3c7;
+                                        border-radius: 8px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-weight: 700;
+                                        color: #92400e;
+                                    ">${confirmadosLista.length}</div>
+                                    <h3 style="margin: 0; font-size: 1.25rem; color: #92400e;">Confirmados (${confirmadosLista.length})</h3>
+                                </div>
+                                <div style="display: grid; gap: 0.75rem;">
+                                    ${confirmadosLista.map(a => `
+                                        <div style="
+                                            background: white;
+                                            border: 2px solid #fef3c7;
+                                            border-radius: 12px;
+                                            padding: 1.25rem;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: space-between;
+                                            transition: all 0.2s;
+                                        " onmouseover="this.style.boxShadow='0 4px 12px rgba(251,191,36,0.2)'" onmouseout="this.style.boxShadow='none'">
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                                    <div style="
+                                                        width: 48px;
+                                                        height: 48px;
+                                                        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+                                                        border-radius: 50%;
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: center;
+                                                        color: white;
+                                                        font-weight: 700;
+                                                        font-size: 1.25rem;
+                                                    ">${(a.socio?.nombre_completo || 'N/A').charAt(0).toUpperCase()}</div>
+                                                    <div>
+                                                        <div style="font-size: 1.125rem; font-weight: 600; color: #18181b; margin-bottom: 0.25rem;">
+                                                            ${a.socio?.nombre_completo || 'N/A'}
+                                                        </div>
+                                                        <div style="font-size: 0.875rem; color: #71717a;">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 0.25rem;">
+                                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                                                <polyline points="22,6 12,13 2,6"></polyline>
+                                                            </svg>
+                                                            ${a.socio?.email || 'N/A'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div style="font-size: 0.75rem; color: #71717a; margin-left: 64px;">
+                                                    Registrado: ${new Date(a.fecha_registro).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; gap: 0.75rem;">
+                                                <button onclick="marcarAsistio('${a.id}')" style="
+                                                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                                    color: white;
+                                                    border: none;
+                                                    padding: 0.75rem 1.5rem;
+                                                    border-radius: 10px;
+                                                    font-weight: 600;
+                                                    cursor: pointer;
+                                                    transition: all 0.2s;
+                                                    display: flex;
+                                                    align-items: center;
+                                                    gap: 0.5rem;
+                                                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                                                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(16, 185, 129, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                         <polyline points="20 6 9 17 4 12"></polyline>
                                                     </svg>
+                                                    Asistió
                                                 </button>
-                                            ` : '✓'}
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
+                                                <button onclick="marcarNoAsistio('${a.id}')" style="
+                                                    background: #f3f4f6;
+                                                    color: #ef4444;
+                                                    border: 2px solid #fecaca;
+                                                    padding: 0.75rem 1.5rem;
+                                                    border-radius: 10px;
+                                                    font-weight: 600;
+                                                    cursor: pointer;
+                                                    transition: all 0.2s;
+                                                    display: flex;
+                                                    align-items: center;
+                                                    gap: 0.5rem;
+                                                " onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#f3f4f6'">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                    </svg>
+                                                    No Asistió
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Sección Ya Asistieron -->
+                        ${asistieronLista.length > 0 ? `
+                            <div>
+                                <div style="
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 0.75rem;
+                                    margin-bottom: 1rem;
+                                    padding-bottom: 0.75rem;
+                                    border-bottom: 2px solid #10b981;
+                                ">
+                                    <div style="
+                                        width: 32px;
+                                        height: 32px;
+                                        background: #d1fae5;
+                                        border-radius: 8px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-weight: 700;
+                                        color: #065f46;
+                                    ">${asistieronLista.length}</div>
+                                    <h3 style="margin: 0; font-size: 1.25rem; color: #065f46;">Ya Asistieron (${asistieronLista.length})</h3>
+                                </div>
+                                <div style="display: grid; gap: 0.75rem;">
+                                    ${asistieronLista.map(a => `
+                                        <div style="
+                                            background: #f0fdf4;
+                                            border: 2px solid #d1fae5;
+                                            border-radius: 12px;
+                                            padding: 1.25rem;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: space-between;
+                                        ">
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                                    <div style="
+                                                        width: 48px;
+                                                        height: 48px;
+                                                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                                        border-radius: 50%;
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: center;
+                                                        color: white;
+                                                        font-weight: 700;
+                                                        font-size: 1.25rem;
+                                                    ">${(a.socio?.nombre_completo || 'N/A').charAt(0).toUpperCase()}</div>
+                                                    <div>
+                                                        <div style="font-size: 1.125rem; font-weight: 600; color: #18181b; margin-bottom: 0.25rem;">
+                                                            ${a.socio?.nombre_completo || 'N/A'}
+                                                        </div>
+                                                        <div style="font-size: 0.875rem; color: #71717a;">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 0.25rem;">
+                                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                                                <polyline points="22,6 12,13 2,6"></polyline>
+                                                            </svg>
+                                                            ${a.socio?.email || 'N/A'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div style="font-size: 0.75rem; color: #71717a; margin-left: 64px;">
+                                                    Registrado: ${new Date(a.fecha_registro).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+                                            <div style="
+                                                background: #d1fae5;
+                                                color: #065f46;
+                                                padding: 0.75rem 1.5rem;
+                                                border-radius: 10px;
+                                                font-weight: 600;
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 0.5rem;
+                                            ">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                                Confirmado
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    ` : `
+                        <div style="text-align: center; padding: 4rem 2rem; color: #71717a;">
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 1.5rem; opacity: 0.3;">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                            </svg>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: #18181b; margin-bottom: 0.5rem;">No hay registros de asistencia</h3>
+                            <p style="font-size: 1rem; margin: 0;">Aún no hay socios inscritos en este evento</p>
+                        </div>
+                    `}
                 </div>
             </div>
         </div>
@@ -677,13 +1046,31 @@ function mostrarModalAsistencias(evento, asistencias) {
 
 async function marcarAsistio(asistenciaId) {
     try {
+        console.log('✓ Marcando asistencia:', asistenciaId);
+
+        // Primero obtener los datos de la asistencia confirmada
+        const { data: asistencia, error: errorGet } = await window.supabaseClient
+            .from('asistencias')
+            .select('evento_id, socio_id')
+            .eq('id', asistenciaId)
+            .single();
+
+        if (errorGet) throw errorGet;
+
+        // Insertar o actualizar en asistencias_eventos (pase de lista)
         const { error } = await window.supabaseClient
             .from('asistencias_eventos')
-            .update({ estado: 'asistio' })
-            .eq('id', asistenciaId);
-        
+            .upsert({
+                evento_id: asistencia.evento_id,
+                socio_id: asistencia.socio_id,
+                estado: 'asistio',
+                fecha_registro: new Date().toISOString()
+            }, {
+                onConflict: 'evento_id,socio_id'
+            });
+
         if (error) throw error;
-        
+
         mostrarMensaje('✅ Asistencia confirmada', 'success');
         await gestionarAsistencias(eventoAsistenciaActual);
     } catch (error) {
@@ -692,7 +1079,51 @@ async function marcarAsistio(asistenciaId) {
     }
 }
 
+async function marcarNoAsistio(asistenciaId) {
+    mostrarAlertaPersonalizada(
+        '¿Marcar como no asistió?',
+        'Esta persona no se presentará al evento',
+        'Confirmar',
+        'Cancelar',
+        async () => {
+            try {
+                console.log('✗ Marcando no asistió:', asistenciaId);
+
+                // Primero obtener los datos de la asistencia confirmada
+                const { data: asistencia, error: errorGet } = await window.supabaseClient
+                    .from('asistencias')
+                    .select('evento_id, socio_id')
+                    .eq('id', asistenciaId)
+                    .single();
+
+                if (errorGet) throw errorGet;
+
+                // Insertar o actualizar en asistencias_eventos (pase de lista)
+                const { error } = await window.supabaseClient
+                    .from('asistencias_eventos')
+                    .upsert({
+                        evento_id: asistencia.evento_id,
+                        socio_id: asistencia.socio_id,
+                        estado: 'no_asistio',
+                        fecha_registro: new Date().toISOString()
+                    }, {
+                        onConflict: 'evento_id,socio_id'
+                    });
+
+                if (error) throw error;
+
+                mostrarMensaje('✅ Marcado como no asistió', 'success');
+                await gestionarAsistencias(eventoAsistenciaActual);
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('❌ Error al actualizar', 'error');
+            }
+        }
+    );
+}
+
 window.marcarAsistio = marcarAsistio;
+window.marcarNoAsistio = marcarNoAsistio;
 
 function cerrarModalAsistencias() {
     const modal = document.getElementById('modalAsistencias');
@@ -760,7 +1191,8 @@ styleAdditional.textContent = `
 `;
 document.head.appendChild(styleAdditional);
 
-console.log('✅ Sistema MEJORADO cargado');
+console.log('✅ Sistema CORREGIDO cargado');
 console.log('✅ Paginación: 10 eventos por página');
 console.log('✅ Eventos completados sin editar');
 console.log('✅ Alertas personalizadas');
+console.log('✅ Gestión de asistencias FUNCIONAL');

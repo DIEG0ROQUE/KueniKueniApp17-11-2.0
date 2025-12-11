@@ -187,94 +187,46 @@
 }
 
 .evento-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 16px;
-    background: var(--secondary-beige, #faf9f7);
-    border-radius: 8px;
-}
-.evento-info-item {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--text-dark, #18181b);
-    font-weight: 500;
-}
-
-/* Aquí están los iconos de los eventos */
-.evento-info-item:nth-child(1)::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 4px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235f0d51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.evento-info-item:nth-child(2)::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 4px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235f0d51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>');
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.evento-info-item:nth-child(3)::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 4px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235f0d51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>');
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.evento-info-item:nth-child(4)::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 4px;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235f0d51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>');
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.evento-progress {
+    flex-direction: column;
+    gap: 14px;
     margin-top: 20px;
 }
 
-.progress-bar {
-    width: 100%;
-    height: 10px;
-    background: #e4e4e7;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 8px;
+.evento-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: var(--text-dark, #18181b);
+    font-weight: 500;
+    padding: 10px 14px;
+    background: var(--secondary-beige, #faf9f7);
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-green, #5f0d51) 0%, #7d1167 100%);
-    transition: width 0.5s ease;
-    border-radius: 10px;
+.evento-info-item:hover {
+    background: #f0ede9;
+    transform: translateX(4px);
 }
 
-.progress-text {
-    font-size: 13px;
-    color: var(--text-gray, #71717a);
-    font-weight: 600;
-    display: block;
+.evento-info-item svg {
+    flex-shrink: 0;
+    color: var(--primary-green, #5f0d51);
 }
+
+.evento-info-item span {
+    flex: 1;
+}
+
+.evento-info-item.evento-ubicacion {
+    grid-column: 1 / -1;
+}
+
+/* Iconos ahora están inline en el HTML */
+
+/* Sección de progreso removida para usuarios públicos */
 
 /* Empty & Loading States */
 .empty-message,
@@ -354,9 +306,12 @@
     }
 
     .evento-info {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 12px;
+        gap: 12px;
+    }
+
+    .evento-info-item {
+        font-size: 14px;
+        padding: 10px 12px;
     }
 
     .empty-message,

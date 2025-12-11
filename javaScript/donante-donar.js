@@ -2,7 +2,7 @@
 // DONANTE-DONAR.JS - VERSIÓN MEJORADA SIN MENSUAL
 // ============================================
 
-const EMAIL_SERVER_URL = 'http://localhost:3000';
+const EMAIL_SERVER_URL = 'https://kuenikueniapp17-11-2-0.onrender.com';
 
 let montoSeleccionado = 0;
 let currentCardType = null;
@@ -139,16 +139,7 @@ function configurarEventListeners() {
     // Submit del formulario
     document.getElementById('donationForm').addEventListener('submit', procesarDonacion);
     
-    // Cerrar sesión
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('¿Estás seguro de cerrar sesión?')) {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        });
-    }
+
 }
 
 // ============================================
@@ -477,6 +468,7 @@ async function guardarDonacionUnica(datos) {
     const dataDonacion = {
         donante_nombre: datos.userName,
         donante_email: datos.userEmail,
+        donante_telefono: 'No especificado', // Los donantes no registran teléfono
         monto: parseFloat(datos.monto),
         moneda: 'MXN',
         metodo_pago: 'tarjeta',
@@ -487,11 +479,12 @@ async function guardarDonacionUnica(datos) {
         referencia_pago: generarReferenciaPago()
     };
     
-    console.log('Guardando donación única:', dataDonacion);
+    console.log('📝 Guardando donación única:', dataDonacion);
     
     mostrarCargando(true);
     
     try {
+        // 1. Guardar donación en Supabase
         const { data, error } = await window.supabaseClient
             .from('donaciones')
             .insert(dataDonacion)
@@ -504,42 +497,89 @@ async function guardarDonacionUnica(datos) {
         
         console.log('Donación guardada exitosamente:', data);
         
-        // Enviar comprobante por correo
+        // 2. Preparar datos para los correos
+        const fechaFormateada = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const destinoTextoCompleto = destinosTexto[destinoSelect];
+
+        // 3. Enviar correo de agradecimiento al donante
         try {
-            console.log('📧 Enviando comprobante...');
-            const emailResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-receipt`, {
+            console.log('Enviando correo de agradecimiento al donante...');
+            const thankYouResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-thank-you`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: datos.userEmail,
-                    nombre: datos.userName,
-                    monto: datos.monto,
-                    fecha: dataDonacion.fecha_donacion,
-                    folio: dataDonacion.referencia_pago,
-                    metodo_pago: dataDonacion.metodo_pago
+                    email: dataDonacion.donante_email,
+                    nombre: dataDonacion.donante_nombre,
+                    monto: dataDonacion.monto,
+                    moneda: dataDonacion.moneda,
+                    referencia: dataDonacion.referencia_pago,
+                    destino: destinoTextoCompleto,
+                    fecha: fechaFormateada
                 })
             });
-            
-            if (emailResponse.ok) {
-                console.log('✅ Comprobante enviado');
+
+            if (thankYouResponse.ok) {
+                console.log('Correo de agradecimiento enviado al donante');
+            } else {
+                console.log('No se pudo enviar correo al donante (no crítico)');
             }
         } catch (emailError) {
-            console.log('⚠️ Error al enviar comprobante:', emailError);
+            console.log('Error al enviar correo al donante (no crítico):', emailError);
+        }
+
+        // 4. Enviar notificación al administrador
+        try {
+            console.log('📬 Enviando notificación al administrador...');
+            const notificationResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-notification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    donante_nombre: dataDonacion.donante_nombre,
+                    donante_email: dataDonacion.donante_email,
+                    donante_telefono: dataDonacion.donante_telefono,
+                    monto: dataDonacion.monto,
+                    moneda: dataDonacion.moneda,
+                    referencia: dataDonacion.referencia_pago,
+                    destino: destinoTextoCompleto,
+                    fecha: fechaFormateada,
+                    metodo_pago: dataDonacion.metodo_pago,
+                    mensaje: mensajeUsuario || null
+                })
+            });
+
+            if (notificationResponse.ok) {
+                console.log('Notificación enviada al administrador');
+            } else {
+                console.log('No se pudo enviar notificación al administrador (no crítico)');
+            }
+        } catch (emailError) {
+            console.log('Error al enviar notificación al administrador (no crítico):', emailError);
         }
         
+        console.log('=== PROCESO COMPLETADO EXITOSAMENTE ===');
+        
+        // 5. Mostrar mensaje de éxito
         mostrarMensajeExito(dataDonacion);
         
+        // 6. Redireccionar después de 4 segundos
         setTimeout(() => {
             window.location.href = 'donante-dashboard.html';
         }, 4000);
         
     } catch (error) {
+        console.error('Error inesperado:', error);
         mostrarMensaje('Error al procesar la donación. Por favor inténtalo de nuevo.', 'error');
     } finally {
         mostrarCargando(false);
     }
 }
-
 function generarReferenciaPago() {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 10000);

@@ -1,4 +1,4 @@
-// socio-acerca.js - CORREGIDO basado en acerca-de.js
+// socio-acerca.js - VERSIÓN CORREGIDA PARA EL NUEVO HTML
 // ============================================================================
 
 let config = {};
@@ -53,6 +53,7 @@ async function cargarDatos() {
         console.log('✅ Datos cargados correctamente');
     } catch (error) {
         console.error('❌ Error al cargar datos:', error);
+        usarDatosPorDefecto();
     }
 }
 
@@ -117,7 +118,7 @@ async function cargarEstadisticas() {
 }
 
 // ============================================================================
-// ACTUALIZAR UI CON DATOS
+// ACTUALIZAR UI CON DATOS - VERSIÓN PARA EL NUEVO HTML
 // ============================================================================
 
 function actualizarUI() {
@@ -128,120 +129,103 @@ function actualizarUI() {
     const eventos = config.eventos_total > 0 ? config.eventos_total : (config.eventos_realizados || 50);
     const socios = config.socios_real > 0 ? config.socios_real : (config.socios_activos || 30);
     
-    // Actualizar título principal
-    const tituloElement = document.querySelector('.acerca-title');
-    if (tituloElement) {
-        tituloElement.textContent = nombre + ' - Paso a Paso';
+    // Actualizar elementos por ID (nuevo HTML)
+    const orgNombreHero = document.getElementById('org-nombre-hero');
+    if (orgNombreHero) {
+        orgNombreHero.textContent = nombre;
     }
     
-    // Actualizar descripción principal
-    const descripcionElement = document.querySelector('.acerca-subtitle');
-    if (descripcionElement) {
-        descripcionElement.textContent = `Somos una asociación civil sin fines de lucro con más de ${anos} años de experiencia trabajando en la región Mixteca de Oaxaca. Nuestro nombre, que significa "paso a paso" en lengua mixteca, refleja nuestra filosofía de trabajo: construir comunidad de manera gradual, sostenible y con la participación activa de todos los miembros.`;
+    const orgNombreDesc = document.getElementById('org-nombre-desc');
+    if (orgNombreDesc) {
+        orgNombreDesc.textContent = nombre + ' - Paso a Paso';
     }
     
-    // Actualizar misión
-    const misionElement = document.querySelector('.mv-card:first-child .mv-text');
-    if (misionElement) {
-        misionElement.textContent = config.mision || 'Promover el bienestar social y el desarrollo integral de las comunidades de la región Mixteca a través de programas de medio ambiente, deporte, cultura y emprendimiento, con especial énfasis en grupos vulnerables como mujeres y adultos mayores.';
+    const orgDescripcion = document.getElementById('org-descripcion');
+    if (orgDescripcion) {
+        orgDescripcion.textContent = `Somos una asociación civil sin fines de lucro con más de ${anos} años de experiencia trabajando en la región Mixteca de Oaxaca. Nuestro nombre refleja nuestra filosofía de trabajo: construir comunidad de manera gradual, sostenible y con la participación activa de todos los miembros.`;
     }
     
-    // Actualizar visión
-    const visionElement = document.querySelector('.mv-card:last-child .mv-text');
-    if (visionElement) {
-        visionElement.textContent = config.vision || 'Ser una organización líder en el desarrollo comunitario de la región Mixteca, reconocida por su impacto social positivo, transparencia en la gestión de recursos y capacidad de generar cambios sostenibles en la calidad de vida de las personas.';
+    const heroDescripcion = document.getElementById('hero-descripcion');
+    if (heroDescripcion) {
+        heroDescripcion.textContent = 'Conoce nuestra historia, misión y el impacto que generamos en la región Mixteca de Oaxaca';
+    }
+    
+    const orgMision = document.getElementById('org-mision');
+    if (orgMision) {
+        orgMision.textContent = config.mision || 'Promover el bienestar social y el desarrollo integral de las comunidades de la región Mixteca a través de programas de medio ambiente, deporte, cultura y emprendimiento, con especial énfasis en grupos vulnerables como mujeres y adultos mayores.';
+    }
+    
+    const orgVision = document.getElementById('org-vision');
+    if (orgVision) {
+        orgVision.textContent = config.vision || 'Ser una organización líder en el desarrollo comunitario de la región Mixteca, reconocida por su impacto social positivo, transparencia en la gestión de recursos y capacidad de generar cambios sostenibles en la calidad de vida de las personas.';
     }
     
     // Actualizar estadísticas con animación
-    const statNumbers = document.querySelectorAll('.stat-number-big');
-    
-    if (statNumbers[0]) {
-        animarNumero(statNumbers[0], beneficiarios, `${beneficiarios}+`);
+    const statBeneficiarios = document.getElementById('stat-beneficiarios');
+    if (statBeneficiarios) {
+        animarNumero(statBeneficiarios, beneficiarios, `${beneficiarios}+`);
     }
     
-    if (statNumbers[1]) {
-        animarNumero(statNumbers[1], eventos, `${eventos}+`);
+    const statEventos = document.getElementById('stat-eventos');
+    if (statEventos) {
+        animarNumero(statEventos, eventos, `${eventos}+`);
     }
     
-    if (statNumbers[2]) {
-        animarNumero(statNumbers[2], socios, `${socios}+`);
+    const statSocios = document.getElementById('stat-socios');
+    if (statSocios) {
+        animarNumero(statSocios, socios, `${socios}+`);
     }
     
-    if (statNumbers[3]) {
-        animarNumero(statNumbers[3], parseInt(anos), `${anos}+`);
+    const statAnos = document.getElementById('stat-anos');
+    if (statAnos) {
+        animarNumero(statAnos, parseInt(anos), `${anos}+`);
+    }
+    
+    const anosExpSub = document.getElementById('anos-exp-sub');
+    if (anosExpSub) {
+        anosExpSub.textContent = anos;
     }
     
     // Actualizar información de contacto
-    const direccion = (config.direccion || 'Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca<br>México, C.P. 69600');
+    const direccion = (config.direccion || 'Abasolo 27, Barrio las Flores, Asunción Nochixtlán, Oaxaca, México');
     
-    const direccionElement = document.querySelector('.contacto-item:nth-child(1) .contacto-text');
-    if (direccionElement) {
-        direccionElement.innerHTML = direccion.replace(/,\s*/g, '<br>');
+    const contactDireccion = document.getElementById('contact-direccion');
+    if (contactDireccion) {
+        contactDireccion.innerHTML = direccion.replace(/,\s*/g, '<br>');
     }
     
-    const emailElement = document.querySelector('.contacto-item:nth-child(2) .contacto-text');
-    if (emailElement) {
-        emailElement.textContent = config.email || 'contacto@kuenikueni.org';
+    const contactEmail = document.getElementById('contact-email');
+    if (contactEmail) {
+        contactEmail.textContent = config.email || 'contacto@kuenikueni.org';
     }
     
-    const telefonoElement = document.querySelector('.contacto-item:nth-child(3) .contacto-text');
-    if (telefonoElement) {
-        telefonoElement.textContent = config.telefono || '+52 951 123 4567';
+    const contactTelefono = document.getElementById('contact-telefono');
+    if (contactTelefono) {
+        contactTelefono.textContent = config.telefono || '+52 951 123 4567';
     }
     
-    // Cargar áreas de trabajo
-    cargarAreasTrabajo();
-    
-    console.log('✅ UI actualizada');
+    console.log('✅ UI actualizada correctamente');
 }
 
 // ============================================================================
-// CARGAR ÁREAS DE TRABAJO DESDE EVENTOS
+// USAR DATOS POR DEFECTO SI FALLA LA CARGA
 // ============================================================================
 
-async function cargarAreasTrabajo() {
-    try {
-        const { data: eventos, error } = await window.supabaseClient
-            .from('eventos')
-            .select('categoria')
-            .order('categoria');
-        
-        if (error) {
-            console.error('Error al cargar categorías:', error);
-            return;
-        }
-        
-        if (eventos && eventos.length > 0) {
-            const categoriasUnicas = [...new Set(eventos.map(e => e.categoria))].filter(Boolean);
-            
-            const descripciones = {
-                'Medio Ambiente': 'Proyectos de reforestación, conservación de recursos naturales y educación ambiental para promover prácticas sostenibles en la comunidad.',
-                'Deportes': 'Torneos deportivos, actividades recreativas y programas de activación física para promover la salud y la integración social.',
-                'Deporte': 'Torneos deportivos, actividades recreativas y programas de activación física para promover la salud y la integración social.',
-                'Cultura': 'Talleres de artesanías tradicionales, eventos culturales y actividades para preservar y promover el patrimonio cultural mixteco.',
-                'Emprendimiento': 'Capacitaciones, asesorías y apoyo para el desarrollo de proyectos productivos y negocios locales sostenibles.',
-                'Salud': 'Programas de salud preventiva, campañas de bienestar y actividades para promover estilos de vida saludables.',
-                'Educación': 'Talleres educativos, capacitaciones y programas de formación para el desarrollo de habilidades.',
-                'Otro': 'Diversas actividades comunitarias y proyectos especiales para el beneficio de la comunidad.'
-            };
-            
-            const areasGrid = document.querySelector('.areas-grid');
-            if (!areasGrid) return;
-            
-            if (categoriasUnicas.length > 0) {
-                areasGrid.innerHTML = categoriasUnicas.map(cat => `
-                    <div class="area-card">
-                        <h4 class="area-title">${cat}</h4>
-                        <p class="area-desc">${descripciones[cat] || `Actividades y proyectos relacionados con ${cat.toLowerCase()}.`}</p>
-                    </div>
-                `).join('');
-                
-                console.log('✅ Áreas actualizadas:', categoriasUnicas);
-            }
-        }
-    } catch (error) {
-        console.error('Error al cargar áreas:', error);
-    }
+function usarDatosPorDefecto() {
+    console.log('⚠️ Usando datos por defecto');
+    
+    config.nombre_organizacion = 'Kueni Kueni';
+    config.anos_experiencia = '11';
+    config.beneficiarios_directos = 500;
+    config.eventos_realizados = 50;
+    config.socios_activos = 30;
+    config.direccion = 'Abasolo 27, Barrio las Flores, Asunción Nochixtlán, Oaxaca, México';
+    config.email = 'contacto@kuenikueni.org';
+    config.telefono = '+52 951 123 4567';
+    config.mision = 'Promover el bienestar social y el desarrollo integral de las comunidades de la región Mixteca a través de programas de medio ambiente, deporte, cultura y emprendimiento, con especial énfasis en grupos vulnerables como mujeres y adultos mayores.';
+    config.vision = 'Ser una organización líder en el desarrollo comunitario de la región Mixteca, reconocida por su impacto social positivo, transparencia en la gestión de recursos y capacidad de generar cambios sostenibles en la calidad de vida de las personas.';
+    
+    actualizarUI();
 }
 
 // ============================================================================
@@ -249,18 +233,8 @@ async function cargarAreasTrabajo() {
 // ============================================================================
 
 function configurarEventListeners() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            if (confirm('¿Cerrar sesión?')) {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        });
-    }
-    
     // Animaciones al hacer scroll
-    const elementos = document.querySelectorAll('.acerca-card, .mv-card, .area-card, .stats-section, .contacto-section');
+    const elementos = document.querySelectorAll('.description-card, .card, .area-card, .impact, .contact');
     
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -341,11 +315,11 @@ style.textContent = `
         to { transform: translateX(400px); opacity: 0; }
     }
     
-    .stat-number-big {
+    .stat-number {
         transition: transform 0.3s ease;
     }
     
-    .stat-box:hover .stat-number-big {
+    .stat-card:hover .stat-number {
         transform: scale(1.15);
         color: #5f0d51;
     }
@@ -360,29 +334,29 @@ style.textContent = `
         border-color: #5f0d51;
     }
     
-    .mv-card {
+    .card {
         transition: all 0.3s ease;
     }
     
-    .mv-card:hover {
+    .card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 20px rgba(95, 13, 81, 0.15);
         border-color: #5f0d51;
     }
     
-    .acerca-card {
+    .description-card {
         transition: all 0.3s ease;
     }
     
-    .acerca-card:hover {
+    .description-card:hover {
         box-shadow: 0 8px 20px rgba(95, 13, 81, 0.1);
     }
     
-    .contacto-item {
+    .contact-item {
         transition: all 0.3s ease;
     }
     
-    .contacto-item:hover .contacto-icon {
+    .contact-item:hover .contact-icon {
         transform: scale(1.1);
         background: #f4e4f0;
     }

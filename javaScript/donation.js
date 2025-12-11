@@ -1,6 +1,5 @@
 // donation.js - Sistema de donaciones con validación de tarjetas y conexión a Supabase
-
-// Definir tipos de tarjetas con sus patrones
+const EMAIL_SERVER_URL = 'https://kuenikueniapp17-11-2-0.onrender.com';
 const cardTypes = {
     visa: {
         pattern: /^4/,
@@ -466,61 +465,131 @@ if (detectedCard) {
     // ============================================
     // GUARDAR DONACIÓN EN SUPABASE
     // ============================================
+    
     async function guardarDonacion(datos) {
-        if (!window.supabaseClient) {
-            mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
-            console.error('Supabase no está configurado');
+    if (!window.supabaseClient) {
+        mostrarMensaje('Error: No se pudo conectar con la base de datos', 'error');
+        console.error('Supabase no está configurado');
+        return;
+    }
+
+    try {
+        mostrarCargando(true);
+
+        console.log('Guardando donación...');
+
+        // 1. Guardar donación en Supabase
+        const { data, error } = await window.supabaseClient
+            .from('donaciones')
+            .insert([datos])
+            .select();
+
+        if (error) {
+            console.error('Error al guardar donación:', error);
+            mostrarMensaje('Error al procesar la donación. Intenta nuevamente.', 'error');
             return;
         }
 
+        console.log('Donación guardada exitosamente:', data);
+
+        // 2. Preparar datos para los correos
+        const fechaFormateada = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const destinoTexto = document.getElementById('destino').options[document.getElementById('destino').selectedIndex].text;
+        const mensajeOpcional = document.getElementById('mensaje').value.trim();
+
+        // 3. Enviar correo de agradecimiento al donante
         try {
-            mostrarCargando(true);
+            console.log('Enviando correo de agradecimiento al donante...');
+            const thankYouResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-thank-you`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: datos.donante_email,
+                    nombre: datos.donante_nombre,
+                    monto: datos.monto,
+                    moneda: datos.moneda,
+                    referencia: datos.referencia_pago,
+                    destino: destinoTexto,
+                    fecha: fechaFormateada
+                })
+            });
 
-            console.log('Guardando donación...');
-
-            const { data, error } = await window.supabaseClient
-                .from('donaciones')
-                .insert([datos])
-                .select();
-
-            if (error) {
-                console.error('Error al guardar donación:', error);
-                mostrarMensaje('Error al procesar la donación. Intenta nuevamente.', 'error');
-                return;
+            if (thankYouResponse.ok) {
+                console.log('Correo de agradecimiento enviado al donante');
+            } else {
+                console.log('No se pudo enviar correo al donante (no crítico)');
             }
-
-            console.log('Donación guardada exitosamente:', data);
-
-            // Mostrar mensaje de éxito
-            mostrarMensajeExito(datos);
-
-            // Limpiar formulario después de 3 segundos
-            setTimeout(() => {
-                donationForm.reset();
-                selectedAmount = 0;
-                currentCardType = null;
-                updateSummary();
-                amountButtons.forEach(btn => btn.classList.remove('selected'));
-                customAmountInput.style.display = 'none';
-                
-                // Limpiar estados de validación
-                cardNumber.classList.remove('valid', 'invalid');
-                expiry.classList.remove('valid', 'invalid');
-                cvv.classList.remove('valid', 'invalid');
-                
-                const logoContainer = document.getElementById('card-logo');
-                if (logoContainer) {
-                    logoContainer.classList.remove('active');
-                }
-            }, 3000);
-
-        } catch (error) {
-            console.error('Error inesperado:', error);
-            mostrarMensaje('Error al procesar la donación', 'error');
-        } finally {
-            mostrarCargando(false);
+        } catch (emailError) {
+            console.log('Error al enviar correo al donante (no crítico):', emailError);
         }
+
+
+        // 4. Enviar notificación al administrador
+        try {
+            console.log('Enviando notificación al administrador...');
+            const notificationResponse = await fetch(`${EMAIL_SERVER_URL}/send-donation-notification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    donante_nombre: datos.donante_nombre,
+                    donante_email: datos.donante_email,
+                    donante_telefono: datos.donante_telefono,
+                    monto: datos.monto,
+                    moneda: datos.moneda,
+                    referencia: datos.referencia_pago,
+                    destino: destinoTexto,
+                    fecha: fechaFormateada,
+                    metodo_pago: datos.metodo_pago,
+                    mensaje: mensajeOpcional || null
+                })
+            });
+
+            if (notificationResponse.ok) {
+                console.log('Notificación enviada al administrador');
+            } else {
+                console.log('No se pudo enviar notificación al administrador (no crítico)');
+            }
+        } catch (emailError) {
+            console.log('Error al enviar notificación al administrador (no crítico):', emailError);
+        }
+
+        // 5. Mostrar mensaje de éxito
+        mostrarMensajeExito(datos);
+
+        // 6. Limpiar formulario después de 3 segundos
+        setTimeout(() => {
+            donationForm.reset();
+            selectedAmount = 0;
+            currentCardType = null;
+            updateSummary();
+            amountButtons.forEach(btn => btn.classList.remove('selected'));
+            customAmountInput.style.display = 'none';
+            
+            // Limpiar estados de validación
+            cardNumber.classList.remove('valid', 'invalid');
+            expiry.classList.remove('valid', 'invalid');
+            cvv.classList.remove('valid', 'invalid');
+            
+            const logoContainer = document.getElementById('card-logo');
+            if (logoContainer) {
+                logoContainer.classList.remove('active');
+            }
+        }, 3000);
+
+    } catch (error) {
+        console.error('Error inesperado:', error);
+        mostrarMensaje('Error al procesar la donación', 'error');
+    } finally {
+        mostrarCargando(false);
     }
+}
 
     // ============================================
     // FUNCIONES AUXILIARES
@@ -574,28 +643,31 @@ if (detectedCard) {
         }, 5000);
     }
 
-    function mostrarMensajeExito(datos) {
-        const container = document.querySelector('.message-container') || (() => {
-            const el = document.createElement('div');
-            el.className = 'message-container';
-            donationForm.insertBefore(el, donationForm.firstChild);
-            return el;
-        })();
+   function mostrarMensajeExito(datos) {
+    const container = document.querySelector('.message-container') || (() => {
+        const el = document.createElement('div');
+        el.className = 'message-container';
+        donationForm.insertBefore(el, donationForm.firstChild);
+        return el;
+    })();
 
-        container.innerHTML = `
-            <div class="message message-success">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎉</div>
-                <h4 style="margin: 0 0 0.5rem 0;">¡Donación exitosa!</h4>
-                <p style="margin: 0;">Gracias <strong>${datos.donante_nombre}</strong> por tu donación de <strong>$${datos.monto.toLocaleString('es-MX')} MXN</strong></p>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; opacity: 0.8;">
-                    Referencia: ${datos.referencia_pago}
-                </p>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">
-                    Recibirás un correo de confirmación en <strong>${datos.donante_email}</strong>
-                </p>
-            </div>
-        `;
-    }
+    container.innerHTML = `
+        <div class="message message-success">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎉</div>
+            <h4 style="margin: 0 0 0.5rem 0;">¡Donación exitosa!</h4>
+            <p style="margin: 0;">Gracias <strong>${datos.donante_nombre}</strong> por tu donación de <strong>$${datos.monto.toLocaleString('es-MX')} MXN</strong></p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; opacity: 0.8;">
+                Referencia: ${datos.referencia_pago}
+            </p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">
+                 Recibirás un correo de confirmación con el comprobante en <strong>${datos.donante_email}</strong>
+            </p>
+            <p style="margin: 0.3rem 0 0 0; font-size: 0.8rem; color: #666;">
+                También hemos notificado a nuestro equipo sobre tu generosa contribución
+            </p>
+        </div>
+    `;
+}
 
     function mostrarCargando(mostrar) {
         const submitBtn = donationForm.querySelector('button[type="submit"]');

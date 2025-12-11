@@ -168,6 +168,7 @@
                         <th>EVENTOS</th>
                         <th>DONACIONES</th>
                         <th>ESTADO</th>
+                        <th>ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody id="tablaSocios"></tbody>
@@ -297,6 +298,238 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DETALLES DEL SOCIO -->
+        <div id="modalDetallesSocio" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-content-large">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="detallesNombreSocio">Detalles del Socio</h2>
+                        <p id="detallesEmailSocio"></p>
+                    </div>
+                    <button id="btnCerrarDetalles" class="btn-close">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- SECCIÓN DE INFORMACIÓN PERSONAL -->
+                    <div class="detalles-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Información del Socio
+                        </h3>
+                        <div class="info-personal-grid">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    Nombre Completo
+                                </div>
+                                <div class="info-value" id="infoNombre">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Correo Electrónico
+                                </div>
+                                <div class="info-value" id="infoEmail">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                    Teléfono
+                                </div>
+                                <div class="info-value" id="infoTelefono">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Fecha de Ingreso
+                                </div>
+                                <div class="info-value" id="infoFechaIngreso">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 11l3 3L22 4"></path>
+                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                    </svg>
+                                    Estado
+                                </div>
+                                <div class="info-value" id="infoEstado">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Eventos Asistidos
+                                </div>
+                                <div class="info-value" id="infoEventosAsistidos">-</div>
+                            </div>
+                        </div>
+                        <div class="info-notas" id="infoNotasContainer" style="display:none;">
+                            <div class="info-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Notas
+                            </div>
+                            <div class="info-value info-notas-text" id="infoNotas">-</div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN DE KPIs -->
+                    <div class="detalles-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            Resumen Financiero
+                        </h3>
+                        <div class="kpis-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-icon kpi-total">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 6v6l4 2"></path>
+                                    </svg>
+                                </div>
+                                <div class="kpi-info">
+                                    <div class="kpi-label">Total Histórico</div>
+                                    <div class="kpi-value" id="kpiTotalHistorico">$0</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon kpi-year">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                </div>
+                                <div class="kpi-info">
+                                    <div class="kpi-label">Total Año <span id="kpiYearLabel"></span></div>
+                                    <div class="kpi-value" id="kpiTotalYear">$0</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon kpi-month">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10H3"></path>
+                                        <path d="M21 6H3"></path>
+                                        <path d="M21 14H3"></path>
+                                        <path d="M21 18H3"></path>
+                                    </svg>
+                                </div>
+                                <div class="kpi-info">
+                                    <div class="kpi-label">Total Mes <span id="kpiMonthLabel"></span></div>
+                                    <div class="kpi-value" id="kpiTotalMonth">$0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN DE HISTORIAL DE DONACIONES -->
+                    <div class="detalles-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                            Últimas 5 Donaciones
+                        </h3>
+                        <div class="historial-container">
+                            <table class="historial-table" id="tablaHistorialDonaciones">
+                                <thead>
+                                    <tr>
+                                        <th>FECHA</th>
+                                        <th>MONTO</th>
+                                        <th>MÉTODO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="3" style="text-align:center;padding:2rem;">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN DE CORREO DE AGRADECIMIENTO -->
+                    <div class="detalles-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Enviar Correo de Agradecimiento
+                        </h3>
+
+                        <div class="email-form">
+                            <div class="plantillas-buttons">
+                                <button type="button" class="btn-plantilla" id="btnPlantillaMensual">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Plantilla Mensual
+                                </button>
+                                <button type="button" class="btn-plantilla" id="btnPlantillaAnual">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Plantilla Anual
+                                </button>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emailAsunto">Asunto</label>
+                                <input type="text" id="emailAsunto" class="form-input" placeholder="Ej: Gracias por tu donación de Diciembre">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emailCuerpo">Mensaje</label>
+                                <textarea id="emailCuerpo" class="form-textarea" rows="8" placeholder="Escribe tu mensaje de agradecimiento aquí..."></textarea>
+                            </div>
+
+                            <div id="emailMessage" class="email-message"></div>
+
+                            <button type="button" class="btn-enviar-email" id="btnEnviarAgradecimiento">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                                <span id="btnEnviarText">Enviar Agradecimiento</span>
+                                <span id="btnEnviarLoader" style="display:none;"><span class="loader-small"></span> Enviando...</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

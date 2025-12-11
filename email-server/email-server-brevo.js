@@ -221,7 +221,7 @@ app.post('/send-recovery-email', async (req, res) => {
                             </div>
                             
                             <center>
-                                <a href="${process.env.FRONTEND_URL || 'http://localhost'}/login.html" class="button">Iniciar Sesión</a>
+                                <a href="${process.env.FRONTEND_URL || 'https://jose43luis.github.io/KueniKueniApp17-11-2.0'}/login.html" class="button">Iniciar Sesión</a>
                             </center>
                             
                             <p style="margin-top: 30px; font-size: 14px; color: #6b7280;">
@@ -316,7 +316,7 @@ app.post('/send-welcome-email', async (req, res) => {
                         <p>Estamos muy contentos de que te hayas unido a nuestra comunidad.</p>
                         <p>Ahora puedes acceder a todos nuestros servicios y eventos.</p>
                         <center>
-                            <a href="${process.env.FRONTEND_URL || 'http://localhost'}/login.html" class="button">Iniciar Sesión</a>
+                            <a href="${process.env.FRONTEND_URL || 'https://jose43luis.github.io/KueniKueniApp17-11-2.0'}/login.html" class="button">Iniciar Sesión</a>
                         </center>
                     </div>
                 </body>
@@ -463,6 +463,100 @@ app.post('/send-event-confirmation', async (req, res) => {
         res.json({ success: true, message: 'Confirmación enviada' });
     } catch (error) {
         res.status(500).json({ error: 'Error al enviar confirmación' });
+    }
+});
+
+// ===================================================
+// ENVIAR CORREO DE AGRADECIMIENTO PERSONALIZADO (REVISADO)
+// ===================================================
+app.post('/send-thanks-email', async (req, res) => {
+    try {
+        const { email, nombre, asunto, mensaje } = req.body;
+
+        // 1. Validación de campos: Asegúrate de que todos los campos existan y no estén vacíos.
+        const missingFields = [];
+        if (!email) missingFields.push('email');
+        if (!nombre) missingFields.push('nombre');
+        if (!asunto) missingFields.push('asunto');
+        if (!mensaje) missingFields.push('mensaje');
+
+        if (missingFields.length > 0) {
+            console.error('❌ Campos faltantes:', missingFields.join(', '));
+            return res.status(400).json({
+                error: `Faltan los siguientes campos requeridos: ${missingFields.join(', ')}`
+            });
+        }
+
+        console.log('📧 Enviando correo de agradecimiento a:', email);
+
+        // 2. Configuración del correo
+        const mailOptions = {
+            from: `"Kueni Kueni" <${process.env.BREVO_USER}>`,
+            to: email,
+            subject: asunto,
+            // 3. El cuerpo HTML: Usa 'mensaje' y reemplaza los saltos de línea (\n) por <br>
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { /* ... */ }
+                        .container { /* ... */ }
+                        .header { /* ... */ }
+                        .content {
+                            /* Se mantiene el white-space: pre-line; para que maneje saltos de línea */
+                            margin: 30px 0;
+                            line-height: 1.8;
+                            white-space: pre-line; 
+                        }
+                        /* ... (resto de estilos) ... */
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="logo">💜</div>
+                            <h1>Kueni Kueni</h1>
+                            <p class="subtitle">Mensaje de Agradecimiento</p>
+                        </div>
+
+                        <div class="content">
+                            Hola <strong>${nombre}</strong>,
+                            
+                            ${mensaje}
+                        </div>
+                        
+                        <center>
+                            <a href="${process.env.FRONTEND_URL || 'https://jose43luis.github.io/KueniKueniApp17-11-2.0'}/login.html" class="button">Visitar Kueni Kueni</a>
+                        </center>
+
+                        <div class="footer">
+                            <p><strong>Kueni Kueni</strong></p>
+                            <p>Asociación Civil sin fines de lucro</p>
+                            <p>Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+
+        console.log('✅ Correo de agradecimiento enviado exitosamente:', info.messageId);
+
+        res.json({
+            success: true,
+            message: 'Correo de agradecimiento enviado exitosamente',
+            email: email
+        });
+
+    } catch (error) {
+        console.error('❌ Error al enviar correo de agradecimiento:', error);
+        res.status(500).json({
+            error: 'Error al enviar el correo',
+            details: error.message
+        });
     }
 });
 

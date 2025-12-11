@@ -279,9 +279,9 @@ function aplicarFiltrosYRedibujarSocios() {
         const telefono = (socio.usuarios?.telefono || '').toLowerCase();
         if (buscar && !(nombre.includes(buscar) || email.includes(buscar) || telefono.includes(buscar))) return false;
 
-        // CORREGIDO: Obtener estado desde la tabla socios, no usuarios
+        // CORREGIDO: Obtener estado desde la tabla usuarios
         if (estado && estado.trim() !== '') {
-            const socioEstado = (socio.estado || 'activo').toLowerCase();
+            const socioEstado = (socio.usuarios?.estado || 'activo').toLowerCase();
             const estadoFiltro = estado.toLowerCase();
             if (socioEstado !== estadoFiltro) return false;
         }
@@ -341,8 +341,8 @@ function mostrarSociosPaginados() {
         const fecha = socio.fecha_ingreso || 'N/A';
         const eventos = socio.total_eventos_asistidos || 0;
         const donaciones = Math.round(parseFloat(socio.total_donaciones || 0));
-        // CORREGIDO: Obtener estado desde la tabla socios, no usuarios
-        const estado = socio.estado || 'activo';
+        // CORREGIDO: Obtener estado desde la tabla usuarios
+        const estado = socio.usuarios?.estado || 'activo';
 
         return `
             <tr>
@@ -502,8 +502,8 @@ async function abrirDetallesSocio(socioId, emailSocio) {
         }) : 'N/A';
         document.getElementById('infoFechaIngreso').textContent = fechaIngreso;
 
-        // Estado del socio (usar el campo estado de la tabla socios, NO del usuario)
-        const estadoSocio = socio.estado || 'activo';
+        // Estado del socio (usar el campo estado de la tabla usuarios, NO de socios)
+        const estadoSocio = socio.usuarios?.estado || 'activo';
         const estadoHTML = `<span style="display:inline-block;background:${estadoSocio === 'activo' ? '#d1fae5' : '#fee2e2'};color:${estadoSocio === 'activo' ? '#065f46' : '#991b1b'};padding:0.25rem 0.75rem;border-radius:6px;font-size:0.75rem;font-weight:600;">${estadoSocio === 'activo' ? 'Activo' : 'Inactivo'}</span>`;
         document.getElementById('infoEstado').innerHTML = estadoHTML;
 

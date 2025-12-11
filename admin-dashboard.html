@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/admin-sidebar.css">
     <link rel="stylesheet" href="styles/admin-common.css">
+    <link rel="stylesheet" href="styles/page-header.css">
     <link rel="stylesheet" href="styles/admin-dashboard.css">
 </head>
 
@@ -96,13 +97,12 @@
 
     <main class="main-content">
         <!-- Header -->
-        <div class="page-header">
-            <div>
-                <h1>Panel de Supervisión</h1>
-                <p>Vista general de las operaciones - Solo Lectura</p>
+        <header class="page-header">
+            <div class="page-header-info">
+                <h1>Panel de Control</h1>
+                <p class="subtitle">Vista general de la administración de Kueni Kueni</p>
             </div>
-            <!--  ELIMINADO: Botón Crear Evento -->
-        </div>
+        </header>
 
         <!-- Estadísticas -->
         <div class="stats-grid">

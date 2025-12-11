@@ -530,6 +530,7 @@ if (detectedCard) {
             console.log('Error al enviar correo al donante (no crítico):', emailError);
         }
 
+
         // 4. Enviar notificación al administrador
         try {
             console.log('Enviando notificación al administrador...');

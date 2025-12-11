@@ -58,6 +58,7 @@ function configurarEventos() {
     });
 
     document.querySelector('.btn-exportar')?.addEventListener('click', exportarReporte);
+    document.querySelector('#btnExportarReporte')?.addEventListener('click', exportarReporte);
 }
 
 async function cargarDatos() {

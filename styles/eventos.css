@@ -120,7 +120,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 24px;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
 }
 
 .evento-card {
@@ -255,6 +255,130 @@
     }
 }
 
+/* ============================================
+   ESTILOS DE PAGINACIÓN
+   ============================================ */
+
+.paginacion-container {
+    margin-top: 40px;
+    margin-bottom: 60px;
+}
+
+.paginacion-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-light, #e4e4e7);
+    flex-wrap: wrap;
+}
+
+.paginacion-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.paginacion-btn {
+    padding: 10px 16px;
+    background-color: var(--primary-green, #5f0d51);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.paginacion-btn:hover:not(:disabled) {
+    background-color: #4d094d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(95, 13, 81, 0.2);
+}
+
+.paginacion-btn:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.paginacion-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.paginacion-texto {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark, #18181b);
+    min-width: 150px;
+    text-align: center;
+}
+
+.paginacion-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.paginacion-selector label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark, #18181b);
+}
+
+.items-per-page {
+    padding: 8px 12px;
+    background-color: white;
+    border: 1px solid var(--border-light, #e4e4e7);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dark, #18181b);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f0d51' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 20px;
+    padding-right: 32px;
+}
+
+.items-per-page:hover {
+    border-color: var(--primary-green, #5f0d51);
+    background-color: #faf9f7;
+}
+
+.items-per-page:focus {
+    outline: none;
+    border-color: var(--primary-green, #5f0d51);
+    box-shadow: 0 0 0 3px rgba(95, 13, 81, 0.1);
+}
+
+/* Animación de carga */
+@keyframes fadeInPagination {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.paginacion-container {
+    animation: fadeInPagination 0.3s ease;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header1 {
@@ -318,6 +442,153 @@
     .loading-message {
         padding: 60px 20px;
     }
+
+    /* Paginación responsive tablet */
+    .paginacion-wrapper {
+        gap: 16px;
+        padding: 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .paginacion-info {
+        flex-direction: column;
+        gap: 12px;
+        min-width: auto;
+    }
+
+    .paginacion-btn {
+        flex: 1;
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    .paginacion-texto {
+        min-width: auto;
+        flex: 1;
+        padding: 8px 0;
+    }
+
+    .paginacion-selector {
+        flex: 1;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .items-per-page {
+        flex: 1;
+        padding: 10px 12px;
+        padding-right: 32px;
+        font-size: 13px;
+    }
+}
+
+/* Responsive - Móvil */
+@media (max-width: 480px) {
+    .header1 {
+        padding: 70px 0 30px;
+        margin-top: 50px;
+    }
+
+    .header1 h1 {
+        font-size: 28px;
+    }
+
+    .header1 p {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .tabs {
+        margin: 24px 0 20px;
+        gap: 2px;
+    }
+
+    .tab {
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+
+    .tab-badge {
+        min-width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+
+    .eventos-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .evento-card {
+        padding: 16px;
+    }
+
+    .evento-titulo {
+        font-size: 18px;
+    }
+
+    .evento-info {
+        gap: 10px;
+    }
+
+    .evento-info-item {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    .empty-message,
+    .loading-message {
+        padding: 40px 16px;
+        font-size: 14px;
+    }
+
+    /* Paginación responsive móvil */
+    .paginacion-wrapper {
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .paginacion-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .paginacion-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+        flex: 1;
+    }
+
+    .paginacion-texto {
+        font-size: 13px;
+        padding: 6px 0;
+    }
+
+    .paginacion-selector {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .paginacion-selector label {
+        font-size: 12px;
+    }
+
+    .items-per-page {
+        width: 100%;
+        padding: 8px 10px;
+        padding-right: 28px;
+        font-size: 12px;
+    }
+
+    .paginacion-container {
+        margin-top: 24px;
+        margin-bottom: 40px;
+    }
 }
 
 /* Animaciones adicionales */
@@ -342,3 +613,6 @@
 .evento-card:nth-child(4) { animation-delay: 0.2s; }
 .evento-card:nth-child(5) { animation-delay: 0.25s; }
 .evento-card:nth-child(6) { animation-delay: 0.3s; }
+.evento-card:nth-child(7) { animation-delay: 0.35s; }
+.evento-card:nth-child(8) { animation-delay: 0.4s; }
+.evento-card:nth-child(9) { animation-delay: 0.45s; }

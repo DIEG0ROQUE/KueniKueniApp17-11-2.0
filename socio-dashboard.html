@@ -7,6 +7,7 @@
     <title>Dashboard - Portal de Socios</title>
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/socio-dashboard.css">
+    <link rel="stylesheet" href="styles/inactive-account.css">
 </head>
 
 <body class="socio-body">
@@ -76,6 +77,28 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        
+        <!-- Mensaje de Cuenta Inactiva (oculto por defecto) -->
+        <div id="inactiveAccountAlert" class="inactive-account-container" style="display: none;">
+            <div class="inactive-card">
+                <div class="inactive-icon">
+                    ⚠️
+                </div>
+                <h2>Cuenta Inactiva</h2>
+                <p class="inactive-description">Tu cuenta está actualmente inactiva.</p>
+                <p class="inactive-warning">📅 Hace más de 3 meses que no has realizado ninguna donación, por eso tu cuenta se desactivó automáticamente.</p>
+                <p class="inactive-subdescription">Para reactivar tu cuenta, haz clic en el botón de abajo.</p>
+                <button class="btn-activate" id="btnActivarCuenta">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                    Activar mi Cuenta
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Normal (visible solo si está activo) -->
+        <div id="activeDashboard">
         <!-- Header -->
         <header class="dashboard-header">
             <div>
@@ -185,12 +208,14 @@
                 </div>
             </div>
         </section>
+        </div><!-- Fin activeDashboard -->
     </main>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="javaScript/supabase-config.js"></script>
     <script src="javaScript/cerrarsesion.js"></script>
+    <script src="javaScript/socio-cuenta-estado.js"></script>
     <script src="javaScript/socio-dashboard.js"></script>
 </body>
 

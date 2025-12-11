@@ -1,0 +1,129 @@
+
+/* ================================================
+   ESTILOS PARA CUENTA INACTIVA
+   ================================================ */
+
+.inactive-account-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 2rem;
+}
+
+.inactive-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(95, 13, 81, 0.1);
+    border: 2px solid #f0d8dc;
+}
+
+.inactive-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.inactive-card h2 {
+    color: #ca8a04;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.inactive-description {
+    color: #52525b;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.inactive-subdescription {
+    color: #71717a;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.btn-activate {
+    background: linear-gradient(135deg, #5f0d51 0%, #92487A 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(95, 13, 81, 0.3);
+}
+
+.btn-activate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(95, 13, 81, 0.4);
+}
+
+.btn-activate:active {
+    transform: translateY(0);
+}
+
+/* Botón Desactivar Cuenta en Sidebar */
+.deactivate-btn {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    background: transparent;
+    border: 2px solid #ef4444;
+    color: #ef4444;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    margin-bottom: 0.75rem;
+}
+
+.deactivate-btn:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateX(4px);
+}
+
+.deactivate-btn svg {
+    flex-shrink: 0;
+}
+
+/* Ocultar navegación cuando está inactivo */
+.sidebar.inactive-mode .sidebar-nav {
+    display: none;
+}
+
+.sidebar.inactive-mode .deactivate-btn {
+    display: none;
+}
+
+/* Mensaje de advertencia sobre donaciones */
+.inactive-warning {
+    background: #FEF3C7;
+    border-left: 4px solid #F59E0B;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    color: #92400E;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-weight: 500;
+}

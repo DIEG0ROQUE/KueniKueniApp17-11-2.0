@@ -75,18 +75,21 @@
             <div id="eventosProximos" class="eventos-grid">
                 <div class="loading-message">Cargando eventos próximos...</div>
             </div>
+            <div id="paginacionProximos" class="paginacion-container"></div>
         </div>
 
         <div id="tab-en-curso" class="tab-content">
             <div id="eventosEnCurso" class="eventos-grid">
                 <div class="loading-message">Cargando eventos en curso...</div>
             </div>
+            <div id="paginacionEnCurso" class="paginacion-container"></div>
         </div>
 
         <div id="tab-completados" class="tab-content">
             <div id="eventosCompletados" class="eventos-grid">
                 <div class="loading-message">Cargando eventos completados...</div>
             </div>
+            <div id="paginacionCompletados" class="paginacion-container"></div>
         </div>
     </div>
 
@@ -138,6 +141,19 @@
 
     <script src="javaScript/supabase-config.js"></script>
     <script>
+        // Estado de paginación
+        const paginationState = {
+            proximos: { currentPage: 1, itemsPerPage: 10, totalItems: 0 },
+            'en-curso': { currentPage: 1, itemsPerPage: 10, totalItems: 0 },
+            completados: { currentPage: 1, itemsPerPage: 10, totalItems: 0 }
+        };
+
+        const eventosData = {
+            proximos: [],
+            'en-curso': [],
+            completados: []
+        };
+
         // Tabs functionality
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -158,54 +174,147 @@
 
         async function cargarEventos() {
             if (!window.supabaseClient) {
-                console.error('Supabase no inicializado');
+                console.error('❌ Supabase no inicializado');
+                mostrarMensajeError('Error de conexión: Supabase no inicializado');
                 return;
             }
 
             try {
+                console.log('⏳ Cargando eventos desde Supabase...');
+
                 const { data: eventos, error } = await window.supabaseClient
                     .from('eventos')
                     .select('*')
                     .order('fecha_evento', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Error de Supabase:', error);
+                    mostrarMensajeError(`Error al cargar eventos: ${error.message}`);
+                    throw error;
+                }
+
+                if (!eventos || eventos.length === 0) {
+                    console.warn('⚠️ No hay eventos en la base de datos');
+                    mostrarMensajeVacio('No hay eventos registrados en este momento');
+                    return;
+                }
+
+                console.log(`✅ ${eventos.length} eventos obtenidos de Supabase`);
 
                 const hoy = new Date();
                 hoy.setHours(0, 0, 0, 0);
 
-                const proximos = [];
-                const enCurso = [];
-                const completados = [];
-
                 eventos.forEach(evento => {
-                    const fechaEvento = new Date(evento.fecha_evento);
-                    fechaEvento.setHours(0, 0, 0, 0);
+                    try {
+                        const fechaEvento = new Date(evento.fecha_evento);
+                        
+                        if (isNaN(fechaEvento.getTime())) {
+                            console.warn(`⚠️ Evento tiene fecha inválida:`, evento.fecha_evento);
+                            return;
+                        }
+                        
+                        fechaEvento.setHours(0, 0, 0, 0);
 
-                    if (fechaEvento.getTime() === hoy.getTime()) {
-                        enCurso.push(evento);
-                    } else if (fechaEvento > hoy) {
-                        proximos.push(evento);
-                    } else {
-                        completados.push(evento);
+                        if (fechaEvento.getTime() === hoy.getTime()) {
+                            eventosData['en-curso'].push(evento);
+                        } else if (fechaEvento > hoy) {
+                            eventosData.proximos.push(evento);
+                        } else {
+                            eventosData.completados.push(evento);
+                        }
+                    } catch (e) {
+                        console.error(`❌ Error procesando evento:`, e);
                     }
                 });
 
-                mostrarEventos(proximos, 'eventosProximos', 'badgeProximos');
-                mostrarEventos(enCurso, 'eventosEnCurso', 'badgeEnCurso');
-                mostrarEventos(completados, 'eventosCompletados', 'badgeCompletados');
+                // Actualizar totales
+                paginationState.proximos.totalItems = eventosData.proximos.length;
+                paginationState['en-curso'].totalItems = eventosData['en-curso'].length;
+                paginationState.completados.totalItems = eventosData.completados.length;
 
-                console.log('Eventos cargados');
+                console.log(`📊 Próximos: ${eventosData.proximos.length} | En Curso: ${eventosData['en-curso'].length} | Completados: ${eventosData.completados.length}`);
+
+                // Mostrar eventos con paginación
+                mostrarEventosConPaginacion('proximos');
+                mostrarEventosConPaginacion('en-curso');
+                mostrarEventosConPaginacion('completados');
+
+                // Actualizar badges
+                document.getElementById('badgeProximos').textContent = eventosData.proximos.length;
+                document.getElementById('badgeEnCurso').textContent = eventosData['en-curso'].length;
+                document.getElementById('badgeCompletados').textContent = eventosData.completados.length;
+
+                console.log('✅ Eventos cargados con paginación');
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Error:', error);
+                mostrarMensajeError(`Error crítico: ${error.message || 'Ocurrió un error al cargar los eventos'}`);
             }
         }
 
-        function mostrarEventos(eventos, containerId, badgeId) {
-            const container = document.getElementById(containerId);
-            const badge = document.getElementById(badgeId);
+        function mostrarMensajeError(mensaje) {
+            const containers = ['eventosProximos', 'eventosEnCurso', 'eventosCompletados'];
+            containers.forEach(id => {
+                const container = document.getElementById(id);
+                container.innerHTML = `
+                    <div class="error-message" style="padding: 2rem; text-align: center; color: #dc2626;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p style="font-weight: 600; margin-bottom: 0.5rem;">Error de Conexión</p>
+                        <p style="font-size: 0.875rem;">${mensaje}</p>
+                        <p style="font-size: 0.875rem; margin-top: 1rem; color: #6b7280;">
+                            Por favor, verifica la consola del navegador (F12) para más detalles.
+                        </p>
+                    </div>
+                `;
+            });
+        }
 
-            badge.textContent = eventos.length;
+        function mostrarMensajeVacio(mensaje) {
+            const containers = ['eventosProximos', 'eventosEnCurso', 'eventosCompletados'];
+            containers.forEach(id => {
+                const container = document.getElementById(id);
+                container.innerHTML = `<div class="empty-message">${mensaje}</div>`;
+            });
+        }
+
+        function mostrarEventosConPaginacion(tabName) {
+            const state = paginationState[tabName];
+            const eventos = eventosData[tabName];
+
+            // Mapeo correcto de IDs
+            const containerMap = {
+                'proximos': 'eventosProximos',
+                'en-curso': 'eventosEnCurso',
+                'completados': 'eventosCompletados'
+            };
+
+            const paginacionMap = {
+                'proximos': 'paginacionProximos',
+                'en-curso': 'paginacionEnCurso',
+                'completados': 'paginacionCompletados'
+            };
+
+            const containerId = containerMap[tabName];
+            const paginacionId = paginacionMap[tabName];
+
+            // Calcular índices
+            const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+            const endIndex = startIndex + state.itemsPerPage;
+            const eventosPage = eventos.slice(startIndex, endIndex);
+
+            // Mostrar eventos
+            mostrarEventos(eventosPage, containerId);
+
+            // Mostrar controles de paginación
+            mostrarPaginacion(tabName, paginacionId, state, eventos.length);
+        }
+
+        function mostrarEventos(eventos, containerId) {
+            const container = document.getElementById(containerId);
 
             if (eventos.length === 0) {
                 container.innerHTML = '<div class="empty-message">No hay eventos en esta sección</div>';
@@ -257,6 +366,66 @@
                 `;
             }).join('');
         }
+
+        function mostrarPaginacion(tabName, paginacionId, state, totalEventos) {
+            const container = document.getElementById(paginacionId);
+            const totalPages = Math.ceil(totalEventos / state.itemsPerPage);
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <div class="paginacion-wrapper">
+                    <div class="paginacion-info">
+                        <button class="paginacion-btn" onclick="cambiarPagina('${tabName}', ${state.currentPage - 1})" 
+                                ${state.currentPage === 1 ? 'disabled' : ''}>
+                            ← Anterior
+                        </button>
+                        <span class="paginacion-texto">Página ${state.currentPage} de ${totalPages}</span>
+                        <button class="paginacion-btn" onclick="cambiarPagina('${tabName}', ${state.currentPage + 1})" 
+                                ${state.currentPage === totalPages ? 'disabled' : ''}>
+                            Siguiente →
+                        </button>
+                    </div>
+                    <div class="paginacion-selector">
+                        <label for="items-${tabName}">Mostrar:</label>
+                        <select id="items-${tabName}" class="items-per-page" onchange="cambiarItemsPorPagina('${tabName}', this.value)">
+                            <option value="10" ${state.itemsPerPage === 10 ? 'selected' : ''}>10 por página</option>
+                            <option value="25" ${state.itemsPerPage === 25 ? 'selected' : ''}>25 por página</option>
+                            <option value="50" ${state.itemsPerPage === 50 ? 'selected' : ''}>50 por página</option>
+                            <option value="100" ${state.itemsPerPage === 100 ? 'selected' : ''}>100 por página</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function cambiarPagina(tabName, newPage) {
+            const state = paginationState[tabName];
+            const totalPages = Math.ceil(state.totalItems / state.itemsPerPage);
+
+            if (newPage >= 1 && newPage <= totalPages) {
+                state.currentPage = newPage;
+                mostrarEventosConPaginacion(tabName);
+                
+                // Scroll suave a la sección de eventos
+                const eventContainer = tabName === 'en-curso' ? 'eventosEnCurso' : 
+                                     tabName === 'proximos' ? 'eventosProximos' : 'eventosCompletados';
+                document.getElementById(eventContainer).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function cambiarItemsPorPagina(tabName, newItemsPerPage) {
+            const state = paginationState[tabName];
+            state.itemsPerPage = parseInt(newItemsPerPage);
+            state.currentPage = 1;
+            mostrarEventosConPaginacion(tabName);
+        }
     </script>
+
 </body>
 </html>

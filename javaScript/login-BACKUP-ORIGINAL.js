@@ -277,15 +277,19 @@ async function realizarLogin(email, password) {
             return;
         }
         
+        if (usuario.estado !== 'activo') {
+            mostrarMensaje('Tu cuenta está inactiva. Contacta al administrador.', 'error');
+            return;
+        }
+        
         console.log('Contraseña correcta');
         
-        // ⭐ MODIFICADO: Guardar sesión incluyendo estado del usuario
+        // Guardar sesión
         sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('userId', usuario.id);
         sessionStorage.setItem('userEmail', usuario.email);
         sessionStorage.setItem('userName', usuario.nombre_completo);
         sessionStorage.setItem('userType', usuario.tipo_usuario);
-        sessionStorage.setItem('userEstado', usuario.estado); // ⭐ NUEVO
         
         console.log('Sesión guardada - Tipo:', usuario.tipo_usuario);
         
@@ -311,21 +315,14 @@ async function realizarLogin(email, password) {
             .update({ ultima_sesion: new Date().toISOString() })
             .eq('id', usuario.id);
         
-        // ⭐ MODIFICADO: Mensaje personalizado según estado
-        let mensaje = '¡Inicio de sesión exitoso!';
-        if (usuario.estado === 'inactivo' && usuario.tipo_usuario === 'socio') {
-            mensaje = '⚠️ Tu cuenta está inactiva. Solo podrás ver tu perfil.';
-        } else {
-            const mensajes = {
-                'admin': '¡Bienvenido Administrador!',
-                'socio': '¡Bienvenido Socio!',
-                'donante': '¡Bienvenido Donante!',
-                'coordinador': '¡Bienvenido Coordinador!'
-            };
-            mensaje = mensajes[usuario.tipo_usuario] || mensaje;
-        }
+        const mensajes = {
+            'admin': '¡Bienvenido Administrador!',
+            'socio': '¡Bienvenido Socio!',
+            'donante': '¡Bienvenido Donante!',
+            'coordinador': '¡Bienvenido Coordinador!'
+        };
         
-        mostrarMensaje(mensaje, 'success');
+        mostrarMensaje(mensajes[usuario.tipo_usuario] || '¡Inicio de sesión exitoso!', 'success');
         
         setTimeout(() => {
             redirectUser(usuario.tipo_usuario);

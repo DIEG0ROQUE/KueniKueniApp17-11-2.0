@@ -262,6 +262,139 @@ app.post('/send-recovery-email', async (req, res) => {
 });
 
 // ===================================================
+// ENVIAR MENSAJE PERSONALIZADO (NUEVO)
+// ===================================================
+app.post('/send-custom-message', async (req, res) => {
+    try {
+        const { email, nombre, asunto, mensaje } = req.body;
+
+        if (!email || !nombre || !asunto || !mensaje) {
+            return res.status(400).json({ 
+                error: 'Todos los campos son requeridos' 
+            });
+        }
+
+        console.log('📧 Enviando mensaje personalizado a:', email);
+
+        // Configurar el correo con el mensaje personalizado
+        const mailOptions = {
+            from: `"Kueni Kueni" <${process.env.BREVO_USER}>`,
+            to: email,
+            subject: asunto,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body {
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                            line-height: 1.8;
+                            color: #333;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                            background-color: #f5f5f5;
+                        }
+                        .container {
+                            background: white;
+                            border-radius: 12px;
+                            padding: 40px;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            padding-bottom: 20px;
+                            border-bottom: 3px solid #5f0d51;
+                        }
+                        .logo {
+                            font-size: 48px;
+                            margin-bottom: 10px;
+                        }
+                        .brand-name {
+                            color: #5f0d51;
+                            font-size: 28px;
+                            font-weight: 700;
+                            margin: 0;
+                        }
+                        .tagline {
+                            color: #6b7280;
+                            font-size: 14px;
+                            margin-top: 5px;
+                        }
+                        .content {
+                            margin: 30px 0;
+                        }
+                        .message {
+                            font-size: 16px;
+                            line-height: 1.8;
+                            color: #1f2937;
+                            white-space: pre-wrap;
+                        }
+                        .footer {
+                            margin-top: 40px;
+                            padding-top: 20px;
+                            border-top: 1px solid #e5e7eb;
+                            text-align: center;
+                            color: #6b7280;
+                            font-size: 13px;
+                        }
+                        .footer-brand {
+                            font-weight: 600;
+                            color: #5f0d51;
+                            margin-bottom: 5px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="logo">💜</div>
+                            <h1 class="brand-name">Kueni Kueni</h1>
+                            <p class="tagline">Paso a paso</p>
+                        </div>
+                        
+                        <div class="content">
+                            <div class="message">${mensaje}</div>
+                        </div>
+                        
+                        <div class="footer">
+                            <p class="footer-brand">Kueni Kueni - Paso a paso</p>
+                            <p>Asociación Civil sin fines de lucro</p>
+                            <p>Abasolo 27, Barrio las Flores<br>Asunción Nochixtlán, Oaxaca</p>
+                            <p style="margin-top: 15px;">© ${new Date().getFullYear()} Kueni Kueni. Todos los derechos reservados.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        // Enviar el correo
+        console.log('📤 Enviando mensaje personalizado...');
+        const info = await transporter.sendMail(mailOptions);
+        
+        console.log('✅ Mensaje enviado exitosamente:', info.messageId);
+
+        res.json({ 
+            success: true,
+            message: 'Mensaje enviado exitosamente',
+            email: email,
+            messageId: info.messageId
+        });
+
+    } catch (error) {
+        console.error('❌ Error al enviar mensaje personalizado:', error);
+        res.status(500).json({ 
+            error: 'Error al enviar el mensaje',
+            details: error.message 
+        });
+    }
+});
+
+// ===================================================
 // ENVIAR CORREO DE BIENVENIDA
 // ===================================================
 app.post('/send-welcome-email', async (req, res) => {

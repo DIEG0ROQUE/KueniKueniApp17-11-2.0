@@ -220,7 +220,7 @@ async function cargarEventos() {
         
         eventosGlobal = eventos || [];
         clasificarEventos(eventosGlobal);
-        aplicarFiltrosEventos(); // pinta usando filtros actuales (aunque estén vacíos)
+        aplicarFiltrosEventos();
         
     } catch (error) {
         console.error('Error al cargar eventos:', error);
@@ -252,25 +252,27 @@ function obtenerFiltrosEventos() {
 function aplicarFiltrosEventos() {
     const { fechaDesde, fechaHasta, categoria, termino } = obtenerFiltrosEventos();
 
+    console.log('=== APLICANDO FILTROS ===');
+    console.log('Categoría seleccionada:', categoria);
+    console.log('Total eventos - Próximos:', eventosProximos.length, 'En Curso:', eventosEnCurso.length, 'Completados:', eventosCompletados.length);
+
     function pasaFiltros(evento) {
-        // Fecha (evento.fecha_evento en formato yyyy-mm-dd)
         if (fechaDesde && evento.fecha_evento < fechaDesde) return false;
         if (fechaHasta && evento.fecha_evento > fechaHasta) return false;
+        
+        // CORREGIDO: Comparar en minúsculas para que funcione con "Cultura" y "cultura"
+        if (categoria && categoria.trim() !== '') {
+            const eventoCategoria = (evento.categoria || '').toLowerCase();
+            const categoriaFiltro = categoria.toLowerCase();
+            if (eventoCategoria !== categoriaFiltro) return false;
+        }
 
-        // Categoría
-        if (categoria && evento.categoria !== categoria) return false;
-
-        // Búsqueda por título, descripción, ubicación
         if (termino) {
             const titulo = (evento.titulo || '').toLowerCase();
             const desc = (evento.descripcion || '').toLowerCase();
             const ubicacion = (evento.ubicacion || '').toLowerCase();
 
-            if (
-                !titulo.includes(termino) &&
-                !desc.includes(termino) &&
-                !ubicacion.includes(termino)
-            ) {
+            if (!titulo.includes(termino) && !desc.includes(termino) && !ubicacion.includes(termino)) {
                 return false;
             }
         }
@@ -282,7 +284,8 @@ function aplicarFiltrosEventos() {
     eventosFiltradosEnCurso = eventosEnCurso.filter(pasaFiltros);
     eventosFiltradosCompletados = eventosCompletados.filter(pasaFiltros);
 
-    // Ajustar páginas actuales si es necesario
+    console.log('Filtrados - Próximos:', eventosFiltradosProximos.length, 'En Curso:', eventosFiltradosEnCurso.length, 'Completados:', eventosFiltradosCompletados.length);
+
     const totalPaginasProximos = calcularTotalPaginas(eventosFiltradosProximos.length, itemsPorPaginaProximos);
     if (paginaActualProximos > totalPaginasProximos) paginaActualProximos = totalPaginasProximos;
     if (paginaActualProximos < 1) paginaActualProximos = 1;
@@ -320,8 +323,8 @@ function limpiarFiltrosEventos() {
 
 // ================= UTILIDADES DE FECHA =================
 
-// Formatear fecha sin problemas de zona horaria
-function formatearFechaLocal(fechaString) {const [year, month, day] = fechaString.split('-');
+function formatearFechaLocal(fechaString) {
+    const [year, month, day] = fechaString.split('-');
     const fecha = new Date(year, month - 1, day);
     
     return fecha.toLocaleDateString('es-MX', {
@@ -346,12 +349,12 @@ function mostrarEventosPaginados(eventos, containerId, badgeId, paginaActual, it
         return;
     }
     
-    // Calcular eventos a mostrar
     const inicio = (paginaActual - 1) * itemsPorPagina;
     const fin = inicio + itemsPorPagina;
     const eventosPagina = eventos.slice(inicio, fin);
     
-    container.innerHTML = eventosPagina.map(evento => {const fechaFormateada = formatearFechaLocal(evento.fecha_evento);
+    container.innerHTML = eventosPagina.map(evento => {
+        const fechaFormateada = formatearFechaLocal(evento.fecha_evento);
         
         const hora = evento.hora_evento ? evento.hora_evento.substring(0, 5) : '00:00';
         const asistentes = evento.asistentes_confirmados || 0;
@@ -367,7 +370,9 @@ function mostrarEventosPaginados(eventos, containerId, badgeId, paginaActual, it
             'Otro': { bg: '#f3f4f6', text: '#374151' }
         };
         
-        const colores = categoriaColors[evento.categoria] || categoriaColors['Otro'];
+        // Normalizar categoría para buscar color
+        const catNormalizada = evento.categoria.charAt(0).toUpperCase() + evento.categoria.slice(1).toLowerCase();
+        const colores = categoriaColors[catNormalizada] || categoriaColors['Otro'];
         
         const estadoColors = {
             'proximo': { bg: '#dbeafe', text: '#1e40af', label: 'Próximo' },
@@ -378,7 +383,6 @@ function mostrarEventosPaginados(eventos, containerId, badgeId, paginaActual, it
         const estadoStyle = estadoColors[evento.estado] || estadoColors['proximo'];
         const estadoBadge = `<span style="background: ${estadoStyle.bg}; color: ${estadoStyle.text}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-left: 0.5rem;">${estadoStyle.label}</span>`;
         
-        // Botón de registro de asistencia solo para eventos activos y completados
         const botonRegistroAsistencia =
             (evento.estado === 'activo' || evento.estado === 'completado')
                 ? ''
@@ -448,7 +452,7 @@ async function editarEvento(id) {
         document.getElementById('modalTitle').textContent = 'Editar Evento';
         document.getElementById('eventoId').value = evento.id;
         document.getElementById('titulo').value = evento.titulo;
-    document.getElementById('descripcion').value = evento.descripcion || '';
+        document.getElementById('descripcion').value = evento.descripcion || '';
         document.getElementById('fecha_evento').value = evento.fecha_evento;
         document.getElementById('hora_evento').value = evento.hora_evento;
         document.getElementById('categoria').value = evento.categoria;
@@ -464,7 +468,8 @@ async function editarEvento(id) {
     }
 }
 
-async function guardarEvento(e) { e.preventDefault();
+async function guardarEvento(e) {
+    e.preventDefault();
     const fechaEvento = document.getElementById('fecha_evento').value;
 
     const hoy = new Date();
@@ -550,13 +555,12 @@ function cerrarModal() {
     document.getElementById('modalEvento').classList.remove('active');
 }
 
-// ============================================================================
-// REGISTRO DE ASISTENCIA (igual que tenías)
-// ============================================================================
+// ================= REGISTRO DE ASISTENCIA =================
 
 async function abrirModalRegistroAsistencia(eventoId) {
     try {
-        eventoSeleccionadoParaAsistencia = eventoId; const { data: evento, error: errorEvento } = await window.supabaseClient
+        eventoSeleccionadoParaAsistencia = eventoId;
+        const { data: evento, error: errorEvento } = await window.supabaseClient
             .from('eventos')
             .select('*')
             .eq('id', eventoId)
@@ -582,7 +586,7 @@ async function abrirModalRegistroAsistencia(eventoId) {
                 <div class="empty-state">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        ircle cx="8.5" cy="7" r="4"></circle>
+                        <circle cx="8.5" cy="7" r="4"></circle>
                         <path d="M18 8l5 5"></path>
                         <path d="m23 8-5 5"></path>
                     </svg>
@@ -627,8 +631,8 @@ async function guardarRegistroAsistencia(e) {
         return;
     }
 
-try {
-     const updates = Array.from(checkboxes).map(async (checkbox) => {
+    try {
+        const updates = Array.from(checkboxes).map(async (checkbox) => {
             const asistenciaId = checkbox.dataset.asistenciaId;
             
             const { error } = await window.supabaseClient

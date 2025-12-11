@@ -27,7 +27,6 @@ function configurarFiltrosPaginacionSocios() {
     document.getElementById('filtroFechaDesde')?.addEventListener('change', aplicarFiltrosYRedibujarSocios);
     document.getElementById('filtroFechaHasta')?.addEventListener('change', aplicarFiltrosYRedibujarSocios);
 
-    // ID correcto según el HTML
     document.getElementById('selectItemsPorPaginaSocios')?.addEventListener('change', function (e) {
         itemsPorPaginaSocios = parseInt(e.target.value, 10) || 10;
         paginaActualSocios = 1;
@@ -46,7 +45,6 @@ function verificarAutenticacion() {
         window.location.href = 'login.html';
     }
 }
-
 
 // ======================= CONFIGURACIÓN DE EVENTOS ====================
 function configurarEventos() {
@@ -223,24 +221,32 @@ async function cargarDatos() {
 }
 
 async function cargarEstadisticas() {
-    const { data: sociosActivos } = await window.supabaseClient.from('socios').select('id').eq('estado', 'activo');
+    const { data: usuariosSocios } = await window.supabaseClient
+        .from('usuarios')
+        .select('id, estado')
+        .eq('tipo_usuario', 'socio');
+    
+    const sociosActivos = usuariosSocios?.filter(u => u.estado === 'activo').length || 0;
+    
     const { data: todosSocios } = await window.supabaseClient.from('socios').select('id');
     const { data: sociosConEventos } = await window.supabaseClient.from('socios').select('total_eventos_asistidos');
     const { data: sociosConDonaciones } = await window.supabaseClient.from('socios').select('total_donaciones');
 
-    document.getElementById('sociosActivos').textContent = sociosActivos?.length || 0;
+    document.getElementById('sociosActivos').textContent = sociosActivos;
     document.getElementById('totalSocios').textContent = todosSocios?.length || 0;
     document.getElementById('eventosAsistidos').textContent = sociosConEventos?.reduce((sum, s) => sum + (s.total_eventos_asistidos || 0), 0) || 0;
     document.getElementById('donacionesSocios').textContent = '$' + Math.round(sociosConDonaciones?.reduce((sum, s) => sum + parseFloat(s.total_donaciones || 0), 0) || 0).toLocaleString('es-MX');
 }
 
 async function cargarSocios() {
+    // CORREGIDO: Obtener el estado desde usuarios
     const { data: socios } = await window.supabaseClient
         .from('socios')
-        .select('*, usuarios (nombre_completo, email, telefono)')
+        .select('*, usuarios (nombre_completo, email, telefono, estado)')
         .order('fecha_ingreso', { ascending: false });
 
     sociosGlobal = socios || [];
+    console.log('Socios cargados:', sociosGlobal.length);
     aplicarFiltrosYRedibujarSocios();
 }
 
@@ -255,16 +261,29 @@ function obtenerFiltrosSocios() {
 function aplicarFiltrosYRedibujarSocios() {
     const { buscar, estado, fechaDesde, fechaHasta } = obtenerFiltrosSocios();
 
+    console.log('=== FILTROS SOCIOS ===');
+    console.log('Estado filtro:', estado);
+    console.log('Total socios:', sociosGlobal.length);
+
     sociosFiltrados = sociosGlobal.filter(socio => {
         const nombre = (socio.usuarios?.nombre_completo || '').toLowerCase();
         const email = (socio.usuarios?.email || '').toLowerCase();
         const telefono = (socio.usuarios?.telefono || '').toLowerCase();
         if (buscar && !(nombre.includes(buscar) || email.includes(buscar) || telefono.includes(buscar))) return false;
-        if (estado && socio.estado !== estado) return false;
+        
+        // CORREGIDO: Obtener estado desde usuarios
+        if (estado && estado.trim() !== '') {
+            const socioEstado = (socio.usuarios?.estado || 'activo').toLowerCase();
+            const estadoFiltro = estado.toLowerCase();
+            if (socioEstado !== estadoFiltro) return false;
+        }
+        
         if (fechaDesde && socio.fecha_ingreso < fechaDesde) return false;
         if (fechaHasta && socio.fecha_ingreso > fechaHasta) return false;
         return true;
     });
+
+    console.log('Socios filtrados:', sociosFiltrados.length);
 
     const totalPaginas = calcularTotalPaginasSocios();
     if (paginaActualSocios > totalPaginas) paginaActualSocios = totalPaginas;
@@ -314,7 +333,8 @@ function mostrarSociosPaginados() {
         const fecha = socio.fecha_ingreso || 'N/A';
         const eventos = socio.total_eventos_asistidos || 0;
         const donaciones = Math.round(parseFloat(socio.total_donaciones || 0));
-        const estado = socio.estado || 'activo';
+        // CORREGIDO: Obtener estado desde usuarios
+        const estado = socio.usuarios?.estado || 'activo';
 
         return `
             <tr>

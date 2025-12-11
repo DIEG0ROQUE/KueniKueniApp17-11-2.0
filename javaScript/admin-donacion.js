@@ -633,7 +633,7 @@ function exportarCSV() {
 
     const csv = [encabezados.join(','), ...filas].join('\n');
 
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset-utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
@@ -651,7 +651,7 @@ function exportarCSV() {
     
 }
 
-// ================== EXPORTAR A PDF (descargable) ==================
+// ================== EXPORTAR A PDF (descargable) - MODIFICADO CON LOGO Y NUEVO FOOTER ==================
 
 function exportarPDF() {
     const datos = donacionesFiltradas && donacionesFiltradas.length > 0
@@ -674,7 +674,15 @@ function exportarPDF() {
     const completadas = datos.filter(d => d.estado_pago === 'completado').length;
     const pendientes = datos.filter(d => d.estado_pago === 'pendiente').length;
 
-    // Construimos HTML del reporte con paleta más morada
+    const fechaGeneracion = new Date().toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // Construimos HTML del reporte con NUEVO DISEÑO: logo arriba, info de generación arriba, copyright abajo
     let html = `
         <!DOCTYPE html>
         <html>
@@ -693,22 +701,55 @@ function exportarPDF() {
                     color: #1f2933;
                     background: #f9fafb;
                 }
+                
+                /* NUEVO HEADER CON LOGO Y INFO */
                 .header {
-                    text-align: center;
-                    margin-bottom: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 20px;
+                    padding-bottom: 16px;
                     border-bottom: 3px solid #7c3aed;
-                    padding-bottom: 20px;
                 }
-                .header h1 {
+                
+                .logo-section {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+                
+                .logo-k {
+                    font-size: 48px;
+                    font-weight: 900;
+                    color: #a855f7;
+                    font-family: Arial Black, sans-serif;
+                    letter-spacing: -2px;
+                    line-height: 1;
+                }
+                
+                .logo-text {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #6b7280;
+                    font-family: Arial, sans-serif;
+                }
+                
+                .header-info {
+                    text-align: right;
+                }
+                
+                .header-title {
+                    font-size: 18px;
+                    font-weight: 700;
                     color: #6d28d9;
-                    font-size: 28px;
-                    margin-bottom: 8px;
+                    margin-bottom: 4px;
                 }
-                .header h2 {
-                    color: #4b5563;
-                    font-size: 16px;
-                    font-weight: normal;
+                
+                .header-subtitle {
+                    font-size: 12px;
+                    color: #6b7280;
                 }
+                
                 .stats {
                     display: flex;
                     justify-content: space-between;
@@ -796,14 +837,22 @@ function exportarPDF() {
                     font-size: 9px;
                     font-weight: 600;
                 }
+                
+                /* NUEVO FOOTER CON COPYRIGHT */
                 .footer {
-                    margin-top: 32px;
+                    margin-top: 40px;
                     text-align: center;
-                    color: #6b7280;
+                    color: #9ca3af;
                     font-size: 10px;
                     border-top: 1px solid #e5e7eb;
-                    padding-top: 12px;
+                    padding-top: 16px;
                 }
+                
+                .copyright {
+                    font-weight: 600;
+                    color: #6b7280;
+                }
+                
                 @media print {
                     body {
                         padding: 20px;
@@ -818,10 +867,18 @@ function exportarPDF() {
             </style>
         </head>
         <body>
+            <!-- NUEVO HEADER CON LOGO -->
             <div class="header">
-                <h1>Kueni Kueni</h1>
-                <h2>Reporte de Donaciones - ${nombreMes}</h2>
+                <div class="logo-section">
+                    <div class="logo-k">K</div>
+                    <div class="logo-text">Kueni Kueni</div>
+                </div>
+                <div class="header-info">
+                    <div class="header-title">Reporte de Donaciones - ${nombreMes}</div>
+                    <div class="header-subtitle">Generado el ${fechaGeneracion}</div>
+                </div>
             </div>
+            
             <div class="stats">
                 <div class="stat-item">
                     <div class="stat-label">Total recaudado</div>
@@ -840,6 +897,7 @@ function exportarPDF() {
                     <div class="stat-value">${datos.length}</div>
                 </div>
             </div>
+            
             <table>
                 <thead>
                     <tr>
@@ -889,20 +947,13 @@ function exportarPDF() {
         `;
     });
 
-    const fechaGeneracion = new Date().toLocaleString('es-MX', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-
     html += `
                 </tbody>
             </table>
+            
+            <!-- NUEVO FOOTER CON COPYRIGHT -->
             <div class="footer">
-                <p>Reporte generado el ${fechaGeneracion}</p>
-                <p>Kueni Kueni - Sistema de Gestión de Donaciones</p>
+                <p class="copyright">© 2025 Kueni Kueni. Todos los derechos reservados.</p>
             </div>
         </body>
         </html>
@@ -925,8 +976,6 @@ function exportarPDF() {
             nuevaVentana.print();
         }, 300);
     };
-
-    
 }
 
 // ================== ERRORES ==================
@@ -947,3 +996,4 @@ function mostrarError(mensaje) {
 
 console.log('✅ Sistema de donaciones con filtros, paginación y exportación cargado');
 console.log('✅ CORREGIDO: Mensaje de búsqueda sin resultados personalizado');
+console.log('✅ MODIFICADO: PDF con logo y copyright actualizado');

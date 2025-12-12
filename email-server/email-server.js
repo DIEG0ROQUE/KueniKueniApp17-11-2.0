@@ -924,35 +924,22 @@ app.post('/send-custom-message', async (req, res) => {
                         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                     }
                     .header {
-                        background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+                        background: linear-gradient(135deg, #5f0d51 0%, #8b1a7a 100%);
                         color: white;
                         padding: 50px 40px;
                         text-align: center;
                     }
-                    .logo {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 12px;
-                        margin-bottom: 15px;
-                    }
-                    .logo-icon {
-                        width: 48px;
-                        height: 48px;
-                        background: rgba(255, 255, 255, 0.2);
-                        border-radius: 12px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
                     .logo-text {
-                        font-size: 32px;
+                        font-size: 36px;
                         font-weight: 700;
                         letter-spacing: -0.5px;
+                        margin-bottom: 10px;
                     }
                     .subtitle {
-                        font-size: 14px;
-                        opacity: 0.9;
+                        font-size: 16px;
+                        opacity: 0.95;
                         margin-top: 8px;
+                        font-weight: 300;
                     }
                     .content {
                         padding: 50px 40px;
@@ -960,7 +947,7 @@ app.post('/send-custom-message', async (req, res) => {
                     .greeting {
                         font-size: 24px;
                         font-weight: 600;
-                        color: #FF6B6B;
+                        color: #5f0d51;
                         margin-bottom: 30px;
                     }
                     .message-content {
@@ -981,7 +968,7 @@ app.post('/send-custom-message', async (req, res) => {
                         font-style: italic;
                     }
                     .signature-name {
-                        color: #374151;
+                        color: #5f0d51;
                         font-weight: 600;
                         font-size: 16px;
                         margin-top: 10px;
@@ -996,7 +983,7 @@ app.post('/send-custom-message', async (req, res) => {
                         align-items: center;
                         gap: 10px;
                         margin-bottom: 20px;
-                        color: #FF6B6B;
+                        color: #5f0d51;
                     }
                     .footer-logo svg {
                         width: 24px;
@@ -1014,7 +1001,7 @@ app.post('/send-custom-message', async (req, res) => {
                     .footer-divider {
                         width: 60px;
                         height: 3px;
-                        background: linear-gradient(90deg, transparent, #FF6B6B, transparent);
+                        background: linear-gradient(90deg, transparent, #5f0d51, transparent);
                         margin: 20px auto;
                     }
                     .social-links {
@@ -1023,7 +1010,7 @@ app.post('/send-custom-message', async (req, res) => {
                     .social-link {
                         display: inline-block;
                         margin: 0 12px;
-                        color: #FF6B6B;
+                        color: #5f0d51;
                         text-decoration: none;
                         font-weight: 500;
                         font-size: 14px;
@@ -1042,14 +1029,7 @@ app.post('/send-custom-message', async (req, res) => {
             <body>
                 <div class="container">
                     <div class="header">
-                        <div class="logo">
-                            <div class="logo-icon">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                            </div>
-                            <div class="logo-text">Kueni Kueni</div>
-                        </div>
+                        <div class="logo-text">💜 Kueni Kueni</div>
                         <div class="subtitle">Paso a Paso</div>
                     </div>
                     <div class="content">
